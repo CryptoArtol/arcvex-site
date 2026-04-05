@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcvex — Automated Crypto Trading. Institutional-Grade.</title>
+    <meta name="description" content="Multi-chain automated trading terminal. DCA bots, Grid bots, real-time analytics. Your keys. Your wallet. Our bots. Join the waitlist.">
+    <meta property="og:title" content="Arcvex — Automated Crypto Trading">
+    <meta property="og:description" content="Multi-chain trading automation. Non-custodial. Institutional-grade. Join the waitlist.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://arcvex.io">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Arcvex — Automated Crypto Trading">
+    <meta name="twitter:description" content="Multi-chain trading automation. Non-custodial. Institutional-grade.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0A0F2C;
+            --surface: #161B33;
+            --surface-2: #2A2F4F;
+            --surface-3: #3D4466;
+            --accent-teal: #00F5D4;
+            --accent-amber: #F5A623;
+            --text-primary: #E8E8E8;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 245, 212, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 212, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Gradient glow */
+        .glow {
+            position: fixed;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse, rgba(0, 245, 212, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 15, 44, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 245, 212, 0.08);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+
+        .logo span {
+            color: var(--accent-teal);
+        }
+
+        .nav-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--accent-teal);
+            border: 1px solid rgba(0, 245, 212, 0.3);
+            padding: 4px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent-teal);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.2s;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.4s;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--accent-teal), #00C4AA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin-bottom: 48px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.6s;
+        }
+
+        /* Email form */
+        .waitlist-form {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            max-width: 480px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.8s;
+        }
+
+        .waitlist-form input[type="email"] {
+            flex: 1;
+            padding: 14px 18px;
+            background: var(--surface);
+            border: 1px solid var(--surface-2);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .waitlist-form input[type="email"]::placeholder {
+            color: var(--text-muted);
+        }
+
+        .waitlist-form input[type="email"]:focus {
+            border-color: var(--accent-teal);
+        }
+
+        .waitlist-form button {
+            padding: 14px 28px;
+            background: var(--accent-teal);
+            color: var(--primary-dark);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .waitlist-form button:hover {
+            background: #00DFC0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 245, 212, 0.3);
+        }
+
+        .waitlist-form button:active {
+            transform: translateY(0);
+        }
+
+        .form-note {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 16px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 1.0s;
+        }
+
+        /* Success state */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeUp 0.4s ease forwards;
+        }
+
+        .success-message .check {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .success-message h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--accent-teal);
+        }
+
+        .success-message p {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        /* Trust bar */
+        .trust-bar {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            padding: 48px 24px;
+            border-top: 1px solid rgba(0, 245, 212, 0.06);
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .trust-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--surface);
+            border: 1px solid var(--surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trust-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--accent-teal);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .trust-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .trust-text strong {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Features */
+        .features {
+            position: relative;
+            z-index: 1;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+
+        .features-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        .features-header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-2);
+            border-radius: 12px;
+            padding: 32px 24px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(0, 245, 212, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(0, 245, 212, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--accent-teal);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .feature-card h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* CTA section */
+        .cta-section {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 80px 24px;
+            border-top: 1px solid rgba(0, 245, 212, 0.06);
+        }
+
+        .cta-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .cta-section .waitlist-form {
+            margin: 0 auto;
+            opacity: 1;
+            animation: none;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid rgba(0, 245, 212, 0.06);
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--accent-teal);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Chains bar */
+        .chains {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .chain-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--surface-2);
+            color: var(--text-muted);
+            background: var(--surface);
+        }
+
+        .chain-tag.active {
+            color: var(--accent-teal);
+            border-color: rgba(0, 245, 212, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 20px;
+            }
+
+            .hero {
+                padding: 100px 20px 60px;
+            }
+
+            .waitlist-form {
+                flex-direction: column;
+            }
+
+            .waitlist-form button {
+                width: 100%;
+            }
+
+            .trust-bar {
+                gap: 24px;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chains {
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 20px;
+            }
+
+            .nav-badge {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">Arc<span>vex</span></div>
+        <div class="nav-badge">EARLY ACCESS</div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-tag">Multi-Chain Trading Automation</div>
+        <h1>Your Keys. Your Wallet.<br><span class="highlight">Our Bots.</span></h1>
+        <p>Institutional-grade automated trading across XRPL, Solana, and EVM chains. Non-custodial. We never touch your funds.</p>
+
+        <form class="waitlist-form" id="waitlistForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <input type="email" name="email" placeholder="Enter your email" required autocomplete="email">
+            <button type="submit">Join Waitlist</button>
+        </form>
+        <p class="form-note">Be the first to access Arcvex. No spam, ever.</p>
+
+        <div class="success-message" id="successMessage">
+            <div class="check">&#10003;</div>
+            <h3>You're on the list.</h3>
+            <p>We'll notify you when Arcvex launches. Check your inbox.</p>
+        </div>
+
+        <div class="chains" style="margin-top: 40px; opacity: 0; animation: fadeUp 0.6s ease forwards 1.2s;">
+            <span class="chain-tag active">XRPL</span>
+            <span class="chain-tag">Solana</span>
+            <span class="chain-tag">Base</span>
+            <span class="chain-tag">Arbitrum</span>
+            <span class="chain-tag">Hyperliquid</span>
+        </div>
+    </section>
+
+    <!-- Trust Bar -->
+    <section class="trust-bar">
+        <div class="trust-item">
+            <div class="trust-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="trust-text">
+                <strong>Non-Custodial</strong>
+                We never access your keys
+            </div>
+        </div>
+        <div class="trust-item">
+            <div class="trust-icon">
+                <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="trust-text">
+                <strong>24/7 Automation</strong>
+                Bots trade while you sleep
+            </div>
+        </div>
+        <div class="trust-item">
+            <div class="trust-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="trust-text">
+                <strong>Multi-Chain</strong>
+                XRPL, Solana, EVM & more
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="features-header">
+            <h2>Built for Serious Traders</h2>
+            <p>Professional-grade tools. Zero compromise on security.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <h3>DCA & Grid Bots</h3>
+                <p>Automate dollar-cost averaging and grid trading strategies. Set parameters, deploy, and let the bot execute 24/7.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                </div>
+                <h3>Real-Time Dashboard</h3>
+                <p>Live portfolio tracking, PnL analytics, and bot performance metrics. See everything at a glance from any device.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                </div>
+                <h3>Wallet-Native Security</h3>
+                <p>Connect your existing wallet. Sign every transaction yourself. Your private keys never leave your device. Ever.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="cta-section">
+        <h2>Ready to Automate?</h2>
+        <p>Join the waitlist and be first in line when Arcvex launches.</p>
+        <form class="waitlist-form" id="waitlistForm2" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <input type="email" name="email" placeholder="Enter your email" required autocomplete="email">
+            <button type="submit">Join Waitlist</button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Arcvex. All rights reserved. | <a href="https://x.com/ArcVex" target="_blank">Follow us on X</a></p>
+    </footer>
+
+    <script>
+        // Handle form submissions
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = form.querySelector('input[type="email"]').value;
+                const button = form.querySelector('button');
+
+                button.textContent = 'Joining...';
+                button.disabled = true;
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ email: email })
+                    });
+
+                    if (response.ok) {
+                        // Show success for the hero form
+                        if (form.id === 'waitlistForm') {
+                            form.style.display = 'none';
+                            document.querySelector('.form-note').style.display = 'none';
+                            document.getElementById('successMessage').classList.add('show');
+                        } else {
+                            button.textContent = 'You\'re in!';
+                            button.style.background = 'rgba(0, 245, 212, 0.2)';
+                            button.style.color = 'var(--accent-teal)';
+                        }
+                    } else {
+                        throw new Error('Submission failed');
+                    }
+                } catch (error) {
+                    button.textContent = 'Try Again';
+                    button.disabled = false;
+                    button.style.background = 'var(--accent-amber)';
+                    setTimeout(() => {
+                        button.textContent = 'Join Waitlist';
+                        button.style.background = '';
+                    }, 2000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
