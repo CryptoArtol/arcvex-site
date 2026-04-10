@@ -201,12 +201,12 @@
     }
 
     .avatar-row img {
-      width: 56px;
-      height: 56px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       border: 3px solid var(--bg-primary);
       object-fit: cover;
-      margin-left: -12px;
+      margin-left: -16px;
     }
 
     .avatar-row img:first-child {
@@ -217,25 +217,50 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 56px;
-      height: 56px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background: var(--bg-card);
       border: 3px solid var(--bg-primary);
-      margin-left: -12px;
-      font-size: 14px;
+      margin-left: -16px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--accent-teal);
     }
 
-    /* Bottom CTA */
-    .bottom-cta .waitlist-form {
-      margin: 0 auto 12px;
-      max-width: 480px;
+    /* Launch CTA */
+    .launch-cta {
+      margin-top: 36px;
     }
 
-    .bottom-cta .waitlist-note {
-      text-align: center;
+    .launch-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent-teal);
+      background: rgba(0, 245, 212, 0.1);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      padding: 12px 28px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .launch-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .launch-sub strong {
+      color: var(--accent-teal);
+    }
+
+    /* Bottom CTA */
+    .bottom-cta .launch-cta {
+      margin-top: 0;
     }
 
     @media (max-width: 768px) {
@@ -254,8 +279,8 @@
 
       .avatar-row img,
       .avatar-count {
-        width: 44px;
-        height: 44px;
+        width: 60px;
+        height: 60px;
       }
     }
   </style>
@@ -273,7 +298,7 @@
         <li><a href="/roadmap">Roadmap</a></li>
         <li><a href="/terms">Terms</a></li>
         <li><a href="/privacy">Privacy</a></li>
-        <li><a href="#waitlist" class="nav-cta">Join Waitlist</a></li>
+        <li><a href="https://x.com/ArcVex" class="nav-cta" target="_blank" rel="noopener">Follow on X</a></li>
       </ul>
     </div>
   </nav>
@@ -284,11 +309,11 @@
       <div class="hero-badge fade-in">Automated Trading on XRPL</div>
       <h1 class="fade-in">Your Keys. Your Wallet.<span>Our Bots.</span></h1>
       <p class="hero-text fade-in">Institutional-grade automated trading built on the XRP Ledger. Set your strategy, deploy your bot, and let it execute 24/7. Non-custodial — we never touch your funds.</p>
-      <form class="waitlist-form fade-in" id="waitlist">
-        <input type="email" placeholder="Enter your email" required>
-        <button type="submit">Join Waitlist</button>
-      </form>
-      <p class="waitlist-note fade-in">Be the first to access Arcvex. No spam, ever. <a href="/privacy">Privacy policy</a></p>
+      <div class="launch-cta fade-in">
+        <div class="launch-badge">Launching Soon</div>
+        <p class="launch-sub"><strong>Free tier available at launch</strong> — try Arcvex with zero commitment.</p>
+        <a href="https://x.com/ArcVex" class="btn-primary" target="_blank" rel="noopener">Follow @ArcVex for Updates &rarr;</a>
+      </div>
     </div>
   </section>
 
@@ -414,7 +439,7 @@
         <p>Engineers, product leads, security experts, and growth strategists — all focused on building the trading terminal serious traders deserve.</p>
 
         <div class="avatar-row">
-          <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/6a4affb2-45b7-4bff-8190-816ff5af2651.jpg" alt="Jacob" loading="lazy">
+          <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/765ae951-8795-4a65-9138-08fd63d979cf.jpg" alt="Jacob" loading="lazy">
           <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/cf13a6e2-1fea-4baa-8a01-8b7a94b5a5e1.jpg" alt="Alex" loading="lazy">
           <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/19223fe4-7a44-45a7-a0f6-a75011ca5f21.jpg" alt="Neil" loading="lazy">
           <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/bb7e22ce-1d7f-4ae0-92b3-0e1fa1e7d0ed.jpg" alt="Bill" loading="lazy">
@@ -429,15 +454,17 @@
   </section>
 
   <!-- Bottom CTA -->
-  <section class="section cta-section" id="waitlist-bottom">
+  <section class="section cta-section">
     <div class="container bottom-cta fade-in">
       <h2>Ready to Automate?</h2>
-      <p>Join the waitlist and be first in line when Arcvex opens access.</p>
-      <form class="waitlist-form">
-        <input type="email" placeholder="Enter your email" required>
-        <button type="submit">Join Waitlist</button>
-      </form>
-      <p class="waitlist-note">No spam, ever. <a href="/privacy">Read our privacy policy</a></p>
+      <p>Arcvex is launching soon with a free tier. Follow us to be first in line.</p>
+      <div class="launch-cta">
+        <div class="launch-badge">Free Tier at Launch</div>
+        <p class="launch-sub">DCA bots, Grid bots, and a real-time dashboard — <strong>free to start</strong>.</p>
+        <a href="https://x.com/ArcVex" class="btn-primary" target="_blank" rel="noopener">Follow @ArcVex on X &rarr;</a>
+        <br><br>
+        <a href="/roadmap" class="btn-secondary">View our roadmap &rarr;</a>
+      </div>
     </div>
   </section>
 
