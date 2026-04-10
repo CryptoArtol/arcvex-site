@@ -189,42 +189,65 @@
     .team-teaser > p {
       color: var(--text-secondary);
       max-width: 600px;
-      margin: 0 auto 40px;
+      margin: 0 auto 48px;
       font-size: 18px;
     }
 
-    .avatar-row {
-      display: flex;
-      justify-content: center;
-      gap: 0;
-      margin-bottom: 32px;
+    .leader-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      margin-bottom: 40px;
     }
 
-    .avatar-row img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 3px solid var(--bg-primary);
-      object-fit: cover;
-      margin-left: -16px;
-    }
-
-    .avatar-row img:first-child {
-      margin-left: 0;
-    }
-
-    .avatar-count {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
+    .leader-card {
       background: var(--bg-card);
-      border: 3px solid var(--bg-primary);
-      margin-left: -16px;
-      font-size: 16px;
-      font-weight: 700;
+      border: 1px solid var(--bg-border);
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .leader-card:hover {
+      border-color: rgba(0, 245, 212, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .leader-card img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgba(0, 245, 212, 0.2);
+      margin-bottom: 20px;
+    }
+
+    .leader-card h4 {
+      font-size: 19px;
+      margin-bottom: 4px;
+    }
+
+    .leader-card .leader-role {
+      color: var(--accent-teal);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .leader-card p.leader-desc {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .team-count {
+      font-size: 17px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .team-count strong {
       color: var(--accent-teal);
     }
 
@@ -277,10 +300,14 @@
         grid-template-columns: 1fr;
       }
 
-      .avatar-row img,
-      .avatar-count {
-        width: 60px;
-        height: 60px;
+      .leader-cards {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .leader-card img {
+        width: 120px;
+        height: 120px;
       }
     }
   </style>
@@ -438,17 +465,29 @@
         <h2>Built by a Team of 36 Specialists</h2>
         <p>Engineers, product leads, security experts, and growth strategists — all focused on building the trading terminal serious traders deserve.</p>
 
-        <div class="avatar-row">
-          <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/765ae951-8795-4a65-9138-08fd63d979cf.jpg" alt="Jacob" loading="lazy">
-          <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/cf13a6e2-1fea-4baa-8a01-8b7a94b5a5e1.jpg" alt="Alex" loading="lazy">
-          <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/19223fe4-7a44-45a7-a0f6-a75011ca5f21.jpg" alt="Neil" loading="lazy">
-          <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/bb7e22ce-1d7f-4ae0-92b3-0e1fa1e7d0ed.jpg" alt="Bill" loading="lazy">
-          <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/cbf88b51-b95e-4f4f-a2b3-e60c3a6e6c33.jpg" alt="Jack" loading="lazy">
-          <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/6eeb99f2-68b7-4c13-a27a-c2cca8f7f1b3.jpg" alt="Amanda" loading="lazy">
-          <div class="avatar-count">+30</div>
+        <div class="leader-cards">
+          <div class="leader-card">
+            <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/765ae951-8795-4a65-9138-08fd63d979cf.jpg" alt="Jacob — Founder" loading="lazy">
+            <h4>Jacob</h4>
+            <div class="leader-role">Founder</div>
+            <p class="leader-desc">XRP trader since 2016. Built Arcvex to solve the execution problems he lived every day.</p>
+          </div>
+          <div class="leader-card">
+            <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/a8fad027-0a02-45d6-829a-b5a4978da593.jpg" alt="Alex Rivera — CEO" loading="lazy">
+            <h4>Alex Rivera</h4>
+            <div class="leader-role">CEO</div>
+            <p class="leader-desc">Serial crypto SaaS founder. Multiple exits. Obsessed with unit economics and sustainable growth.</p>
+          </div>
+          <div class="leader-card">
+            <img src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/team-assets/leonardo/69e621c7-4c56-44a1-9a25-aac4f02ea067.jpg" alt="Luna Vasquez — COO" loading="lazy">
+            <h4>Luna Vasquez</h4>
+            <div class="leader-role">COO</div>
+            <p class="leader-desc">Operations backbone. Keeps the 36-person team shipping on schedule and accountable.</p>
+          </div>
         </div>
 
-        <a href="/team" class="btn-primary">Meet the Team &rarr;</a>
+        <p class="team-count"><strong>+33 more</strong> specialists in engineering, security, product, and growth.</p>
+        <a href="/team" class="btn-primary">Meet the Full Team &rarr;</a>
       </div>
     </div>
   </section>
