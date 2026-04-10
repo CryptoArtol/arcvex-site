@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Arcvex</title>
+  <meta name="description" content="Arcvex takes your privacy seriously. Learn how we collect, process, and protect your personal data in compliance with GDPR, CCPA, and international standards.">
+  <meta property="og:title" content="Privacy Policy — Arcvex">
+  <meta property="og:description" content="Arcvex privacy practices and data protection commitment.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://arcvex.io/privacy">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .legal-page {
+      padding: 48px 0;
+    }
+
+    .legal-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .legal-sidebar {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+
+    .legal-toc {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border-left: 2px solid var(--border-color, #1A2D5C);
+      padding-left: 16px;
+    }
+
+    .legal-toc li {
+      margin: 12px 0;
+    }
+
+    .legal-toc a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1.5;
+      display: block;
+      padding: 4px 0;
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+      padding-left: 12px;
+      margin-left: -16px;
+    }
+
+    .legal-toc a:hover {
+      color: var(--accent-teal);
+    }
+
+    .legal-toc a.active {
+      color: var(--accent-teal);
+      border-left-color: var(--accent-teal);
+      font-weight: 500;
+    }
+
+    .legal-content {
+      line-height: 1.8;
+    }
+
+    .legal-content h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 56px;
+      margin-bottom: 24px;
+      color: var(--text-primary);
+      scroll-margin-top: 100px;
+    }
+
+    .legal-content h2:first-child {
+      margin-top: 0;
+    }
+
+    .legal-content h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 32px;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .legal-content p {
+      margin-bottom: 16px;
+      color: var(--text-secondary);
+    }
+
+    .legal-content ul,
+    .legal-content ol {
+      margin: 16px 0 24px 24px;
+      color: var(--text-secondary);
+    }
+
+    .legal-content li {
+      margin-bottom: 12px;
+      line-height: 1.8;
+    }
+
+    .legal-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 14px;
+      border: 1px solid var(--border-color, #1A2D5C);
+    }
+
+    .legal-content th {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border-color, #1A2D5C);
+      color: var(--text-primary);
+    }
+
+    .legal-content td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color, #1A2D5C);
+      color: var(--text-secondary);
+    }
+
+    .legal-content tr:last-child td {
+      border-bottom: none;
+    }
+
+    .legal-badge {
+      display: inline-block;
+      background: rgba(0, 200, 180, 0.1);
+      border: 1px solid var(--accent-teal);
+      color: var(--accent-teal);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 32px;
+    }
+
+    .legal-content strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .legal-content em {
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .legal-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .legal-sidebar {
+        position: static;
+      }
+
+      .legal-toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        border-left: none;
+        padding-left: 0;
+      }
+
+      .legal-toc li {
+        margin: 0;
+      }
+
+      .legal-toc a {
+        padding: 6px 12px;
+        border-left: none;
+        margin-left: 0;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color, #1A2D5C);
+        border-radius: 4px;
+        font-size: 13px;
+      }
+
+      .legal-toc a.active {
+        background: var(--accent-teal);
+        color: var(--bg-primary);
+        border-color: var(--accent-teal);
+      }
+
+      .legal-content h2 {
+        font-size: 20px;
+        margin-top: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <a href="/" class="nav-logo">ARC<span>VEX</span></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="/about">About</a></li>
+        <li><a href="/team">Team</a></li>
+        <li><a href="/terms">Terms</a></li>
+        <li><a href="/privacy" class="active">Privacy</a></li>
+        <li><a href="#" class="nav-cta">Start Free Trial</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Legal Page -->
+  <section class="legal-page">
+    <div class="container">
+      <div class="legal-layout">
+
+        <!-- Sidebar TOC -->
+        <aside class="legal-sidebar">
+          <ul class="legal-toc">
+            <li><a href="#section-1">Who We Are</a></li>
+            <li><a href="#section-2">What Data We Collect</a></li>
+            <li><a href="#section-3">How We Use Your Data</a></li>
+            <li><a href="#section-4">How We Share Your Data</a></li>
+            <li><a href="#section-5">Data Retention</a></li>
+            <li><a href="#section-6">Your Rights</a></li>
+            <li><a href="#section-7">Data Security</a></li>
+            <li><a href="#section-8">Cookies and Tracking</a></li>
+            <li><a href="#section-9">International Data Transfers</a></li>
+            <li><a href="#section-10">Children's Privacy</a></li>
+            <li><a href="#section-11">Changes to This Policy</a></li>
+            <li><a href="#section-12">Contact Us</a></li>
+          </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="legal-content">
+          <div class="legal-badge">Last Updated: April 9, 2026</div>
+
+          <h2 id="section-1">1. Who We Are</h2>
+          <p>Arcvex ("we," "us," or "our") operates the automated trading platform at arcvex.io. This Privacy Policy explains how we collect, use, store, and protect your personal data when you use our website, dashboard, trading bots, and related services (the "Service").</p>
+          <h3>Data Controller</h3>
+          <ul>
+            <li><strong>Entity:</strong> Arcvex (sole proprietorship, Denmark — CVR pending registration)</li>
+            <li><strong>Country:</strong> Denmark</li>
+            <li><strong>Email:</strong> privacy@arcvex.io</li>
+            <li><strong>Website:</strong> arcvex.io</li>
+            <li><strong>Supervisory authority:</strong> Datatilsynet (Danish Data Protection Agency)</li>
+          </ul>
+
+          <h2 id="section-2">2. What Data We Collect</h2>
+
+          <h3>2.1 Data You Provide</h3>
+          <ul>
+            <li><strong>Account information:</strong> email address, username, and password hash</li>
+            <li><strong>Identity verification data:</strong> name, date of birth, government-issued ID (only when KYC is required)</li>
+            <li><strong>Payment information:</strong> processed by our third-party payment provider — we do not store full card numbers</li>
+            <li><strong>Support communications:</strong> emails, messages, and any attachments you send us</li>
+            <li><strong>Preferences:</strong> dashboard settings, notification preferences, and theme selection</li>
+          </ul>
+
+          <h3>2.2 Data Generated by Your Use of the Service</h3>
+          <ul>
+            <li><strong>Trading activity:</strong> bot configurations, order history, trade execution data, P&L records, and strategy parameters</li>
+            <li><strong>Wallet addresses:</strong> public wallet addresses you connect to the Service (we never collect or store private keys)</li>
+            <li><strong>Usage data:</strong> pages viewed, features used, session duration, click patterns, and dashboard interactions</li>
+            <li><strong>Device and connection data:</strong> IP address, browser type, operating system, device type, and screen resolution</li>
+            <li><strong>Log data:</strong> server logs including timestamps, API calls, error logs, and performance metrics</li>
+          </ul>
+
+          <h3>2.3 Data from Third Parties</h3>
+          <ul>
+            <li><strong>Blockchain data:</strong> publicly available on-chain transaction data associated with your connected wallet addresses</li>
+            <li><strong>Analytics providers:</strong> aggregated usage patterns from privacy-respecting analytics tools</li>
+          </ul>
+
+          <h2 id="section-3">3. How We Use Your Data</h2>
+          <p>We use your data for the following purposes, each with a specific legal basis:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Purpose</th>
+                <th>Legal Basis (GDPR)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Providing and operating the Service (bot execution, dashboard, API)</td>
+                <td>Contractual necessity</td>
+              </tr>
+              <tr>
+                <td>Processing payments and managing subscriptions</td>
+                <td>Contractual necessity</td>
+              </tr>
+              <tr>
+                <td>Sending transactional emails (bot alerts, account changes, security notifications)</td>
+                <td>Contractual necessity</td>
+              </tr>
+              <tr>
+                <td>Improving the Service (performance, UX, feature development)</td>
+                <td>Legitimate interest</td>
+              </tr>
+              <tr>
+                <td>Preventing fraud, abuse, and ensuring platform security</td>
+                <td>Legitimate interest</td>
+              </tr>
+              <tr>
+                <td>Complying with legal obligations (AML, tax reporting, regulatory requests)</td>
+                <td>Legal obligation</td>
+              </tr>
+              <tr>
+                <td>Identity verification (KYC) when required by law</td>
+                <td>Legal obligation</td>
+              </tr>
+              <tr>
+                <td>Sending product updates and feature announcements</td>
+                <td>Legitimate interest (with opt-out)</td>
+              </tr>
+              <tr>
+                <td>Marketing communications</td>
+                <td>Consent (opt-in only)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>We will <strong>never</strong> use your trading data to trade against you, share your strategies with other users, or sell your personal data to third parties.</p>
+
+          <h2 id="section-4">4. How We Share Your Data</h2>
+          <p>We share your data only in these limited circumstances:</p>
+
+          <h3>4.1 Service Providers</h3>
+          <p>We use third-party service providers who process data on our behalf:</p>
+          <ul>
+            <li><strong>Hosting and infrastructure:</strong> server hosting, CDN, and database services</li>
+            <li><strong>Payment processing:</strong> subscription billing and payment verification</li>
+            <li><strong>Analytics:</strong> privacy-respecting usage analytics (no advertising trackers)</li>
+            <li><strong>Email delivery:</strong> transactional and notification emails</li>
+            <li><strong>Identity verification:</strong> KYC provider (only when verification is required)</li>
+          </ul>
+          <p>All service providers are bound by data processing agreements and may only use your data to provide services to us.</p>
+
+          <h3>4.2 Legal Requirements</h3>
+          <p>We may disclose your data when required by law, regulation, legal process, or governmental request. We will notify you of such requests where legally permitted.</p>
+
+          <h3>4.3 Business Transfers</h3>
+          <p>In the event of a merger, acquisition, or sale of assets, your data may be transferred to the successor entity. We will notify you before your data becomes subject to a different privacy policy.</p>
+
+          <h3>4.4 With Your Consent</h3>
+          <p>We may share your data with third parties when you explicitly consent to the sharing.</p>
+
+          <p><strong>We do not sell your personal data. We do not share your data with advertising networks.</strong></p>
+
+          <h2 id="section-5">5. Data Retention</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Data Type</th>
+                <th>Retention Period</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Account information</td>
+                <td>Duration of account + 2 years</td>
+                <td>Service provision and audit trail</td>
+              </tr>
+              <tr>
+                <td>Trading activity and bot data</td>
+                <td>Duration of account + 5 years</td>
+                <td>Regulatory compliance, dispute resolution</td>
+              </tr>
+              <tr>
+                <td>Payment records</td>
+                <td>7 years after transaction</td>
+                <td>Tax and financial reporting obligations</td>
+              </tr>
+              <tr>
+                <td>KYC/identity documents</td>
+                <td>5 years after relationship ends</td>
+                <td>AML regulatory requirements</td>
+              </tr>
+              <tr>
+                <td>Usage and analytics data</td>
+                <td>26 months</td>
+                <td>Service improvement (anonymised after 12 months)</td>
+              </tr>
+              <tr>
+                <td>Support communications</td>
+                <td>3 years after resolution</td>
+                <td>Quality assurance and dispute resolution</td>
+              </tr>
+              <tr>
+                <td>Server logs</td>
+                <td>90 days</td>
+                <td>Security monitoring and debugging</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>After the retention period expires, data is permanently deleted or irreversibly anonymised.</p>
+
+          <h2 id="section-6">6. Your Rights</h2>
+          <p>Depending on your jurisdiction, you have the following rights regarding your personal data:</p>
+
+          <h3>6.1 Under GDPR (EU/EEA Residents)</h3>
+          <ul>
+            <li><strong>Access:</strong> Request a copy of the personal data we hold about you</li>
+            <li><strong>Rectification:</strong> Request correction of inaccurate or incomplete data</li>
+            <li><strong>Erasure ("Right to be Forgotten"):</strong> Request deletion of your data, subject to legal retention requirements</li>
+            <li><strong>Restriction:</strong> Request that we limit processing of your data in certain circumstances</li>
+            <li><strong>Portability:</strong> Receive your data in a structured, machine-readable format</li>
+            <li><strong>Objection:</strong> Object to processing based on legitimate interest</li>
+            <li><strong>Withdraw Consent:</strong> Withdraw consent for processing based on consent at any time</li>
+          </ul>
+
+          <h3>6.2 Under CCPA/CPRA (California Residents)</h3>
+          <ul>
+            <li><strong>Know:</strong> Right to know what personal information we collect, use, and disclose</li>
+            <li><strong>Delete:</strong> Right to request deletion of your personal information</li>
+            <li><strong>Opt-out of Sale:</strong> We do not sell personal information, but you may submit a request to confirm this</li>
+            <li><strong>Non-discrimination:</strong> We will not discriminate against you for exercising your rights</li>
+          </ul>
+
+          <h3>6.3 How to Exercise Your Rights</h3>
+          <p>Submit requests to privacy@arcvex.io. We will respond within 30 days (GDPR) or 45 days (CCPA). We may ask for identity verification before processing your request.</p>
+          <p>If you are unsatisfied with our response, you have the right to lodge a complaint with your local data protection authority.</p>
+
+          <h2 id="section-7">7. Data Security</h2>
+          <p>We implement appropriate technical and organisational measures to protect your data:</p>
+          <ul>
+            <li><strong>Encryption:</strong> Data encrypted in transit (TLS 1.3) and at rest (AES-256)</li>
+            <li><strong>Access controls:</strong> Role-based access, principle of least privilege, multi-factor authentication for team access</li>
+            <li><strong>Monitoring:</strong> Continuous security monitoring and anomaly detection</li>
+            <li><strong>Incident response:</strong> Documented breach response procedures with notification within 72 hours as required by GDPR</li>
+            <li><strong>Regular audits:</strong> Periodic security assessments and vulnerability scanning</li>
+          </ul>
+          <p>No system is 100% secure. While we take reasonable measures to protect your data, we cannot guarantee absolute security.</p>
+
+          <h2 id="section-8">8. Cookies and Tracking</h2>
+
+          <h3>8.1 Essential Cookies</h3>
+          <p>We use essential cookies required for the Service to function (authentication, session management, security). These cannot be disabled.</p>
+
+          <h3>8.2 Analytics Cookies</h3>
+          <p>We use privacy-respecting analytics to understand how the Service is used. These do not track you across other websites and can be disabled.</p>
+
+          <h3>8.3 No Advertising Cookies</h3>
+          <p>We do not use advertising cookies, retargeting pixels, or third-party advertising trackers.</p>
+
+          <p>You can manage cookie preferences through your browser settings or our cookie consent banner.</p>
+
+          <h2 id="section-9">9. International Data Transfers</h2>
+          <p>Your data may be processed in countries outside your country of residence. When we transfer data outside the EU/EEA, we ensure appropriate safeguards are in place, including:</p>
+          <ul>
+            <li>Standard Contractual Clauses (SCCs) approved by the European Commission</li>
+            <li>Adequacy decisions where applicable</li>
+            <li>Additional technical and organisational measures as needed</li>
+          </ul>
+
+          <h2 id="section-10">10. Children's Privacy</h2>
+          <p>The Service is not intended for anyone under the age of 18. We do not knowingly collect personal data from minors. If we become aware that we have collected data from a minor, we will delete it promptly.</p>
+
+          <h2 id="section-11">11. Changes to This Policy</h2>
+          <p>We may update this Privacy Policy from time to time. When we make material changes, we will:</p>
+          <ul>
+            <li>Update the "Last Updated" date at the top of this document</li>
+            <li>Notify you via email or in-dashboard notification</li>
+            <li>Provide at least 14 days' notice before changes take effect</li>
+          </ul>
+
+          <h2 id="section-12">12. Contact Us</h2>
+          <p>For privacy-related questions, concerns, or data subject requests:</p>
+          <ul>
+            <li><strong>Privacy inquiries:</strong> privacy@arcvex.io</li>
+            <li><strong>General support:</strong> support@arcvex.io</li>
+            <li><strong>Website:</strong> arcvex.io</li>
+          </ul>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <div class="trust-bar">
+    <div class="container">
+      <div class="trust-bar-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Non-custodial
+      </div>
+      <div class="trust-bar-item">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Encrypted
+      </div>
+      <div class="trust-bar-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Multi-chain
+      </div>
+      <div class="trust-bar-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        XRPL &middot; Solana &middot; EVM
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-left">&copy; 2026 Arcvex. All rights reserved.</div>
+      <ul class="footer-links">
+        <li><a href="/about">About</a></li>
+        <li><a href="/team">Team</a></li>
+        <li><a href="/terms">Terms</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/risk-disclosure">Risk Disclosure</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Sidebar TOC active link tracking -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fade-in on scroll
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.fade-in').forEach(function(el) {
+        observer.observe(el);
+      });
+
+      // Update active TOC link based on scroll position
+      const tocLinks = document.querySelectorAll('.legal-toc a');
+      const sections = document.querySelectorAll('h2[id^="section-"]');
+
+      window.addEventListener('scroll', function() {
+        let current = '';
+        sections.forEach(function(section) {
+          const sectionTop = section.offsetTop;
+          if (pageYOffset >= sectionTop - 150) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        tocLinks.forEach(function(link) {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
