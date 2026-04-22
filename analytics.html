@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcvex — Wallet Analytics</title>
+  <meta name="description" content="Live USD and XRP growth of your XRPL wallet — across 7D, 14D, 21D, 28D, 1M, 3M, 1Y windows.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/xrpl@3.1.0/build/xrpl-latest-min.js"></script>
+
+  <style>
+    :root {
+      --bg-base:     #0A0F2C;
+      --bg-surface:  #161B33;
+      --bg-elevated: #2A2F4F;
+      --bg-border:   #3D4466;
+
+      --text-primary:   #E8E8E8;
+      --text-secondary: #A8ADC4;
+      --text-muted:     #6B7094;
+      --text-inverse:   #1A1A2E;
+
+      --brand-teal:     #00F5D4;
+      --brand-teal-dim: #00C4A8;
+      --brand-amber:    #F5A623;
+      --brand-amber-dim:#C7851C;
+
+      --trade-buy:    #00F5D4;
+      --trade-buy-bg: rgba(0, 245, 212, 0.08);
+      --trade-sell:   #F5A623;
+      --trade-sell-bg:rgba(245, 166, 35, 0.08);
+
+      --radius-card: 16px;
+      --radius-input:12px;
+      --radius-btn:  12px;
+      --radius-chip: 999px;
+
+      --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-glow-teal: 0 0 0 1px rgba(0,245,212,0.4), 0 8px 24px rgba(0,245,212,0.12);
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(61,68,102,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(61,68,102,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .mono, .num { font-family: var(--font-mono); font-feature-settings: 'tnum' 1, 'cv11' 1; }
+
+    /* ============================================================
+       HEADER (shared style with swap.html)
+       ============================================================ */
+    header {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(10,15,44,0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--bg-border);
+    }
+    .header-inner {
+      max-width: 1320px; margin: 0 auto;
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 18px; letter-spacing: -0.01em;
+      color: var(--text-primary); text-decoration: none;
+    }
+    .brand-mark {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dim));
+      display: grid; place-items: center;
+      color: var(--text-inverse); font-weight: 800; font-size: 14px;
+    }
+    nav.links {
+      display: flex; gap: 22px;
+      font-size: 14px; color: var(--text-secondary);
+    }
+    nav.links a { color: var(--text-secondary); text-decoration: none; transition: color 120ms; }
+    nav.links a:hover { color: var(--text-primary); }
+    nav.links a.active { color: var(--text-primary); }
+    @media (max-width: 720px) { nav.links { display: none; } }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-btn);
+      font-weight: 600; font-size: 14px;
+      border: none; cursor: pointer;
+      transition: transform 120ms ease-out, background 120ms, box-shadow 120ms;
+    }
+    .btn-primary { background: var(--brand-teal); color: var(--text-inverse); }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--brand-teal-dim);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-glow-teal);
+    }
+    .btn-ghost {
+      background: transparent; color: var(--brand-teal);
+      border: 1px solid var(--brand-teal);
+    }
+    .btn-ghost:hover { background: var(--trade-buy-bg); }
+
+    .wallet-chip {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 8px 14px;
+      border-radius: var(--radius-chip);
+      background: var(--bg-elevated);
+      border: 1px solid var(--bg-border);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 120ms;
+    }
+    .wallet-chip:hover { background: var(--bg-border); }
+    .wallet-chip .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--brand-teal);
+      box-shadow: 0 0 8px var(--brand-teal);
+    }
+
+    /* ============================================================
+       MAIN
+       ============================================================ */
+    main {
+      position: relative; z-index: 1;
+      max-width: 1120px; margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .hero h1 {
+      font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .hero h1 .accent { color: var(--brand-teal); }
+    .hero p {
+      color: var(--text-secondary);
+      font-size: 17px;
+      max-width: 620px; margin: 0 auto;
+    }
+
+    /* ---- Connect CTA ---- */
+    .connect-cta {
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-card);
+      padding: 48px 32px;
+      text-align: center;
+      box-shadow: var(--shadow-card);
+    }
+    .connect-cta h2 {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+    .connect-cta p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      max-width: 480px;
+      margin: 0 auto 24px;
+    }
+
+    /* ---- Window pills ---- */
+    .window-pills {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin-bottom: 32px;
+    }
+    .window-pills button {
+      padding: 10px 18px;
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-chip);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 120ms;
+      min-width: 64px;
+    }
+    .window-pills button:hover {
+      color: var(--text-primary);
+      border-color: var(--brand-teal);
+    }
+    .window-pills button.active {
+      background: var(--brand-teal);
+      color: var(--text-inverse);
+      border-color: var(--brand-teal);
+    }
+
+    /* ---- Headline cards ---- */
+    .headlines {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 680px) { .headlines { grid-template-columns: 1fr; } }
+
+    .headline-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 28px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .headline-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 60%, rgba(0,245,212,0.04));
+      pointer-events: none;
+    }
+    .headline-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .headline-value {
+      font-size: clamp(2.5rem, 4vw, 3.25rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      font-feature-settings: 'tnum' 1, 'cv11' 1;
+    }
+    .headline-delta {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-chip);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 600;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+    }
+    .headline-delta.up {
+      background: var(--trade-buy-bg);
+      color: var(--brand-teal);
+    }
+    .headline-delta.down {
+      background: var(--trade-sell-bg);
+      color: var(--brand-amber);
+    }
+    .headline-delta .arrow { font-size: 12px; }
+
+    /* ---- Spark chart ---- */
+    .spark-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-card);
+      padding: 24px 28px 28px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-card);
+    }
+    .spark-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .spark-title {
+      font-size: 14px; color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+    .spark-toggle {
+      display: inline-flex;
+      background: var(--bg-elevated);
+      padding: 4px;
+      border-radius: var(--radius-chip);
+      gap: 4px;
+    }
+    .spark-toggle button {
+      background: transparent; border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: var(--radius-chip);
+      cursor: pointer;
+      transition: all 120ms;
+    }
+    .spark-toggle button.active {
+      background: var(--brand-teal);
+      color: var(--text-inverse);
+    }
+    .spark-chart {
+      width: 100%;
+      height: 220px;
+    }
+    .spark-footer {
+      display: flex; justify-content: space-between;
+      margin-top: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ---- Asset breakdown ---- */
+    .breakdown {
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-card);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-card);
+    }
+    .breakdown h2 {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .asset-row {
+      display: grid;
+      grid-template-columns: 70px 1fr 150px 100px 90px;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--bg-border);
+    }
+    .asset-row:last-child { border-bottom: none; }
+    @media (max-width: 680px) {
+      .asset-row {
+        grid-template-columns: 60px 1fr 110px;
+        gap: 10px;
+      }
+      .asset-row .amt-col,
+      .asset-row .pct-col { display: none; }
+    }
+    .asset-code {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .asset-meta {
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .asset-amt {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+    .asset-usd {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: right;
+    }
+    .asset-pct {
+      text-align: right;
+    }
+    .asset-bar-wrap {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .asset-bar {
+      height: 4px;
+      width: 100%;
+      background: var(--bg-elevated);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .asset-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand-teal), var(--brand-teal-dim));
+      transition: width 300ms ease-out;
+    }
+    .asset-pct-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .excluded-note {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--bg-border);
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ---- Loader ---- */
+    .loader {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .loader .bar {
+      height: 3px;
+      max-width: 220px;
+      margin: 14px auto 0;
+      background: var(--bg-elevated);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .loader .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand-teal), var(--brand-teal-dim));
+      animation: loadsweep 1.4s ease-in-out infinite;
+    }
+    @keyframes loadsweep {
+      0%   { transform: translateX(-100%); }
+      50%  { transform: translateX(0%); }
+      100% { transform: translateX(220px); }
+    }
+
+    /* ---- Toasts ---- */
+    .toasts {
+      position: fixed; bottom: 20px; right: 20px;
+      z-index: 200;
+      display: flex; flex-direction: column; gap: 10px;
+      max-width: 360px;
+    }
+    .toast {
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-input);
+      box-shadow: var(--shadow-card);
+      font-size: 13px;
+      color: var(--text-primary);
+      animation: toast-in 160ms ease-out;
+    }
+    .toast.warn { border-color: var(--brand-amber); color: var(--brand-amber); }
+    .toast.ok { border-color: var(--brand-teal); color: var(--brand-teal); }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid var(--bg-border);
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+      line-height: 1.8;
+    }
+    footer a { color: var(--text-secondary); text-decoration: none; }
+    footer a:hover { color: var(--text-primary); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="/" class="brand">
+        <span class="brand-mark">A</span>
+        <span>Arcvex</span>
+      </a>
+      <nav class="links">
+        <a href="/">Home</a>
+        <a href="/swap">Swap</a>
+        <a href="/analytics" class="active">Analytics</a>
+        <a href="/about">About</a>
+        <a href="/team">Team</a>
+      </nav>
+      <div id="walletArea">
+        <button class="btn btn-primary" id="btnConnect">Connect Xaman</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Your wallet, <span class="accent">through time</span>.</h1>
+      <p>Total wallet value in USD and XRP. Growth across 7D, 14D, 21D, 28D, 1M, 3M, 1Y windows — live from the XRPL.</p>
+    </section>
+
+    <!-- Disconnected state -->
+    <section class="connect-cta" id="connectCta">
+      <h2>Sign in to see your wallet's story</h2>
+      <p>Connect Xaman to load your current XRP + trustline balances, reconstruct your wallet history on-ledger, and track growth in USD and XRP over any window.</p>
+      <button class="btn btn-primary" id="btnConnectCta">Connect Xaman</button>
+    </section>
+
+    <!-- Loader -->
+    <section class="loader hidden" id="loader">
+      <div id="loaderText">Reading your wallet from the XRPL…</div>
+      <div class="bar"><div class="bar-fill"></div></div>
+    </section>
+
+    <!-- Window pills -->
+    <section class="window-pills hidden" id="windowPills">
+      <button data-hours="3">3H</button>
+      <button data-hours="24">1D</button>
+      <button data-hours="72">3D</button>
+      <button data-hours="168" class="active">7D</button>
+      <button data-hours="336">14D</button>
+      <button data-hours="504">21D</button>
+      <button data-hours="672">28D</button>
+      <button data-hours="720">1M</button>
+      <button data-hours="2160">3M</button>
+      <button data-hours="8760">1Y</button>
+    </section>
+
+    <!-- Headlines -->
+    <section class="headlines hidden" id="headlines">
+      <div class="headline-card">
+        <div class="headline-label">Wallet value · USD</div>
+        <div class="headline-value mono" id="usdValue">$—</div>
+        <div class="headline-delta" id="usdDelta"><span class="arrow">·</span><span>—</span></div>
+      </div>
+      <div class="headline-card">
+        <div class="headline-label">Buying power · XRP</div>
+        <div class="headline-value mono" id="xrpEquiv">— XRP</div>
+        <div class="headline-delta" id="xrpEquivDelta"><span class="arrow">·</span><span>—</span></div>
+      </div>
+    </section>
+
+    <!-- Sparkline -->
+    <section class="spark-section hidden" id="sparkSection">
+      <div class="spark-header">
+        <div class="spark-title">Value over window</div>
+        <div class="spark-toggle">
+          <button data-view="usd" class="active">USD</button>
+          <button data-view="xrp">XRP</button>
+        </div>
+      </div>
+      <svg class="spark-chart" id="sparkChart" viewBox="0 0 800 220" preserveAspectRatio="none"></svg>
+      <div class="spark-footer">
+        <span id="sparkStart">—</span>
+        <span id="sparkEnd">—</span>
+      </div>
+    </section>
+
+    <!-- Asset breakdown -->
+    <section class="breakdown hidden" id="breakdown">
+      <h2>Holdings breakdown</h2>
+      <div id="assetsList"></div>
+      <div class="excluded-note hidden" id="excludedNote"></div>
+    </section>
+
+    <footer>
+      <div>
+        <a href="/">Arcvex</a> · Wallet analytics · Read-only · Live from the XRPL
+      </div>
+      <div style="margin-top: 8px;">
+        <a href="/terms">Terms</a> ·
+        <a href="/privacy">Privacy</a> ·
+        <a href="/risk-disclosure">Risk Disclosure</a> ·
+        <a href="https://x.com/Arcvex_io" target="_blank" rel="noopener">X</a>
+      </div>
+      <div style="max-width: 640px; margin: 10px auto 0; font-size: 11px;">
+        USD values use CoinGecko (XRP/USD) and XRPL orderbook mid-prices for IOUs. Stablecoins (RLUSD, issuer-USD) treated as $1. Assets with no liquid orderbook are excluded from totals.
+      </div>
+    </footer>
+  </main>
+
+  <div class="toasts" id="toasts"></div>
+
+  <script type="module">
+    import { XummPkce } from 'https://esm.sh/xumm-oauth2-pkce@2.8.5';
+
+    // --------------------------------------------------------------
+    // CONSTANTS
+    // --------------------------------------------------------------
+    const XAMAN_API_KEY = '5e34057c-473f-46cc-81d6-2dc769549da0';
+    const XRPL_WS = 'wss://xrplcluster.com';
+    const COINGECKO_XRP_URL_DAILY  = 'https://api.coingecko.com/api/v3/coins/ripple/market_chart?vs_currency=usd&days=365';
+    const COINGECKO_XRP_URL_HOURLY = 'https://api.coingecko.com/api/v3/coins/ripple/market_chart?vs_currency=usd&days=30'; // auto-returns hourly (2–90 days range)
+    const COINGECKO_XRP_URL_FINE   = 'https://api.coingecko.com/api/v3/coins/ripple/market_chart?vs_currency=usd&days=1';  // auto-returns ~5-minute for last 24h
+
+    // Stablecoins — pinned at $1 regardless of DEX mid
+    const STABLE_KEYS = new Set([
+      'rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De|524C555344000000000000000000000000000000', // RLUSD
+      'rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq|USD',  // Bitstamp USD
+      'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B|USD',   // GateHub USD
+    ]);
+    const isStable = (issuer, currency) => STABLE_KEYS.has(`${issuer}|${currency}`);
+
+    // Map from window hours → display label
+    const WINDOW_LABELS = {
+      3: '3H', 24: '1D', 72: '3D',
+      168: '7D', 336: '14D', 504: '21D', 672: '28D',
+      720: '1M', 2160: '3M', 8760: '1Y',
+    };
+
+    // --------------------------------------------------------------
+    // STATE
+    // --------------------------------------------------------------
+    const state = {
+      xrplClient: null,
+      connectedAccount: null,
+      xummSdk: null,
+
+      // Current balances: { [assetKey]: { code, currency, issuer, balance, priceXrp, priceUsd } }
+      // assetKey = "XRP" for XRP, or "issuer|currency" for IOUs
+      assets: {},
+
+      // Historical XRP/USD daily: [{ts, price}, ...], sorted ascending
+      xrpUsdHistory: [],
+
+      // Balance timeline: [{ts, balances: {[assetKey]: amount}}], ascending by ts.
+      // First entry is the earliest reconstructed point; last entry matches "now".
+      balanceTimeline: [],
+
+      // Selected window in hours
+      windowHours: 168,  // default 7D
+      // Selected spark view: 'usd' | 'xrp'
+      sparkView: 'usd',
+
+      excludedAssets: [], // assets with no price discovery
+    };
+
+    const xumm = new XummPkce(XAMAN_API_KEY, { implicit: true });
+
+    // --------------------------------------------------------------
+    // DOM refs
+    // --------------------------------------------------------------
+    const $ = (id) => document.getElementById(id);
+    const walletArea = $('walletArea');
+    const connectCta = $('connectCta');
+    const loader = $('loader');
+    const loaderText = $('loaderText');
+    const windowPills = $('windowPills');
+    const headlines = $('headlines');
+    const sparkSection = $('sparkSection');
+    const breakdown = $('breakdown');
+    const usdValue = $('usdValue');
+    const usdDelta = $('usdDelta');
+    const xrpEquiv = $('xrpEquiv');
+    const xrpEquivDelta = $('xrpEquivDelta');
+    const sparkChart = $('sparkChart');
+    const sparkStart = $('sparkStart');
+    const sparkEnd = $('sparkEnd');
+    const assetsList = $('assetsList');
+    const excludedNote = $('excludedNote');
+
+    // --------------------------------------------------------------
+    // UTILS
+    // --------------------------------------------------------------
+    const fmtUsd = (v) => {
+      if (v === null || v === undefined || !isFinite(v)) return '$—';
+      return '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+    const fmtXrp = (v) => {
+      if (v === null || v === undefined || !isFinite(v)) return '— XRP';
+      return Number(v).toLocaleString('en-US', { maximumFractionDigits: 4 }) + ' XRP';
+    };
+    const fmtPct = (v) => {
+      if (v === null || v === undefined || !isFinite(v)) return '—';
+      return (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+    };
+    const fmtNum = (n, dp = 4) => {
+      if (n === null || n === undefined || !isFinite(n)) return '—';
+      return Number(n).toLocaleString('en-US', { maximumFractionDigits: dp });
+    };
+    const fromDrops = (d) => Number(d) / 1_000_000;
+    const short = (addr) => addr ? `${addr.slice(0,6)}…${addr.slice(-4)}` : '';
+    const hexToAscii = (hex) => {
+      if (!hex || hex.length !== 40) return hex;
+      let s = '';
+      for (let i = 0; i < hex.length; i += 2) {
+        const c = parseInt(hex.substr(i, 2), 16);
+        if (c === 0) break;
+        s += String.fromCharCode(c);
+      }
+      return s || hex;
+    };
+    const isoCurrency = (cur) => {
+      if (!cur) return '';
+      if (cur.length === 3) return cur;
+      if (cur.length === 40) return hexToAscii(cur).replace(/\0+$/,'').trim() || cur.slice(0,6);
+      return cur;
+    };
+    const toast = (msg, kind = 'info') => {
+      const el = document.createElement('div');
+      el.className = `toast ${kind}`;
+      el.textContent = msg;
+      $('toasts').appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; }, 4200);
+      setTimeout(() => el.remove(), 4600);
+    };
+    const setLoader = (text) => { loaderText.textContent = text; };
+
+    // Linear interpolation: given an ascending series [{ts, v}], return v at timestamp t.
+    // Returns the value at the nearest point NOT after t (step-wise), which is what we want for
+    // balance reconstruction (balance between events is constant).
+    function sampleSeries(series, t) {
+      if (!series.length) return null;
+      if (t <= series[0].ts) return series[0].v;
+      if (t >= series[series.length - 1].ts) return series[series.length - 1].v;
+      // Binary search
+      let lo = 0, hi = series.length - 1;
+      while (hi - lo > 1) {
+        const mid = (lo + hi) >> 1;
+        if (series[mid].ts <= t) lo = mid;
+        else hi = mid;
+      }
+      return series[lo].v;
+    }
+
+    // --------------------------------------------------------------
+    // XRPL
+    // --------------------------------------------------------------
+    async function connectXrpl() {
+      if (state.xrplClient?.isConnected()) return state.xrplClient;
+      const c = new xrpl.Client(XRPL_WS);
+      c.on('error', (e) => console.error('[xrpl]', e));
+      await c.connect();
+      state.xrplClient = c;
+      return c;
+    }
+
+    async function fetchCurrentBalances(account) {
+      const c = await connectXrpl();
+      const [info, lines] = await Promise.all([
+        c.request({ command: 'account_info', account }),
+        c.request({ command: 'account_lines', account, limit: 200 }),
+      ]);
+      const xrp = fromDrops(info.result.account_data.Balance);
+      const assets = {
+        'XRP': {
+          key: 'XRP', code: 'XRP', currency: 'XRP', issuer: null,
+          balance: xrp, priceUsd: null, priceXrp: 1,
+        },
+      };
+      for (const l of lines.result.lines) {
+        const bal = parseFloat(l.balance);
+        if (bal <= 0) continue; // skip zero/negative (liability) lines
+        const key = `${l.account}|${l.currency}`;
+        assets[key] = {
+          key,
+          code: isoCurrency(l.currency),
+          currency: l.currency,
+          issuer: l.account,
+          balance: bal,
+          priceUsd: null,
+          priceXrp: null,
+        };
+      }
+      return assets;
+    }
+
+    // Fetch IOU price in XRP from the XRPL DEX orderbook mid.
+    async function fetchIouPriceInXrp(issuer, currency) {
+      const c = await connectXrpl();
+      try {
+        const [asksRes, bidsRes] = await Promise.all([
+          c.request({
+            command: 'book_offers',
+            taker_gets: { currency, issuer },
+            taker_pays: { currency: 'XRP' },
+            limit: 10,
+          }),
+          c.request({
+            command: 'book_offers',
+            taker_gets: { currency: 'XRP' },
+            taker_pays: { currency, issuer },
+            limit: 10,
+          }),
+        ]);
+        // asks: seller of IOU, wants XRP. bestAsk gives iou/xrp
+        const asks = asksRes.result.offers || [];
+        const bids = bidsRes.result.offers || [];
+        let bestAsk = null, bestBid = null;
+        if (asks.length) {
+          const o = asks[0];
+          const iouAmt = parseFloat(o.TakerGets.value);
+          const xrpAmt = fromDrops(o.TakerPays);
+          // iou per xrp
+          bestAsk = iouAmt / xrpAmt;
+        }
+        if (bids.length) {
+          const o = bids[0];
+          const iouAmt = parseFloat(o.TakerPays.value);
+          const xrpAmt = fromDrops(o.TakerGets);
+          bestBid = iouAmt / xrpAmt;
+        }
+        if (!bestAsk && !bestBid) return null;
+        // mid (iou per xrp)
+        const mid = bestAsk && bestBid ? (bestAsk + bestBid) / 2 : (bestAsk || bestBid);
+        // convert to XRP per 1 IOU
+        return 1 / mid;
+      } catch (e) {
+        console.warn('[fetchIouPriceInXrp]', issuer, currency, e.message || e);
+        return null;
+      }
+    }
+
+    // --------------------------------------------------------------
+    // COINGECKO
+    // --------------------------------------------------------------
+    async function fetchXrpUsdHistory() {
+      // Fetch three granularities in parallel and merge. Higher-res wins in overlapping ranges.
+      //   - Fine (5-min, last 24h)  → drives 3H accuracy
+      //   - Hourly (last 30 days)   → drives 1D / 3D / 7D / 14D / 28D / 1M
+      //   - Daily (last 365 days)   → drives 3M / 1Y
+      async function fetchOne(url) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('CoinGecko ' + res.status);
+          const data = await res.json();
+          return (data.prices || []).map(([ts, v]) => ({ ts, v }));
+        } catch (e) {
+          console.warn('[coingecko]', url, e.message || e);
+          return [];
+        }
+      }
+      const [fine, hourly, daily] = await Promise.all([
+        fetchOne(COINGECKO_XRP_URL_FINE),
+        fetchOne(COINGECKO_XRP_URL_HOURLY),
+        fetchOne(COINGECKO_XRP_URL_DAILY),
+      ]);
+
+      if (!fine.length && !hourly.length && !daily.length) {
+        toast('Could not load XRP/USD history — deltas will be unavailable.', 'warn');
+        return [];
+      }
+
+      // Merge: prefer finest resolution. Strategy — if fine points exist, use them for their
+      // range; use hourly for any ts earlier than fine's earliest; use daily for earlier than hourly's earliest.
+      const out = [];
+      const fineStart = fine.length ? fine[0].ts : Infinity;
+      const hourlyStart = hourly.length ? hourly[0].ts : Infinity;
+
+      for (const d of daily)  if (d.ts < hourlyStart) out.push(d);
+      for (const h of hourly) if (h.ts < fineStart)  out.push(h);
+      for (const f of fine)                           out.push(f);
+
+      out.sort((a, b) => a.ts - b.ts);
+      return out;
+    }
+
+    // --------------------------------------------------------------
+    // TX HISTORY → BALANCE TIMELINE
+    // --------------------------------------------------------------
+    // Walk backward via account_tx, use getBalanceChanges to reconstruct balances at each tx time.
+    // We stop when we've reached 365 days back OR run out of history.
+    async function fetchTxHistory(account, maxAgeMs) {
+      const c = await connectXrpl();
+      const cutoff = Date.now() - maxAgeMs;
+      let marker = undefined;
+      const all = [];
+      // Safety cap: 5000 txs max
+      const HARD_CAP = 5000;
+      while (all.length < HARD_CAP) {
+        const res = await c.request({
+          command: 'account_tx',
+          account,
+          ledger_index_min: -1,
+          ledger_index_max: -1,
+          limit: 200,
+          forward: false,
+          ...(marker ? { marker } : {}),
+        });
+        const txs = res.result.transactions || [];
+        for (const entry of txs) {
+          const meta = entry.meta;
+          const tx = entry.tx || entry.tx_json;
+          if (!tx || !meta || typeof meta !== 'object') continue;
+          // Ripple epoch → unix ms
+          const rippleDate = tx.date ?? tx.ledger_index;
+          if (typeof tx.date !== 'number') continue;
+          const txTs = (tx.date + 946684800) * 1000;
+          all.push({ txTs, tx, meta });
+          if (txTs < cutoff) {
+            return all;
+          }
+        }
+        if (!res.result.marker) break;
+        marker = res.result.marker;
+        setLoader(`Reading your wallet history… ${all.length} transactions scanned`);
+      }
+      return all;
+    }
+
+    // Build balance timeline from current balances + reversed tx history.
+    // Timeline is ascending: [oldest, ..., newest].
+    //
+    // Each snapshot represents "from this ts onwards, balance was X" until the next snapshot.
+    // So balanceAt(query_ts) = snapshots[largest i where snapshots[i].ts <= query_ts].
+    //
+    // Construction: walk txs newest→oldest. `running` starts as current balance. At each tx,
+    // the balance AFTER that tx equals current `running` — push snapshot at ts = txTs with
+    // that value. Then reverse the tx's delta out to get the pre-tx balance, and continue.
+    function buildBalanceTimeline(currentAssets, txs) {
+      const snapshots = [];
+      const running = {};
+      for (const k of Object.keys(currentAssets)) running[k] = currentAssets[k].balance;
+
+      for (const { txTs, meta } of txs) {
+        let changes;
+        try { changes = xrpl.getBalanceChanges(meta); }
+        catch (e) { continue; }
+        const mine = changes.find(c => c.account === state.connectedAccount);
+        if (!mine) continue;
+
+        // Balance just AFTER this tx = what `running` currently holds.
+        snapshots.push({ ts: txTs, balances: { ...running } });
+
+        // Reverse the tx delta out → running is now balance BEFORE the tx.
+        for (const b of mine.balances) {
+          const key = b.currency === 'XRP' ? 'XRP' : `${b.issuer}|${b.currency}`;
+          const delta = parseFloat(b.value);
+          running[key] = (running[key] || 0) - delta;
+        }
+      }
+      // After walking all txs, `running` = balance before the oldest tx we saw.
+      // Anchor that as the "initial" state at ts = 0 so any query older than the first tx
+      // returns this state.
+      snapshots.push({ ts: 0, balances: { ...running } });
+
+      snapshots.reverse(); // ascending
+      return snapshots;
+    }
+
+    // Get balance of an asset at a given timestamp.
+    function balanceAt(timeline, assetKey, ts) {
+      if (!timeline.length) return 0;
+      if (ts <= timeline[0].ts) return timeline[0].balances[assetKey] || 0;
+      if (ts >= timeline[timeline.length - 1].ts) {
+        return timeline[timeline.length - 1].balances[assetKey] || 0;
+      }
+      // Binary search for snapshot <= ts
+      let lo = 0, hi = timeline.length - 1;
+      while (hi - lo > 1) {
+        const mid = (lo + hi) >> 1;
+        if (timeline[mid].ts <= ts) lo = mid;
+        else hi = mid;
+      }
+      return timeline[lo].balances[assetKey] || 0;
+    }
+
+    // --------------------------------------------------------------
+    // VALUATION
+    // --------------------------------------------------------------
+    // Compute total wallet USD value at timestamp ts.
+    function walletUsdAt(ts) {
+      const xrpUsd = sampleSeries(state.xrpUsdHistory, ts);
+      if (!xrpUsd) return null;
+      let total = 0;
+      for (const k of Object.keys(state.assets)) {
+        const a = state.assets[k];
+        const bal = balanceAt(state.balanceTimeline, k, ts);
+        if (bal <= 0) continue;
+        if (k === 'XRP') total += bal * xrpUsd;
+        else if (isStable(a.issuer, a.currency)) total += bal * 1;
+        else if (a.priceXrp) total += bal * a.priceXrp * xrpUsd;
+        // else excluded (no price)
+      }
+      return total;
+    }
+
+    // Compute XRP equivalent (buying power) at ts
+    function walletXrpAt(ts) {
+      const xrpUsd = sampleSeries(state.xrpUsdHistory, ts);
+      if (!xrpUsd) return null;
+      const usd = walletUsdAt(ts);
+      if (usd === null) return null;
+      return usd / xrpUsd;
+    }
+
+    // --------------------------------------------------------------
+    // RENDER
+    // --------------------------------------------------------------
+    function renderHeadlines() {
+      const nowTs = Date.now();
+      const agoTs = nowTs - state.windowHours * 3600 * 1000;
+      const nowUsd = walletUsdAt(nowTs);
+      const agoUsd = walletUsdAt(agoTs);
+      const nowXrp = walletXrpAt(nowTs);
+      const agoXrp = walletXrpAt(agoTs);
+
+      usdValue.textContent = nowUsd === null ? '$—' : fmtUsd(nowUsd);
+      xrpEquiv.textContent = nowXrp === null ? '— XRP' : fmtXrp(nowXrp);
+
+      // Deltas
+      const usdPct = (agoUsd && nowUsd !== null) ? ((nowUsd - agoUsd) / agoUsd) * 100 : null;
+      const xrpPct = (agoXrp && nowXrp !== null) ? ((nowXrp - agoXrp) / agoXrp) * 100 : null;
+      renderDelta(usdDelta, usdPct);
+      renderDelta(xrpEquivDelta, xrpPct);
+    }
+
+    function renderDelta(el, pct) {
+      el.classList.remove('up', 'down');
+      if (pct === null || !isFinite(pct)) {
+        el.innerHTML = `<span class="arrow">·</span><span>no data for this window</span>`;
+        return;
+      }
+      const cls = pct >= 0 ? 'up' : 'down';
+      el.classList.add(cls);
+      const arrow = pct >= 0 ? '▲' : '▼';
+      const label = WINDOW_LABELS[state.windowHours] || `${state.windowHours}H`;
+      el.innerHTML = `<span class="arrow">${arrow}</span><span>${fmtPct(pct)} · ${label}</span>`;
+    }
+
+    function renderSparkline() {
+      const windowMs = state.windowHours * 3600 * 1000;
+      const nowTs = Date.now();
+      const startTs = nowTs - windowMs;
+      const STEPS = 80;
+      const pts = [];
+      for (let i = 0; i <= STEPS; i++) {
+        const t = startTs + (windowMs * i / STEPS);
+        const v = state.sparkView === 'usd' ? walletUsdAt(t) : walletXrpAt(t);
+        pts.push({ t, v });
+      }
+      const valid = pts.filter(p => p.v !== null && isFinite(p.v));
+      if (valid.length < 2) {
+        sparkChart.innerHTML = `<text x="400" y="110" text-anchor="middle" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="13">No data for this window</text>`;
+        sparkStart.textContent = '—'; sparkEnd.textContent = '—';
+        return;
+      }
+      const vs = valid.map(p => p.v);
+      let minV = Math.min(...vs), maxV = Math.max(...vs);
+      if (minV === maxV) { minV *= 0.99; maxV *= 1.01; }
+      const W = 800, H = 220, PAD = 8;
+      const xAt = (i) => (i / STEPS) * (W - PAD * 2) + PAD;
+      const yAt = (v) => H - PAD - ((v - minV) / (maxV - minV)) * (H - PAD * 2);
+
+      // Path
+      let d = '';
+      pts.forEach((p, i) => {
+        if (p.v === null || !isFinite(p.v)) return;
+        d += (d ? ' L ' : 'M ') + xAt(i).toFixed(2) + ' ' + yAt(p.v).toFixed(2);
+      });
+
+      // Fill area (under the line down to H)
+      const first = pts.findIndex(p => p.v !== null);
+      const last = pts.length - 1 - [...pts].reverse().findIndex(p => p.v !== null);
+      const fillD = d + ` L ${xAt(last).toFixed(2)} ${H} L ${xAt(first).toFixed(2)} ${H} Z`;
+
+      const firstV = pts.find(p => p.v !== null)?.v;
+      const lastV = [...pts].reverse().find(p => p.v !== null)?.v;
+      const trendingUp = lastV >= firstV;
+      const stroke = trendingUp ? 'var(--brand-teal)' : 'var(--brand-amber)';
+      const fill = trendingUp ? 'rgba(0,245,212,0.12)' : 'rgba(245,166,35,0.10)';
+
+      sparkChart.innerHTML = `
+        <path d="${fillD}" fill="${fill}" />
+        <path d="${d}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      `;
+
+      // Footer labels — show time too when window is < 2 days
+      const startDate = new Date(startTs);
+      const endDate = new Date(nowTs);
+      const startFmt = state.sparkView === 'usd' ? fmtUsd(firstV) : fmtXrp(firstV);
+      const endFmt = state.sparkView === 'usd' ? fmtUsd(lastV) : fmtXrp(lastV);
+      const needTime = state.windowHours < 48;
+      const fmtWhen = (d) => needTime
+        ? d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : d.toLocaleDateString();
+      sparkStart.textContent = `${fmtWhen(startDate)} · ${startFmt}`;
+      sparkEnd.textContent = `${fmtWhen(endDate)} · ${endFmt}`;
+    }
+
+    function renderBreakdown() {
+      const nowTs = Date.now();
+      const xrpUsd = sampleSeries(state.xrpUsdHistory, nowTs);
+      const rows = [];
+      let totalUsd = 0;
+      state.excludedAssets = [];
+
+      for (const k of Object.keys(state.assets)) {
+        const a = state.assets[k];
+        if (a.balance <= 0) continue;
+        let usd = null;
+        if (k === 'XRP') usd = xrpUsd ? a.balance * xrpUsd : null;
+        else if (isStable(a.issuer, a.currency)) usd = a.balance * 1;
+        else if (a.priceXrp && xrpUsd) usd = a.balance * a.priceXrp * xrpUsd;
+
+        if (usd === null) {
+          state.excludedAssets.push(a.code);
+          continue;
+        }
+        totalUsd += usd;
+        rows.push({ a, usd });
+      }
+
+      // Sort by USD desc
+      rows.sort((x, y) => y.usd - x.usd);
+
+      assetsList.innerHTML = rows.map(({ a, usd }) => {
+        const pct = totalUsd > 0 ? (usd / totalUsd) * 100 : 0;
+        const issuerTxt = a.issuer ? short(a.issuer) : 'native';
+        return `
+          <div class="asset-row">
+            <div>
+              <div class="asset-code">${a.code}</div>
+              <div class="asset-meta">${issuerTxt}</div>
+            </div>
+            <div class="asset-bar-wrap">
+              <div class="asset-bar"><div class="asset-bar-fill" style="width: ${pct.toFixed(1)}%"></div></div>
+              <div class="asset-pct-num">${pct.toFixed(1)}% of wallet</div>
+            </div>
+            <div class="asset-amt amt-col">${fmtNum(a.balance, 4)} ${a.code}</div>
+            <div class="asset-usd">${fmtUsd(usd)}</div>
+            <div class="asset-pct pct-col asset-pct-num">${pct.toFixed(1)}%</div>
+          </div>
+        `;
+      }).join('');
+
+      if (state.excludedAssets.length) {
+        excludedNote.textContent = `Excluded from total (no liquid price): ${state.excludedAssets.join(', ')}`;
+        excludedNote.classList.remove('hidden');
+      } else {
+        excludedNote.classList.add('hidden');
+      }
+    }
+
+    function renderAll() {
+      renderHeadlines();
+      renderSparkline();
+      renderBreakdown();
+    }
+
+    // --------------------------------------------------------------
+    // EVENT WIRING
+    // --------------------------------------------------------------
+    document.querySelectorAll('#windowPills button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.windowHours = parseInt(b.dataset.hours, 10);
+        document.querySelectorAll('#windowPills button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        renderAll();
+      });
+    });
+    document.querySelectorAll('.spark-toggle button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.sparkView = b.dataset.view;
+        document.querySelectorAll('.spark-toggle button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        renderSparkline();
+      });
+    });
+
+    // --------------------------------------------------------------
+    // XAMAN
+    // --------------------------------------------------------------
+    $('btnConnect').addEventListener('click', () => xumm.authorize());
+    $('btnConnectCta').addEventListener('click', () => xumm.authorize());
+
+    function renderConnected() {
+      walletArea.innerHTML = `
+        <div class="wallet-chip" id="walletChip" title="Click to disconnect">
+          <span class="dot"></span>
+          <span>${short(state.connectedAccount)}</span>
+        </div>
+      `;
+      $('walletChip').addEventListener('click', async () => {
+        if (!confirm('Disconnect Xaman?')) return;
+        await xumm.logout();
+        state.connectedAccount = null;
+        state.xummSdk = null;
+        state.assets = {};
+        state.balanceTimeline = [];
+        walletArea.innerHTML = `<button class="btn btn-primary" id="btnConnect">Connect Xaman</button>`;
+        $('btnConnect').addEventListener('click', () => xumm.authorize());
+        connectCta.classList.remove('hidden');
+        loader.classList.add('hidden');
+        windowPills.classList.add('hidden');
+        headlines.classList.add('hidden');
+        sparkSection.classList.add('hidden');
+        breakdown.classList.add('hidden');
+      });
+    }
+
+    xumm.on('success', async () => {
+      try {
+        const s = await xumm.state();
+        state.connectedAccount = s.me.account;
+        state.xummSdk = s.sdk;
+        renderConnected();
+        await hydrateAll();
+        toast(`Loaded analytics for ${short(state.connectedAccount)}`, 'ok');
+      } catch (e) {
+        console.error(e); toast('Analytics load failed: ' + (e.message || e), 'warn');
+      }
+    });
+    xumm.on('retrieved', async () => {
+      const s = await xumm.state();
+      if (s && s.me) {
+        state.connectedAccount = s.me.account;
+        state.xummSdk = s.sdk;
+        renderConnected();
+        await hydrateAll();
+      }
+    });
+    xumm.on('error', (e) => { console.error('[xumm]', e); toast('Xaman error — try again.', 'warn'); });
+
+    // --------------------------------------------------------------
+    // MASTER HYDRATION
+    // --------------------------------------------------------------
+    async function hydrateAll() {
+      connectCta.classList.add('hidden');
+      loader.classList.remove('hidden');
+
+      try {
+        setLoader('Reading your current balances…');
+        state.assets = await fetchCurrentBalances(state.connectedAccount);
+
+        setLoader('Fetching XRP/USD history from CoinGecko…');
+        state.xrpUsdHistory = await fetchXrpUsdHistory();
+
+        setLoader('Pricing your IOU holdings via XRPL DEX…');
+        // Fetch IOU prices (non-stable, non-XRP) in parallel
+        const jobs = Object.values(state.assets)
+          .filter(a => a.key !== 'XRP' && !isStable(a.issuer, a.currency))
+          .map(async (a) => {
+            a.priceXrp = await fetchIouPriceInXrp(a.issuer, a.currency);
+          });
+        await Promise.all(jobs);
+
+        setLoader('Rebuilding your wallet history from on-chain transactions…');
+        const maxAgeMs = 366 * 86400 * 1000;
+        const txs = await fetchTxHistory(state.connectedAccount, maxAgeMs);
+        state.balanceTimeline = buildBalanceTimeline(state.assets, txs);
+
+        loader.classList.add('hidden');
+        windowPills.classList.remove('hidden');
+        headlines.classList.remove('hidden');
+        sparkSection.classList.remove('hidden');
+        breakdown.classList.remove('hidden');
+        renderAll();
+      } catch (e) {
+        console.error('[hydrate]', e);
+        loader.classList.add('hidden');
+        connectCta.classList.remove('hidden');
+        toast('Failed to load analytics: ' + (e.message || e), 'warn');
+      }
+    }
+
+    // Expose for debug
+    window.__arcvexAnalytics = state;
+  </script>
+</body>
+</html>
