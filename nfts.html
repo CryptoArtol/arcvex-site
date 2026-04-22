@@ -707,8 +707,8 @@
        ============================================================ -->
   <main>
     <section class="hero">
-      <h1>XRPL <span class="accent">NFTs</span>. On-chain bids, on-chain asks, no middle layer.</h1>
-      <p>Browse the biggest XRPL collections by 24h volume, view active sell offers live from the ledger, and accept them from your Xaman wallet. Listings and cancellations are signed by you and submitted straight to the XRPL.</p>
+      <h1>XRPL <span class="accent">NFTs</span>. Only the open-market offers. No broker in the middle.</h1>
+      <p>We only show sell offers you can actually accept — no destination lock, no marketplace middleman, no hidden broker fee. Prices and offers are read live from the XRPL; broker-locked listings on xrp.cafe and others are marked accordingly so you know before you click.</p>
     </section>
 
     <!-- Tabs -->
@@ -829,7 +829,7 @@
       <a href="https://x.com/Arcvex_io" target="_blank" rel="noopener">X</a>
     </div>
     <div class="disclaimer" style="margin-top: 8px; max-width: 680px; margin-left: auto; margin-right: auto;">
-      Not financial advice. Collection stats via <a href="https://xrp.cafe" target="_blank" rel="noopener">xrp.cafe</a> and <a href="https://xrpldata.com" target="_blank" rel="noopener">xrpldata.com</a>; offers are read live from the XRPL. NFT markets are illiquid and volatile. Transactions are signed by you in Xaman and submitted directly to the ledger — once accepted they are final.
+      Not financial advice. Collection metadata via <a href="https://xrp.cafe" target="_blank" rel="noopener">xrp.cafe</a>; sell offers are read live from the XRPL. We only surface offers any account can accept (no destination lock) — offers locked to marketplace brokers like xrp.cafe are shown but marked "Broker-only" since a direct accept would fail. NFT markets are illiquid and volatile.
     </div>
   </footer>
 
@@ -1150,6 +1150,31 @@
         throw e;
       }
     }
+
+    // An "open" sell offer is one that anyone (or specifically the
+    // connected account) can accept via NFTokenAcceptOffer.
+    //
+    // A lot of XRPL marketplaces (xrp.cafe is the loudest) create sell
+    // offers with `destination` set to their own broker address, meaning
+    // ONLY they can accept and relay the trade, collecting a fee. Those
+    // offers are visible on-chain but buyable only through that broker —
+    // if we emit a direct NFTokenAcceptOffer for them we get tecNO_PERMISSION.
+    //
+    // This helper returns only the sell offers a direct buy could accept:
+    //   - destination absent (truly open)
+    //   - or destination === the connected account (targeted at us)
+    //
+    // Amount must be an XRP drops string (we don't handle IOU-priced NFTs).
+    function isOpenXrpSellOffer(o, account) {
+      if (typeof o.amount !== 'string') return false;  // IOU-priced
+      if (!o.destination) return true;
+      if (account && o.destination === account) return true;
+      return false;
+    }
+    async function fetchOpenSellOffers(nftId) {
+      const all = await fetchSellOffers(nftId);
+      return all.filter(o => isOpenXrpSellOffer(o, state.connectedAccount));
+    }
     async function fetchBuyOffers(nftId) {
       const c = await xrplConnect();
       try {
@@ -1209,21 +1234,20 @@
         const j = await fetchXrpCafe(`/api/nft/${encodeURIComponent(nftId)}`, { retries: 2 });
         const n = j?.nft;
         if (!n) { nftMetaCache.set(nftId, null); return null; }
+        // NOTE: xrp.cafe surfaces an `amount`/`offerowner` on listed NFTs,
+        // but those are almost always broker-locked sell offers
+        // (destination=xrp.cafe_broker) that we can't accept directly — a
+        // direct NFTokenAcceptOffer from any other account returns
+        // tecNO_PERMISSION. We deliberately ignore those fields and rely
+        // on the on-chain `nft_sell_offers` check for the real "buyable"
+        // signal. See fetchOpenSellOffers() / isOpenXrpSellOffer().
         const meta = {
           thumb: n.media_url_sm || n.media_url || null,
           full:  n.media_url    || n.media_url_sm || null,
           name:  n.item_name    || null,
           desc:  n.item_desc    || null,
           ranking: n.ranking    || null,
-          totalItems: n.totalNumberOfItems || null,
-          // Listing info (null when not for sale). `amount` is in drops.
-          // xrp.cafe doesn't surface the nft_offer_index here; we look that
-          // up on-chain when the user actually clicks to buy.
-          listing: n.amount ? {
-            amount: Number(n.amount),
-            owner: n.offerowner,
-            expiration: n.expiration
-          } : null
+          totalItems: n.totalNumberOfItems || null
         };
         nftMetaCache.set(nftId, meta);
         return meta;
@@ -1265,12 +1289,26 @@
       card.dataset.hydrated = '1';
       const id = card.dataset.nftid;
       hydrateQueue.push(async () => {
-        const meta = await fetchNftMeta(id);
+        // Parallel: xrp.cafe for thumb/name/rank (CDN-backed, has rate limit)
+        // and XRPL for on-chain sell offers (authoritative for "can I buy this").
+        // We deliberately IGNORE xrp.cafe's amount/offerowner fields — those
+        // surface broker-locked offers we couldn't accept directly.
+        const [meta, openOffers] = await Promise.all([
+          fetchNftMeta(id),
+          fetchOpenSellOffers(id).catch(() => [])
+        ]);
         if (!card.isConnected) return;
+
+        // Pick the lowest-priced open offer as the "price" shown on the card
+        const best = openOffers.length
+          ? openOffers.reduce((a, b) => Number(a.amount) < Number(b.amount) ? a : b)
+          : null;
+        const listed = !!best;
+        const priceXrp = listed ? drops(best.amount) : null;
+
         const cover = card.querySelector('.cover');
-        const listed = !!meta?.listing;
         const pricePill = listed
-          ? `<span class="price-pill">${fmtXrp(drops(meta.listing.amount))} XRP</span>`
+          ? `<span class="price-pill">${fmtXrp(priceXrp)} XRP</span>`
           : '';
         if (cover) {
           cover.innerHTML = (meta?.thumb
@@ -1279,16 +1317,17 @@
         }
         const nameEl = card.querySelector('.name');
         if (nameEl && meta?.name) nameEl.textContent = meta.name;
+
         // Flag listing state so the filter/sort can use it
         card.dataset.listed = listed ? '1' : '0';
         if (listed) {
-          card.dataset.priceDrops = String(meta.listing.amount);
+          card.dataset.priceDrops = String(best.amount);
+          card.dataset.offerIndex = best.nft_offer_index;  // ready for one-click Buy
           card.classList.remove('unlisted');
         } else {
           card.classList.add('unlisted');
         }
         if (meta?.ranking) card.dataset.rank = String(meta.ranking);
-        // If listed-only filter is on, re-apply filter so newly-discovered listings appear
         applyNftFilterSort();
       });
       pumpHydrateQueue();
@@ -1681,17 +1720,26 @@
         el.innerHTML = `<div class="mono" style="color: var(--text-muted); font-size: 12px;">No active sell offers on-chain.</div>`;
         return;
       }
-      // Filter to XRP-only offers. IOU offers are rare for NFTs and add complexity.
+      // Split offers by "directly buyable" (open or targeted at us) vs.
+      // "broker-locked" (destination set to a third party — marketplace
+      // brokers). Only XRP-priced offers are handled for now; IOU-priced
+      // are rare for NFTs and add complexity.
       const xrpOffers = offers.filter(o => typeof o.amount === 'string');
       const iouCount = offers.length - xrpOffers.length;
+      const open = xrpOffers.filter(o => isOpenXrpSellOffer(o, state.connectedAccount));
+      const locked = xrpOffers.filter(o => !isOpenXrpSellOffer(o, state.connectedAccount));
 
-      el.innerHTML = xrpOffers.map(o => {
+      // Sort each group by price ascending
+      open.sort((a, b) => Number(a.amount) - Number(b.amount));
+      locked.sort((a, b) => Number(a.amount) - Number(b.amount));
+
+      const renderOpenRow = (o) => {
         const mine = state.connectedAccount && o.owner === state.connectedAccount;
         return `
           <div class="offer-row ${mine ? 'mine' : ''}">
             <div>
               <div class="px">${fmtXrp(drops(o.amount))} XRP</div>
-              <div class="by">by ${short(o.owner)}${mine ? ' (you)' : ''}${o.destination ? ' · to ' + short(o.destination) : ''}</div>
+              <div class="by">by ${short(o.owner)}${mine ? ' (you)' : ''}${o.destination ? ` · targeted at you` : ' · open to anyone'}</div>
             </div>
             <div>
               ${mine
@@ -1700,7 +1748,34 @@
             </div>
           </div>
         `;
-      }).join('') + (iouCount ? `<div class="mono" style="color: var(--text-muted); font-size: 11px; margin-top: 6px;">${iouCount} non-XRP offer(s) hidden.</div>` : '');
+      };
+      const renderLockedRow = (o) => `
+        <div class="offer-row" style="opacity: 0.55;" title="This offer can only be accepted by ${o.destination} — typically a marketplace broker like xrp.cafe or onxrp.">
+          <div>
+            <div class="px" style="color: var(--text-secondary);">${fmtXrp(drops(o.amount))} XRP</div>
+            <div class="by">by ${short(o.owner)} · locked to ${short(o.destination)}</div>
+          </div>
+          <div>
+            <span class="btn btn-quiet btn-small" style="cursor: not-allowed; opacity: 0.7;">Broker-only</span>
+          </div>
+        </div>
+      `;
+
+      let html = '';
+      if (open.length) {
+        html += `<div style="font-size: 11px; color: var(--brand-teal); margin: 4px 0 6px; text-transform: uppercase; letter-spacing: 0.08em;">Open offers · directly buyable</div>`;
+        html += open.map(renderOpenRow).join('');
+      } else {
+        html += `<div class="mono" style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">No directly-buyable offers.</div>`;
+      }
+      if (locked.length) {
+        html += `<div style="font-size: 11px; color: var(--text-muted); margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.08em;">Broker-locked · only the destination wallet can accept</div>`;
+        html += locked.map(renderLockedRow).join('');
+      }
+      if (iouCount) {
+        html += `<div class="mono" style="color: var(--text-muted); font-size: 11px; margin-top: 6px;">${iouCount} non-XRP offer(s) hidden.</div>`;
+      }
+      el.innerHTML = html;
 
       el.querySelectorAll('[data-accept-offer]').forEach(btn => {
         btn.addEventListener('click', () => acceptSellOffer(btn.getAttribute('data-accept-offer')));
