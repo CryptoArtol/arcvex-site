@@ -843,7 +843,16 @@
     // CONSTANTS
     // --------------------------------------------------------------
     const XAMAN_API_KEY = '5e34057c-473f-46cc-81d6-2dc769549da0';
-    const XRPL_WS       = 'wss://xrplcluster.com';
+    // Public XRPL nodes. xrpl.js connects to the first one; if that fails
+    // (rate-limit, rejected, timeout) we fall through the list. All are
+    // free and operated by different parties, so one IP-level block
+    // doesn't take us fully offline.
+    const XRPL_WS_ENDPOINTS = [
+      'wss://xrplcluster.com',
+      'wss://s1.ripple.com:443',
+      'wss://s2.ripple.com:443',
+      'wss://xrpl.ws'
+    ];
 
     // Seed list of tracked xrp.cafe collection slugs. Sorted client-side
     // by 24h / total volume to produce the "top collections" view. Extend
@@ -988,13 +997,35 @@
     // --------------------------------------------------------------
     // XRPL CLIENT
     // --------------------------------------------------------------
+    // In-flight promise so concurrent callers share a single connection
+    // attempt instead of racing to create N clients to the same server
+    // (which would just get us rate-limited faster).
+    let _xrplConnecting = null;
     async function xrplConnect() {
       if (state.xrplClient?.isConnected()) return state.xrplClient;
-      const c = new xrpl.Client(XRPL_WS);
-      c.on('error', (e) => console.error('[xrpl]', e));
-      await c.connect();
-      state.xrplClient = c;
-      return c;
+      if (_xrplConnecting) return _xrplConnecting;
+      _xrplConnecting = (async () => {
+        let lastErr = null;
+        for (const url of XRPL_WS_ENDPOINTS) {
+          try {
+            const c = new xrpl.Client(url, { connectionTimeout: 5000 });
+            c.on('error', (e) => console.warn('[xrpl]', url, e?.message || e));
+            await c.connect();
+            state.xrplClient = c;
+            return c;
+          } catch (e) {
+            lastErr = e;
+            console.warn('[xrpl] connect failed on', url, '— trying next');
+          }
+        }
+        throw lastErr || new Error('All XRPL endpoints unreachable');
+      })();
+      try {
+        const c = await _xrplConnecting;
+        return c;
+      } finally {
+        _xrplConnecting = null;
+      }
     }
 
     // --------------------------------------------------------------
