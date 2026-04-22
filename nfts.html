@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcvex — XRPL NFT Marketplace</title>
+  <meta name="description" content="Browse, buy, list, and cancel XRPL NFT offers on-chain. Top collections ranked by volume. Sign every move in Xaman.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/xrpl@3.1.0/build/xrpl-latest-min.js"></script>
+
+  <style>
+    /* ============================================================
+       ARCVEX BRAND TOKENS
+       ============================================================ */
+    :root {
+      --bg-base:     #0A0F2C;
+      --bg-surface:  #161B33;
+      --bg-elevated: #2A2F4F;
+      --bg-border:   #3D4466;
+
+      --text-primary:   #E8E8E8;
+      --text-secondary: #A8ADC4;
+      --text-muted:     #6B7094;
+      --text-inverse:   #1A1A2E;
+
+      --brand-teal:     #00F5D4;
+      --brand-teal-dim: #00C4A8;
+      --brand-amber:    #F5A623;
+      --brand-amber-dim:#C7851C;
+
+      --trade-buy:    #00F5D4;
+      --trade-buy-bg: rgba(0, 245, 212, 0.08);
+      --trade-sell:   #F5A623;
+      --trade-sell-bg:rgba(245, 166, 35, 0.08);
+
+      --state-info: #6B9BFF;
+
+      --radius-card: 16px;
+      --radius-input:12px;
+      --radius-btn:  12px;
+      --radius-chip: 999px;
+
+      --shadow-card:      0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-glow-teal: 0 0 0 1px rgba(0, 245, 212, 0.4), 0 8px 24px rgba(0, 245, 212, 0.12);
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(61,68,102,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(61,68,102,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .mono, .num { font-family: var(--font-mono); font-feature-settings: 'tnum' 1, 'cv11' 1; }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    header {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(10,15,44,0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--bg-border);
+    }
+    .header-inner {
+      max-width: 1320px; margin: 0 auto;
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 18px; letter-spacing: -0.01em;
+      color: var(--text-primary); text-decoration: none;
+    }
+    .brand-mark {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dim));
+      display: grid; place-items: center;
+      color: var(--text-inverse); font-weight: 800; font-size: 14px;
+    }
+    nav.links {
+      display: flex; gap: 22px;
+      font-size: 14px; color: var(--text-secondary);
+    }
+    nav.links a { color: var(--text-secondary); text-decoration: none; transition: color 120ms; }
+    nav.links a:hover { color: var(--text-primary); }
+    nav.links a.active { color: var(--text-primary); }
+    @media (max-width: 720px) { nav.links { display: none; } }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-btn);
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 14px;
+      border: none; cursor: pointer;
+      transition: transform 120ms ease-out, background 120ms, box-shadow 120ms;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--brand-teal); color: var(--text-inverse); }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--brand-teal-dim);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-glow-teal);
+    }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-ghost {
+      background: transparent; color: var(--brand-teal);
+      border: 1px solid var(--brand-teal);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: var(--trade-buy-bg);
+      transform: translateY(-1px);
+    }
+    .btn-sell {
+      background: var(--brand-amber); color: var(--text-inverse);
+    }
+    .btn-sell:hover:not(:disabled) {
+      background: var(--brand-amber-dim);
+      transform: translateY(-1px);
+    }
+    .btn-small { padding: 7px 12px; font-size: 12px; }
+    .btn-large { padding: 14px 24px; font-size: 15px; width: 100%; }
+    .btn-quiet {
+      background: var(--bg-elevated); color: var(--text-secondary);
+      border: 1px solid var(--bg-border);
+    }
+    .btn-quiet:hover { color: var(--text-primary); border-color: var(--brand-teal); }
+
+    .wallet-chip {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 8px 14px;
+      border-radius: var(--radius-chip);
+      background: var(--bg-elevated);
+      border: 1px solid var(--bg-border);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 120ms;
+    }
+    .wallet-chip:hover { background: var(--bg-border); }
+    .wallet-chip .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--brand-teal);
+      box-shadow: 0 0 8px var(--brand-teal);
+    }
+
+    /* ============================================================
+       LAYOUT
+       ============================================================ */
+    main {
+      position: relative; z-index: 1;
+      max-width: 1320px; margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .hero h1 .accent { color: var(--brand-teal); }
+    .hero p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      max-width: 620px; margin: 0 auto;
+    }
+
+    /* ============================================================
+       TABS
+       ============================================================ */
+    .tabs {
+      display: inline-flex;
+      background: var(--bg-elevated);
+      padding: 4px;
+      border-radius: var(--radius-chip);
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .tabs button {
+      background: transparent; border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-sans); font-weight: 600; font-size: 13px;
+      padding: 8px 18px; border-radius: var(--radius-chip);
+      cursor: pointer; transition: all 120ms;
+    }
+    .tabs button.active {
+      background: var(--brand-teal);
+      color: var(--text-inverse);
+    }
+
+    /* ============================================================
+       TOOLBAR (search / sort / add-slug)
+       ============================================================ */
+    .toolbar {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .toolbar .search {
+      flex: 1; min-width: 220px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-input);
+    }
+    .toolbar .search input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--text-primary); font-size: 14px;
+    }
+    .toolbar .search input::placeholder { color: var(--text-muted); }
+    .toolbar select {
+      padding: 10px 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-input);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .toolbar .meta-count {
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      margin-left: auto;
+    }
+
+    /* ============================================================
+       COLLECTIONS GRID
+       ============================================================ */
+    .collections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .collection-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 140ms, border-color 140ms, box-shadow 140ms;
+    }
+    .collection-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--brand-teal);
+      box-shadow: var(--shadow-glow-teal);
+    }
+    .collection-card .cover {
+      aspect-ratio: 1 / 1;
+      background: var(--bg-elevated);
+      display: grid; place-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .collection-card .cover img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+    }
+    .collection-card .cover .rank {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(10,15,44,0.85);
+      color: var(--brand-teal);
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600;
+      padding: 4px 8px;
+      border-radius: var(--radius-chip);
+      border: 1px solid var(--brand-teal);
+    }
+    .collection-card .cover .verified {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(0, 245, 212, 0.15);
+      color: var(--brand-teal);
+      font-size: 10px; font-weight: 700;
+      padding: 3px 7px;
+      border-radius: var(--radius-chip);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .collection-card .body { padding: 14px 16px 18px; }
+    .collection-card .name {
+      font-weight: 600; font-size: 15px;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .collection-card .stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;
+      font-size: 12px;
+    }
+    .collection-card .stats .lbl {
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      font-size: 10px;
+    }
+    .collection-card .stats .val {
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .collection-card.err {
+      opacity: 0.5;
+    }
+    .collection-card.err .cover { color: var(--text-muted); font-size: 12px; }
+
+    /* Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-elevated) 0%, var(--bg-border) 50%, var(--bg-elevated) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s linear infinite;
+      border-radius: var(--radius-input);
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ============================================================
+       COLLECTION DETAIL VIEW
+       ============================================================ */
+    .detail-head {
+      display: flex; align-items: center; gap: 18px;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-card);
+    }
+    .detail-head .cover {
+      width: 96px; height: 96px; border-radius: var(--radius-input);
+      overflow: hidden; background: var(--bg-elevated);
+      flex-shrink: 0;
+    }
+    .detail-head .cover img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-head .info { flex: 1; min-width: 0; }
+    .detail-head h2 {
+      font-size: 24px; font-weight: 700;
+      margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .detail-head .desc {
+      color: var(--text-secondary); font-size: 13px;
+      margin-bottom: 10px;
+      max-height: 36px; overflow: hidden;
+    }
+    .detail-head .stats-row {
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .detail-head .stat .lbl {
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      font-size: 10px;
+    }
+    .detail-head .stat .val {
+      font-family: var(--font-mono);
+      font-weight: 600; font-size: 15px;
+    }
+    .back-btn {
+      background: transparent; border: none;
+      color: var(--brand-teal); cursor: pointer;
+      font-size: 13px; font-weight: 600;
+      padding: 6px 0;
+      margin-bottom: 12px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .back-btn:hover { text-decoration: underline; }
+
+    .nfts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .nft-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 140ms, border-color 140ms;
+    }
+    .nft-card:hover {
+      transform: translateY(-1px);
+      border-color: var(--brand-teal);
+    }
+    .nft-card .cover {
+      aspect-ratio: 1 / 1;
+      background: var(--bg-elevated);
+      display: grid; place-items: center;
+      overflow: hidden;
+    }
+    .nft-card .cover img { width: 100%; height: 100%; object-fit: cover; }
+    .nft-card .cover .placeholder { color: var(--text-muted); font-size: 11px; text-align: center; padding: 10px; }
+    .nft-card .body { padding: 10px 12px; }
+    .nft-card .name {
+      font-size: 13px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .nft-card .sub {
+      font-size: 11px; color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .nft-card .price {
+      display: inline-block;
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px; font-weight: 600;
+      color: var(--brand-teal);
+    }
+    /* Price pill overlay on the artwork */
+    .nft-card .cover .price-pill {
+      position: absolute;
+      left: 8px; bottom: 8px;
+      padding: 4px 9px;
+      border-radius: var(--radius-chip);
+      background: rgba(10,15,44,0.85);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--brand-teal);
+      color: var(--brand-teal);
+      font-family: var(--font-mono);
+      font-size: 12px; font-weight: 600;
+      letter-spacing: -0.01em;
+      pointer-events: none;
+    }
+    .nft-card .cover { position: relative; }
+    .nft-card.unlisted { opacity: 0.55; }
+    .nft-card.unlisted:hover { opacity: 1; }
+    .nft-card.hidden-by-filter { display: none; }
+
+    /* Listed-only toggle + scan-more button */
+    .filter-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-chip);
+      color: var(--text-secondary);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; user-select: none;
+      transition: all 120ms;
+    }
+    .filter-pill input { accent-color: var(--brand-teal); }
+    .filter-pill.active {
+      background: var(--trade-buy-bg);
+      border-color: var(--brand-teal);
+      color: var(--brand-teal);
+    }
+    .detail-toolbar {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .empty {
+      padding: 60px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      border: 1px dashed var(--bg-border);
+      border-radius: var(--radius-card);
+    }
+    .empty .title { color: var(--text-secondary); font-size: 15px; margin-bottom: 6px; }
+
+    /* ============================================================
+       NFT DETAIL MODAL
+       ============================================================ */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(5, 8, 20, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 110;
+      display: none;
+      justify-content: center; align-items: center;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 28px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      animation: modal-in 140ms ease-out;
+    }
+    .modal.nft-modal { max-width: 720px; text-align: left; padding: 0; overflow: hidden; }
+    .nft-modal .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 640px) { .nft-modal .layout { grid-template-columns: 1fr; } }
+    .nft-modal .media {
+      aspect-ratio: 1 / 1;
+      background: var(--bg-elevated);
+      display: grid; place-items: center;
+      overflow: hidden;
+    }
+    .nft-modal .media img { width: 100%; height: 100%; object-fit: cover; }
+    .nft-modal .media .placeholder { color: var(--text-muted); padding: 24px; text-align: center; }
+    .nft-modal .side {
+      padding: 24px;
+      display: flex; flex-direction: column;
+      max-height: 560px; overflow-y: auto;
+    }
+    .nft-modal h3 {
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .nft-modal .sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      word-break: break-all;
+      margin-bottom: 14px;
+    }
+    .nft-modal .section-title {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 14px 0 8px;
+    }
+    .offer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px; align-items: center;
+      padding: 10px 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-input);
+      margin-bottom: 8px;
+    }
+    .offer-row .px {
+      font-family: var(--font-mono);
+      font-weight: 600; font-size: 15px;
+      color: var(--brand-teal);
+    }
+    .offer-row .by {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .offer-row.mine .px { color: var(--brand-amber); }
+
+    .modal h3.qr-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .modal p.qr-sub {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .modal .qr-box {
+      background: #E8E8E8;
+      padding: 16px; border-radius: var(--radius-input);
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .modal .qr-box img { display: block; width: 220px; height: 220px; }
+    .modal .status {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      min-height: 18px;
+    }
+    .modal .actions {
+      display: flex; gap: 10px; justify-content: center;
+    }
+    .modal a.deeplink {
+      display: inline-block;
+      color: var(--brand-teal);
+      font-size: 13px;
+      text-decoration: none;
+    }
+    .modal a.deeplink:hover { text-decoration: underline; }
+    @keyframes modal-in {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* ============================================================
+       LIST / CREATE OFFER PANEL
+       ============================================================ */
+    .input-row {
+      background: var(--bg-elevated);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-input);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .input-row-top {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .amt-input {
+      background: transparent; border: none; outline: none;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 18px; font-weight: 600;
+      width: 100%;
+    }
+
+    /* ============================================================
+       TOASTS
+       ============================================================ */
+    .toasts {
+      position: fixed; bottom: 20px; right: 20px;
+      z-index: 200;
+      display: flex; flex-direction: column; gap: 10px;
+      max-width: 360px;
+    }
+    .toast {
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-input);
+      box-shadow: var(--shadow-card);
+      font-size: 13px;
+      color: var(--text-primary);
+      animation: toast-in 160ms ease-out;
+    }
+    .toast.warn { border-color: var(--brand-amber); color: var(--brand-amber); }
+    .toast.ok { border-color: var(--brand-teal); color: var(--brand-teal); }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+    }
+
+    footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid var(--bg-border);
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+    }
+    footer a { color: var(--text-secondary); text-decoration: none; }
+    footer a:hover { color: var(--brand-teal); }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header>
+    <div class="header-inner">
+      <a href="/" class="brand">
+        <span class="brand-mark">A</span>
+        <span>Arcvex</span>
+      </a>
+      <nav class="links">
+        <a href="/">Home</a>
+        <a href="/swap">Swap</a>
+        <a href="/analytics">Analytics</a>
+        <a href="/nfts" style="color: var(--text-primary);">NFTs</a>
+        <a href="/about">About</a>
+        <a href="/team">Team</a>
+      </nav>
+      <div id="walletArea">
+        <button class="btn btn-primary" id="btnConnect">Connect Xaman</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN
+       ============================================================ -->
+  <main>
+    <section class="hero">
+      <h1>XRPL <span class="accent">NFTs</span>. On-chain bids, on-chain asks, no middle layer.</h1>
+      <p>Browse the biggest XRPL collections by 24h volume, view active sell offers live from the ledger, and accept them from your Xaman wallet. Listings and cancellations are signed by you and submitted straight to the XRPL.</p>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <button class="active" data-tab="collections">Collections</button>
+      <button data-tab="mine">My NFTs</button>
+      <button data-tab="offers">My Offers</button>
+    </div>
+
+    <!-- Rate-limit banner (shown when xrp.cafe throttles us) -->
+    <div id="rateLimitBanner" style="display: none; padding: 10px 14px; margin-bottom: 16px; background: var(--trade-sell-bg); border: 1px solid var(--brand-amber); border-radius: var(--radius-input); color: var(--brand-amber); font-size: 13px; text-align: center;"></div>
+
+    <!-- ====== COLLECTIONS TAB ====== -->
+    <div id="view-collections">
+      <div class="toolbar">
+        <label class="search">
+          <span style="color: var(--text-muted); font-size: 14px;">🔍</span>
+          <input id="searchInput" placeholder="Search by collection name or slug…">
+        </label>
+        <select id="sortSelect">
+          <option value="vol24">Top 24h volume</option>
+          <option value="volTotal">Total volume</option>
+          <option value="floor">Floor price (asc)</option>
+          <option value="floorDesc">Floor price (desc)</option>
+          <option value="holders">Holders</option>
+          <option value="items">Items</option>
+          <option value="name">Name (A-Z)</option>
+        </select>
+        <button class="btn btn-quiet btn-small" id="btnAddSlug" title="xrp.cafe tracks ~9,992 collections. Paste any slug to add it.">+ Add slug</button>
+        <button class="btn btn-quiet btn-small" id="btnRefresh" title="Re-fetch all collection stats">↻ Refresh</button>
+        <span class="meta-count" id="metaCount">…</span>
+      </div>
+      <div class="collections-grid" id="collectionsGrid"></div>
+    </div>
+
+    <!-- ====== COLLECTION DETAIL (hidden until opened) ====== -->
+    <div id="view-detail" style="display: none;">
+      <button class="back-btn" id="btnBack">← Back to collections</button>
+      <div class="detail-head" id="detailHead"></div>
+      <div class="detail-toolbar">
+        <label class="filter-pill" id="listedPill">
+          <input type="checkbox" id="listedOnly">
+          <span>Listed for sale only</span>
+        </label>
+        <label class="filter-pill" id="autoScanPill" title="Scan the entire collection in the background. Pauses if you switch collections.">
+          <input type="checkbox" id="autoScan">
+          <span>Auto-scan all</span>
+        </label>
+        <select id="nftSort" class="btn-quiet" style="padding: 8px 12px; background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: var(--radius-input); color: var(--text-primary); font-size: 13px;">
+          <option value="default">Sort: Default</option>
+          <option value="priceAsc">Price: low to high</option>
+          <option value="priceDesc">Price: high to low</option>
+          <option value="rankAsc">Rarity: top ranked</option>
+        </select>
+        <span class="meta-count" id="nftMetaCount"></span>
+      </div>
+      <div class="nfts-grid" id="nftsGrid"></div>
+      <div id="gridSentinel" style="height: 40px; margin-top: 20px;"></div>
+    </div>
+
+    <!-- ====== MY NFTS TAB ====== -->
+    <div id="view-mine" style="display: none;">
+      <div class="toolbar">
+        <span class="meta-count" id="mineCount">Connect Xaman to see your NFTs.</span>
+        <button class="btn btn-quiet btn-small" id="btnMineRefresh" style="margin-left: auto;">↻ Refresh</button>
+      </div>
+      <div class="nfts-grid" id="mineGrid"></div>
+    </div>
+
+    <!-- ====== MY OFFERS TAB ====== -->
+    <div id="view-offers" style="display: none;">
+      <div class="toolbar">
+        <span class="meta-count" id="offersCount">Connect Xaman to see your open offers.</span>
+      </div>
+      <div id="offersList"></div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       NFT DETAIL MODAL
+       ============================================================ -->
+  <div class="modal-backdrop" id="nftModal" role="dialog" aria-modal="true">
+    <div class="modal nft-modal">
+      <div class="layout">
+        <div class="media" id="nftMedia"></div>
+        <div class="side" id="nftSide"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SIGN MODAL (Xaman QR)
+       ============================================================ -->
+  <div class="modal-backdrop" id="signModal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3 class="qr-title" id="signTitle">Sign in Xaman</h3>
+      <p class="qr-sub" id="signSub">Scan the QR with the Xaman app, or open the deeplink on your phone.</p>
+      <div class="qr-box"><img id="signQR" src="" alt="Xaman QR"></div>
+      <div class="status mono" id="signStatus">Waiting for scan…</div>
+      <div class="actions">
+        <a id="signDeeplink" class="btn btn-ghost" href="#" target="_blank" rel="noopener">Open in Xaman</a>
+        <button class="btn btn-ghost" id="signCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div class="toasts" id="toasts"></div>
+
+  <footer>
+    <div>
+      <a href="/">Arcvex</a> · XRPL NFT marketplace · Non-custodial · You sign with Xaman
+    </div>
+    <div style="margin-top: 8px;">
+      <a href="/terms">Terms</a> ·
+      <a href="/privacy">Privacy</a> ·
+      <a href="/risk-disclosure">Risk Disclosure</a> ·
+      <a href="https://x.com/Arcvex_io" target="_blank" rel="noopener">X</a>
+    </div>
+    <div class="disclaimer" style="margin-top: 8px; max-width: 680px; margin-left: auto; margin-right: auto;">
+      Not financial advice. Collection stats via <a href="https://xrp.cafe" target="_blank" rel="noopener">xrp.cafe</a> and <a href="https://xrpldata.com" target="_blank" rel="noopener">xrpldata.com</a>; offers are read live from the XRPL. NFT markets are illiquid and volatile. Transactions are signed by you in Xaman and submitted directly to the ledger — once accepted they are final.
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       SCRIPT
+       ============================================================ -->
+  <script type="module">
+    import { XummPkce } from 'https://esm.sh/xumm-oauth2-pkce@2.8.5';
+
+    // --------------------------------------------------------------
+    // CONSTANTS
+    // --------------------------------------------------------------
+    const XAMAN_API_KEY = '5e34057c-473f-46cc-81d6-2dc769549da0';
+    const XRPL_WS       = 'wss://xrplcluster.com';
+
+    // Seed list of tracked xrp.cafe collection slugs. Sorted client-side
+    // by 24h / total volume to produce the "top collections" view. Extend
+    // via the "+ Add slug" button — extras persist in localStorage.
+    //
+    // xrp.cafe has no public "top N" enumeration endpoint (their
+    // /api/collections/* endpoints require an internal token). This list
+    // is a curated set of verified & high-volume collections that we
+    // confirmed resolve via /api/collection/{slug}. xrp.cafe reports
+    // ~9,992 collections total, so paste any slug from
+    // https://xrp.cafe/collection/<slug> to add it.
+    const SEED_SLUGS = [
+      // Top by historical total volume
+      'xspectar', 'xpunks', 'degens', 'whales', 'rebels',
+      'xwarriors', 'xlions', 'xwhales', 'xuniverse', 'xrpcats',
+      'samurai', 'ledgerpunks', 'jellyfish', 'xrpbull', 'xbears',
+      'xknights', 'xhares', 'xcrusaders', 'doodles',
+      // Smaller but verified / notable
+      'xrpunks', 'pepe-on-xrpl', 'xrp-legends', 'xrp-art', 'xlarva',
+      'xrpanda', 'xoge', 'xrpape', 'seeds', 'roxy', 'xmonkeys',
+      'robots', 'sharks', 'xrp-sharks', 'vikings', 'mages', 'skulls',
+      'owls', 'matrix', 'xbulls', 'gems', 'pumpkins', 'birds',
+      'cats', 'dogs', 'stars', 'xmas', 'lions', 'genesis',
+      'gold', 'silver', 'phoenix'
+    ];
+
+    const LS_EXTRA_SLUGS   = 'arcvex.nfts.extraSlugs';
+    const LS_REMOVED_SLUGS = 'arcvex.nfts.removedSlugs';
+    const LS_COLLECTION_CACHE = 'arcvex.nfts.collectionCache';  // { slug: {data, ts} }
+    const COLLECTION_CACHE_TTL_MS = 10 * 60 * 1000;             // 10 minutes
+
+    function getCachedCollection(slug) {
+      try {
+        const blob = JSON.parse(localStorage.getItem(LS_COLLECTION_CACHE) || '{}');
+        const row = blob[slug];
+        if (!row) return null;
+        if (Date.now() - row.ts > COLLECTION_CACHE_TTL_MS) return null;
+        return row.data;
+      } catch (_) { return null; }
+    }
+    function setCachedCollection(slug, data) {
+      try {
+        const blob = JSON.parse(localStorage.getItem(LS_COLLECTION_CACHE) || '{}');
+        blob[slug] = { data, ts: Date.now() };
+        localStorage.setItem(LS_COLLECTION_CACHE, JSON.stringify(blob));
+      } catch (_) {}
+    }
+
+    const drops = (x) => Number(x) / 1_000_000;
+    const toDrops = (xrp) => String(Math.round(Number(xrp) * 1_000_000));
+    const short = (addr) => addr ? `${addr.slice(0,6)}…${addr.slice(-4)}` : '';
+    const fmtXrp = (v) => {
+      if (v === null || v === undefined || isNaN(v)) return '—';
+      const n = Number(v);
+      if (n === 0) return '0';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(2) + 'K';
+      if (n < 1) return n.toFixed(3);
+      return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    };
+    const fmtInt = (v) => {
+      if (v === null || v === undefined || isNaN(v)) return '—';
+      return Number(v).toLocaleString('en-US');
+    };
+    const hexToAscii = (hex) => {
+      if (!hex || typeof hex !== 'string') return '';
+      let s = '';
+      for (let i = 0; i < hex.length; i += 2) {
+        const c = parseInt(hex.substr(i, 2), 16);
+        if (isNaN(c) || c === 0) break;
+        s += String.fromCharCode(c);
+      }
+      return s;
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    // --------------------------------------------------------------
+    // STATE
+    // --------------------------------------------------------------
+    const state = {
+      xrplClient: null,
+      connectedAccount: null,
+      xummSdk: null,
+      xrpBalance: null,
+      collections: [],         // [{slug, data, err}]
+      currentDetail: null,     // current collection when viewing detail
+      detailNfts: [],
+      myNfts: [],
+      myOffers: [],
+      tab: 'collections'
+    };
+
+    // --------------------------------------------------------------
+    // TOAST
+    // --------------------------------------------------------------
+    function toast(msg, kind = 'info') {
+      const el = document.createElement('div');
+      el.className = `toast ${kind}`;
+      el.textContent = msg;
+      $('toasts').appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(12px)'; }, 4200);
+      setTimeout(() => el.remove(), 4600);
+    }
+
+    // --------------------------------------------------------------
+    // SLUG PERSISTENCE
+    // --------------------------------------------------------------
+    function getExtraSlugs() {
+      try { return JSON.parse(localStorage.getItem(LS_EXTRA_SLUGS) || '[]'); }
+      catch (_) { return []; }
+    }
+    function getRemovedSlugs() {
+      try { return JSON.parse(localStorage.getItem(LS_REMOVED_SLUGS) || '[]'); }
+      catch (_) { return []; }
+    }
+    function addExtraSlug(slug) {
+      const extras = getExtraSlugs();
+      if (!extras.includes(slug)) {
+        extras.push(slug);
+        localStorage.setItem(LS_EXTRA_SLUGS, JSON.stringify(extras));
+      }
+      const removed = getRemovedSlugs().filter(s => s !== slug);
+      localStorage.setItem(LS_REMOVED_SLUGS, JSON.stringify(removed));
+    }
+    function removeSlug(slug) {
+      const extras = getExtraSlugs().filter(s => s !== slug);
+      localStorage.setItem(LS_EXTRA_SLUGS, JSON.stringify(extras));
+      const removed = getRemovedSlugs();
+      if (!removed.includes(slug)) {
+        removed.push(slug);
+        localStorage.setItem(LS_REMOVED_SLUGS, JSON.stringify(removed));
+      }
+    }
+    function allSlugs() {
+      const removed = new Set(getRemovedSlugs());
+      const seed = SEED_SLUGS.filter(s => !removed.has(s));
+      const extras = getExtraSlugs().filter(s => !removed.has(s));
+      return Array.from(new Set([...seed, ...extras]));
+    }
+
+    // --------------------------------------------------------------
+    // XRPL CLIENT
+    // --------------------------------------------------------------
+    async function xrplConnect() {
+      if (state.xrplClient?.isConnected()) return state.xrplClient;
+      const c = new xrpl.Client(XRPL_WS);
+      c.on('error', (e) => console.error('[xrpl]', e));
+      await c.connect();
+      state.xrplClient = c;
+      return c;
+    }
+
+    // --------------------------------------------------------------
+    // DATA: xrp.cafe collection stats
+    // --------------------------------------------------------------
+    // Shared "cool-down" timestamp. When any xrp.cafe request hits a 429
+    // or a CORS-wrapped fetch failure (browser can't tell the difference),
+    // we park all subsequent calls until the cooldown passes. This keeps
+    // us from making the rate-limit worse.
+    let xrpCafeColdUntil = 0;
+    let _bannerInterval = null;
+    function xrpCafeIsCold() { return Date.now() < xrpCafeColdUntil; }
+    function xrpCafeCoolDown(ms) {
+      xrpCafeColdUntil = Math.max(xrpCafeColdUntil, Date.now() + ms);
+      updateRateLimitBanner();
+    }
+    function updateRateLimitBanner() {
+      const banner = $('rateLimitBanner');
+      if (!banner) return;
+      const tick = () => {
+        const remaining = xrpCafeColdUntil - Date.now();
+        if (remaining <= 0) {
+          banner.style.display = 'none';
+          if (_bannerInterval) { clearInterval(_bannerInterval); _bannerInterval = null; }
+          return;
+        }
+        banner.textContent = `xrp.cafe is rate-limiting us — retrying in ${Math.ceil(remaining / 1000)}s. Cached data shown below.`;
+        banner.style.display = 'block';
+      };
+      tick();
+      if (!_bannerInterval) _bannerInterval = setInterval(tick, 1000);
+    }
+
+    async function fetchXrpCafe(path, { retries = 3 } = {}) {
+      let attempt = 0;
+      while (true) {
+        // Wait out any active cool-down before attempting
+        while (xrpCafeIsCold()) {
+          await new Promise(r => setTimeout(r, 500));
+        }
+        try {
+          const res = await fetch(`https://api.xrp.cafe${path}`);
+          if (res.status === 429) {
+            xrpCafeCoolDown(20_000);
+            if (attempt++ >= retries) throw new Error('HTTP 429');
+            continue;
+          }
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        } catch (e) {
+          // "Failed to fetch" from the browser covers CORS-wrapped 429s,
+          // network hiccups, and DNS issues. Treat as transient.
+          if (String(e.message).includes('Failed to fetch')) {
+            xrpCafeCoolDown(15_000);
+          }
+          if (attempt++ >= retries) throw e;
+          await new Promise(r => setTimeout(r, 1500 * Math.pow(2, attempt)));
+        }
+      }
+    }
+
+    async function fetchCollection(slug) {
+      // Try in-flight cache first — avoids refetching across reloads.
+      const cached = getCachedCollection(slug);
+      if (cached) return cached;
+      const json = await fetchXrpCafe(`/api/collection/${encodeURIComponent(slug)}`);
+      const c = Array.isArray(json) ? json[0] : json;
+      if (!c || !c.issuer) throw new Error('No collection data');
+      const data = {
+        slug,
+        issuer: c.issuer,
+        taxon: c.token_taxon ?? c.taxon ?? 0,
+        name: c.collection_name || slug,
+        desc: c.collection_desc || '',
+        image: c.collection_img || '',
+        verified: !!c.verified,
+        items: Number(c.numberInCollection || 0),
+        floor: c.FloorPrice != null ? drops(c.FloorPrice) : null,
+        vol24: c.collectionVolume24hr != null ? drops(c.collectionVolume24hr) : 0,
+        volTotal: c.totalCollectionVolume != null ? drops(c.totalCollectionVolume) : 0,
+        holders: Number(c.holders || 0),
+        percentListed: Number(c.percentListed || 0),
+        twitter: c.twitter || '',
+        website: c.website || ''
+      };
+      setCachedCollection(slug, data);
+      return data;
+    }
+
+    async function fetchAllCollections() {
+      const slugs = allSlugs();
+      // Seed the list with any cached data so the page renders instantly
+      // even while rate-limited or offline. Missing cache entries stay in
+      // "loading" state and get filled in by the workers below.
+      state.collections = slugs.map(slug => {
+        const cached = getCachedCollection(slug);
+        return cached
+          ? { slug, data: cached, err: null, loading: false, stale: true }
+          : { slug, data: null, err: null, loading: true };
+      });
+      renderCollections();
+
+      // Keep concurrency low for the initial burst — 54 slugs at 3 in
+      // flight is well under xrp.cafe's ~80 req/10s budget and leaves
+      // headroom for any NFT-detail fetches happening concurrently.
+      const CONCURRENCY = 3;
+      let i = 0;
+      async function worker() {
+        while (i < slugs.length) {
+          const idx = i++;
+          const slug = slugs[idx];
+          // If we already served cached data, a refresh is nice-to-have
+          // but not required. Fetch anyway to keep it fresh.
+          try {
+            const data = await fetchCollection(slug);
+            state.collections[idx] = { slug, data, err: null, loading: false };
+          } catch (e) {
+            // Keep any prior cached data (state.collections[idx] already
+            // holds it if we pre-seeded from cache); just annotate the err.
+            const prev = state.collections[idx];
+            state.collections[idx] = prev?.data
+              ? { ...prev, loading: false, err: null, stale: true }
+              : { slug, data: null, err: e.message || 'error', loading: false };
+          }
+          renderCollections();
+        }
+      }
+      await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+      renderCollections();
+    }
+
+    // --------------------------------------------------------------
+    // DATA: xrpldata NFTs in a collection
+    // --------------------------------------------------------------
+    async function fetchNftsInCollection(issuer, taxon) {
+      const url = `https://api.xrpldata.com/api/v1/xls20-nfts/issuer/${issuer}/taxon/${taxon}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json?.data?.nfts || [];
+    }
+
+    // --------------------------------------------------------------
+    // DATA: sell offers for a specific NFTokenID
+    // --------------------------------------------------------------
+    async function fetchSellOffers(nftId) {
+      const c = await xrplConnect();
+      try {
+        const res = await c.request({ command: 'nft_sell_offers', nft_id: nftId });
+        return res?.result?.offers || [];
+      } catch (e) {
+        if (e?.data?.error === 'objectNotFound') return [];
+        throw e;
+      }
+    }
+    async function fetchBuyOffers(nftId) {
+      const c = await xrplConnect();
+      try {
+        const res = await c.request({ command: 'nft_buy_offers', nft_id: nftId });
+        return res?.result?.offers || [];
+      } catch (e) {
+        if (e?.data?.error === 'objectNotFound') return [];
+        throw e;
+      }
+    }
+
+    // --------------------------------------------------------------
+    // DATA: account_nfts
+    // --------------------------------------------------------------
+    async function fetchMyNfts(account) {
+      const c = await xrplConnect();
+      const out = [];
+      let marker;
+      do {
+        const res = await c.request({
+          command: 'account_nfts',
+          account,
+          ledger_index: 'validated',
+          limit: 400,
+          ...(marker ? { marker } : {})
+        });
+        for (const n of (res?.result?.account_nfts || [])) out.push(n);
+        marker = res?.result?.marker;
+      } while (marker);
+      return out;
+    }
+
+    // --------------------------------------------------------------
+    // XRPL NFT URI decoding (best-effort IPFS / ipfs://)
+    // --------------------------------------------------------------
+    function decodeNftUri(uriHex) {
+      if (!uriHex) return '';
+      const raw = hexToAscii(uriHex);
+      if (!raw) return '';
+      if (raw.startsWith('ipfs://')) {
+        return 'https://ipfs.io/ipfs/' + raw.slice('ipfs://'.length);
+      }
+      return raw;
+    }
+
+    // XRPL NFT URIs typically point at IPFS metadata JSON, which browsers
+    // can rarely fetch directly — most gateways are CORS-blocked or missing
+    // the pin. Instead we hit xrp.cafe's per-NFT endpoint, which returns a
+    // CDN-cached thumbnail (media_url_sm) and full-size image (media_url),
+    // plus item_name / ranking for the detail modal. CORS-open. Cached in
+    // memory so we don't re-fetch on tab switches.
+    const nftMetaCache = new Map(); // nftId -> { thumb, full, name, desc, ranking } | null
+
+    async function fetchNftMeta(nftId) {
+      if (nftMetaCache.has(nftId)) return nftMetaCache.get(nftId);
+      try {
+        const j = await fetchXrpCafe(`/api/nft/${encodeURIComponent(nftId)}`, { retries: 2 });
+        const n = j?.nft;
+        if (!n) { nftMetaCache.set(nftId, null); return null; }
+        const meta = {
+          thumb: n.media_url_sm || n.media_url || null,
+          full:  n.media_url    || n.media_url_sm || null,
+          name:  n.item_name    || null,
+          desc:  n.item_desc    || null,
+          ranking: n.ranking    || null,
+          totalItems: n.totalNumberOfItems || null,
+          // Listing info (null when not for sale). `amount` is in drops.
+          // xrp.cafe doesn't surface the nft_offer_index here; we look that
+          // up on-chain when the user actually clicks to buy.
+          listing: n.amount ? {
+            amount: Number(n.amount),
+            owner: n.offerowner,
+            expiration: n.expiration
+          } : null
+        };
+        nftMetaCache.set(nftId, meta);
+        return meta;
+      } catch (_) {
+        nftMetaCache.set(nftId, null);
+        return null;
+      }
+    }
+
+    // Lazy image hydration. xrp.cafe rate-limits at ~80 req/10s, and a
+    // collection can hold 10,000+ NFTs, so we CANNOT fetch everything
+    // up-front. Instead we watch cards with an IntersectionObserver and
+    // only hydrate those near the viewport. Requests go through a small
+    // queue with a strict cap of 4 in flight + 80ms spacing — well under
+    // the rate limit even when the user scrolls fast.
+    // Tuned to stay under xrp.cafe's observed ~80 req/10s limit even when
+    // many fetches resolve quickly. 6 concurrent × 60ms gap = ~10 req/s
+    // ceiling, typically ~6-8/s in practice because individual fetches
+    // take 200-500ms. A full 8,882-item collection auto-scans in ~20 min.
+    const HYDRATE_MAX_INFLIGHT = 6;
+    const HYDRATE_GAP_MS = 60;
+    let hydrateInflight = 0;
+    const hydrateQueue = [];
+    let hydrateObserver = null;
+
+    function pumpHydrateQueue() {
+      while (hydrateInflight < HYDRATE_MAX_INFLIGHT && hydrateQueue.length) {
+        const job = hydrateQueue.shift();
+        hydrateInflight++;
+        job().finally(() => {
+          hydrateInflight--;
+          setTimeout(pumpHydrateQueue, HYDRATE_GAP_MS);
+        });
+      }
+    }
+
+    function hydrateCard(card) {
+      if (!card || card.dataset.hydrated) return;
+      card.dataset.hydrated = '1';
+      const id = card.dataset.nftid;
+      hydrateQueue.push(async () => {
+        const meta = await fetchNftMeta(id);
+        if (!card.isConnected) return;
+        const cover = card.querySelector('.cover');
+        const listed = !!meta?.listing;
+        const pricePill = listed
+          ? `<span class="price-pill">${fmtXrp(drops(meta.listing.amount))} XRP</span>`
+          : '';
+        if (cover) {
+          cover.innerHTML = (meta?.thumb
+            ? `<img src="${escapeAttr(meta.thumb)}" alt="" loading="lazy" onerror="this.parentElement.querySelector('img').replaceWith(Object.assign(document.createElement('span'),{className:'placeholder',textContent:'No preview'}))">`
+            : `<span class="placeholder">No preview</span>`) + pricePill;
+        }
+        const nameEl = card.querySelector('.name');
+        if (nameEl && meta?.name) nameEl.textContent = meta.name;
+        // Flag listing state so the filter/sort can use it
+        card.dataset.listed = listed ? '1' : '0';
+        if (listed) {
+          card.dataset.priceDrops = String(meta.listing.amount);
+          card.classList.remove('unlisted');
+        } else {
+          card.classList.add('unlisted');
+        }
+        if (meta?.ranking) card.dataset.rank = String(meta.ranking);
+        // If listed-only filter is on, re-apply filter so newly-discovered listings appear
+        applyNftFilterSort();
+      });
+      pumpHydrateQueue();
+    }
+
+    // Kick off lazy hydration for every .nft-card in a container.
+    // - First 24 cards: hydrate eagerly (above-the-fold, feels instant)
+    // - Remaining:      lazy via IntersectionObserver with a generous
+    //                   rootMargin so cards hydrate before reaching view
+    function hydrateNftImages(container /*, nftList */) {
+      const cards = container.querySelectorAll('.nft-card[data-nftid]:not([data-hydrated])');
+      if (!cards.length) return;
+
+      const EAGER = 24;
+      cards.forEach((c, i) => { if (i < EAGER) hydrateCard(c); });
+
+      if (cards.length <= EAGER || !('IntersectionObserver' in window)) {
+        // No lazy needed — everything already queued
+        cards.forEach(c => hydrateCard(c));
+        return;
+      }
+
+      if (hydrateObserver) hydrateObserver.disconnect();
+      hydrateObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            hydrateCard(entry.target);
+            hydrateObserver.unobserve(entry.target);
+          }
+        }
+      }, { rootMargin: '1200px 0px', threshold: 0.01 });
+
+      cards.forEach((c, i) => { if (i >= EAGER) hydrateObserver.observe(c); });
+    }
+
+    // --------------------------------------------------------------
+    // RENDERING: collections grid
+    // --------------------------------------------------------------
+    function filteredSortedCollections() {
+      const q = $('searchInput').value.trim().toLowerCase();
+      const sort = $('sortSelect').value;
+      let rows = state.collections
+        .filter(r => r.data)
+        .map(r => r.data);
+
+      if (q) {
+        rows = rows.filter(r =>
+          r.name.toLowerCase().includes(q) ||
+          r.slug.toLowerCase().includes(q) ||
+          r.issuer.toLowerCase().includes(q)
+        );
+      }
+
+      const cmp = (a, b, key, dir = -1) => ((Number(a[key] ?? 0) - Number(b[key] ?? 0)) * dir);
+      switch (sort) {
+        case 'vol24':     rows.sort((a,b) => cmp(a,b,'vol24')); break;
+        case 'volTotal':  rows.sort((a,b) => cmp(a,b,'volTotal')); break;
+        case 'floor':     rows.sort((a,b) => {
+          const av = a.floor == null ? Infinity : a.floor;
+          const bv = b.floor == null ? Infinity : b.floor;
+          return av - bv;
+        }); break;
+        case 'floorDesc': rows.sort((a,b) => (b.floor ?? -1) - (a.floor ?? -1)); break;
+        case 'holders':   rows.sort((a,b) => cmp(a,b,'holders')); break;
+        case 'items':     rows.sort((a,b) => cmp(a,b,'items')); break;
+        case 'name':      rows.sort((a,b) => a.name.localeCompare(b.name)); break;
+      }
+
+      // Pin user-added slugs above seed slugs so anything the user manually
+      // tracked surfaces first. Within the user-added group, most recently
+      // added comes first (mirrors the localStorage insertion order, reversed).
+      const extras = getExtraSlugs();
+      const extraRank = new Map(extras.map((s, i) => [s, extras.length - i]));  // higher = newer
+      rows.sort((a, b) => {
+        const aIsExtra = extraRank.has(a.slug);
+        const bIsExtra = extraRank.has(b.slug);
+        if (aIsExtra && !bIsExtra) return -1;
+        if (bIsExtra && !aIsExtra) return 1;
+        if (aIsExtra && bIsExtra) return extraRank.get(b.slug) - extraRank.get(a.slug);
+        return 0;  // preserve prior sort for seed-vs-seed
+      });
+      return rows;
+    }
+
+    function renderCollections() {
+      const grid = $('collectionsGrid');
+      const loaded = state.collections.filter(r => !r.loading).length;
+      const withData = state.collections.filter(r => r.data).length;
+      const total = state.collections.length;
+      $('metaCount').textContent = total
+        ? `${withData} loaded / ${total} tracked${loaded < total ? ' · loading…' : ''}`
+        : '';
+
+      const rows = filteredSortedCollections();
+      if (!rows.length && loaded === total) {
+        grid.innerHTML = `<div class="empty" style="grid-column: 1/-1;"><div class="title">No collections match</div>Try clearing the search or adjusting the sort.</div>`;
+        return;
+      }
+
+      grid.innerHTML = rows.map((c, i) => `
+        <div class="collection-card" data-slug="${c.slug}">
+          <div class="cover">
+            <span class="rank">#${i + 1}</span>
+            ${c.verified ? '<span class="verified">Verified</span>' : ''}
+            ${c.image
+              ? `<img src="${escapeAttr(c.image)}" alt="${escapeAttr(c.name)}" loading="lazy" onerror="this.style.display='none'">`
+              : `<span style="color: var(--text-muted); font-size: 11px;">No image</span>`}
+          </div>
+          <div class="body">
+            <div class="name" title="${escapeAttr(c.name)}">${escapeHtml(c.name)}</div>
+            <div class="stats">
+              <div>
+                <div class="lbl">Floor</div>
+                <div class="val">${c.floor != null ? fmtXrp(c.floor) + ' XRP' : '—'}</div>
+              </div>
+              <div>
+                <div class="lbl">24h Vol</div>
+                <div class="val">${fmtXrp(c.vol24)} XRP</div>
+              </div>
+              <div>
+                <div class="lbl">Holders</div>
+                <div class="val">${fmtInt(c.holders)}</div>
+              </div>
+              <div>
+                <div class="lbl">Items</div>
+                <div class="val">${fmtInt(c.items)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Also show errored slugs at the bottom if nothing's loading anymore
+      if (loaded === total) {
+        const errs = state.collections.filter(r => r.err);
+        if (errs.length) {
+          grid.innerHTML += errs.map(r => `
+            <div class="collection-card err" title="Failed to load">
+              <div class="cover"><span>Not found on xrp.cafe</span></div>
+              <div class="body">
+                <div class="name">${escapeHtml(r.slug)}</div>
+                <div class="stats"><div><div class="lbl">Error</div><div class="val" style="color: var(--brand-amber);">${escapeHtml(r.err)}</div></div></div>
+                <div style="margin-top: 10px;"><button class="btn btn-quiet btn-small" data-remove-slug="${escapeAttr(r.slug)}">Remove</button></div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Wire click -> detail
+      grid.querySelectorAll('.collection-card[data-slug]').forEach(el => {
+        el.addEventListener('click', () => openCollection(el.dataset.slug));
+      });
+      grid.querySelectorAll('[data-remove-slug]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const slug = btn.getAttribute('data-remove-slug');
+          removeSlug(slug);
+          state.collections = state.collections.filter(r => r.slug !== slug);
+          renderCollections();
+          toast(`Removed ${slug}`, 'ok');
+        });
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function escapeAttr(s) { return escapeHtml(s); }
+
+    // --------------------------------------------------------------
+    // COLLECTION DETAIL
+    // --------------------------------------------------------------
+    async function openCollection(slug) {
+      const row = state.collections.find(r => r.slug === slug);
+      if (!row || !row.data) { toast('Collection not loaded.', 'warn'); return; }
+      state.currentDetail = row.data;
+
+      $('view-collections').style.display = 'none';
+      $('view-mine').style.display = 'none';
+      $('view-offers').style.display = 'none';
+      $('view-detail').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      const c = row.data;
+      $('detailHead').innerHTML = `
+        <div class="cover">${c.image ? `<img src="${escapeAttr(c.image)}" alt="" onerror="this.style.display='none'">` : ''}</div>
+        <div class="info">
+          <h2>${escapeHtml(c.name)} ${c.verified ? '<span class="verified" style="font-size: 10px; padding: 3px 7px; background: rgba(0,245,212,0.15); color: var(--brand-teal); border-radius: 999px; text-transform: uppercase; letter-spacing: 0.08em; margin-left: 8px;">Verified</span>' : ''}</h2>
+          <div class="desc">${escapeHtml(c.desc || '')}</div>
+          <div class="stats-row">
+            <div class="stat"><div class="lbl">Floor</div><div class="val" style="color: var(--brand-teal);">${c.floor != null ? fmtXrp(c.floor) + ' XRP' : '—'}</div></div>
+            <div class="stat"><div class="lbl">24h Vol</div><div class="val">${fmtXrp(c.vol24)} XRP</div></div>
+            <div class="stat"><div class="lbl">Total Vol</div><div class="val">${fmtXrp(c.volTotal)} XRP</div></div>
+            <div class="stat"><div class="lbl">Holders</div><div class="val">${fmtInt(c.holders)}</div></div>
+            <div class="stat"><div class="lbl">Items</div><div class="val">${fmtInt(c.items)}</div></div>
+            <div class="stat"><div class="lbl">Listed</div><div class="val">${Number(c.percentListed || 0).toFixed(1)}%</div></div>
+            <div class="stat"><div class="lbl">Issuer</div><div class="val mono" style="font-size: 12px;" title="${escapeAttr(c.issuer)}">${short(c.issuer)}</div></div>
+          </div>
+          <div style="margin-top: 10px;">
+            <a class="btn btn-ghost btn-small" href="https://xrp.cafe/collection/${encodeURIComponent(c.slug)}" target="_blank" rel="noopener">View on xrp.cafe ↗</a>
+            ${c.website ? `<a class="btn btn-ghost btn-small" href="${escapeAttr(c.website)}" target="_blank" rel="noopener">Website ↗</a>` : ''}
+            ${c.twitter ? `<a class="btn btn-ghost btn-small" href="https://twitter.com/${escapeAttr(c.twitter)}" target="_blank" rel="noopener">X / Twitter ↗</a>` : ''}
+          </div>
+        </div>
+      `;
+
+      $('nftsGrid').innerHTML = `<div class="empty" style="grid-column: 1/-1;"><div class="title">Loading NFTs from the ledger…</div>This collection has ${fmtInt(c.items)} items.</div>`;
+
+      // Reset detail-view state when opening a fresh collection
+      currentNftRenderCap = NFT_RENDER_CAP_INIT;
+      autoScanAbort++;  // cancel any auto-scan running for the previous collection
+      // Purge any pending hydration jobs left over from the previous
+      // collection. In-flight requests (max 4) finish naturally; nothing
+      // from the old queue will block new work.
+      hydrateQueue.length = 0;
+      const listedToggle = $('listedOnly'); if (listedToggle) listedToggle.checked = false;
+      const autoScanToggle = $('autoScan'); if (autoScanToggle) autoScanToggle.checked = false;
+      const sortSel = $('nftSort'); if (sortSel) sortSel.value = 'default';
+      $('listedPill')?.classList.remove('active');
+      $('autoScanPill')?.classList.remove('active');
+
+      try {
+        const nfts = await fetchNftsInCollection(c.issuer, c.taxon);
+        state.detailNfts = nfts;
+        renderCollectionNfts();
+        // Kick the scroll check once: a short viewport may already have the
+        // sentinel within range, so load another batch straight away.
+        setTimeout(() => maybeLoadMoreOnScroll(), 200);
+      } catch (e) {
+        $('nftsGrid').innerHTML = `<div class="empty" style="grid-column: 1/-1;"><div class="title">Couldn't load NFTs</div>${escapeHtml(e.message || String(e))}</div>`;
+      }
+    }
+
+    // How many NFTs we render per collection initially. "Scan more" expands
+    // this in chunks of 300 when the user wants deeper listing coverage.
+    const NFT_RENDER_CAP_INIT = 300;
+    const NFT_RENDER_CAP_STEP = 300;
+    let currentNftRenderCap = NFT_RENDER_CAP_INIT;
+
+    function renderCollectionNfts() {
+      const nfts = state.detailNfts.slice(0, currentNftRenderCap);
+      if (!nfts.length) {
+        $('nftsGrid').innerHTML = `<div class="empty" style="grid-column: 1/-1;">No NFTs found for this collection.</div>`;
+        $('nftMetaCount').textContent = '';
+        return;
+      }
+      $('nftsGrid').innerHTML = nfts.map(n => {
+        const id = n.NFTokenID;
+        return `
+          <div class="nft-card" data-nftid="${id}">
+            <div class="cover"><div class="skeleton" style="width: 100%; height: 100%;"></div></div>
+            <div class="body">
+              <div class="name">#${id.slice(-6)}</div>
+              <div class="sub">${short(n.Issuer || state.currentDetail.issuer)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      $('nftsGrid').querySelectorAll('.nft-card').forEach(el => {
+        el.addEventListener('click', () => openNft(el.dataset.nftid));
+      });
+      hydrateNftImages($('nftsGrid'), nfts);
+      applyNftFilterSort();
+    }
+
+    // Debounced so the hydration loop doesn't re-run it 300 times.
+    // Uses setTimeout rather than rAF because rAF is throttled / skipped
+    // in background or headless tabs.
+    let _filterSortPending = false;
+    function applyNftFilterSort() {
+      if (_filterSortPending) return;
+      _filterSortPending = true;
+      setTimeout(() => {
+        _filterSortPending = false;
+        _applyNftFilterSort();
+      }, 60);
+    }
+    function _applyNftFilterSort() {
+      const grid = $('nftsGrid');
+      if (!grid) return;
+      const listedOnly = $('listedOnly')?.checked;
+      const sort = $('nftSort')?.value || 'default';
+
+      let cards = [...grid.querySelectorAll('.nft-card')];
+      let listedCount = 0, unlistedCount = 0, pendingCount = 0;
+      for (const c of cards) {
+        const ls = c.dataset.listed;
+        if (ls === '1') listedCount++;
+        else if (ls === '0') unlistedCount++;
+        else pendingCount++;
+      }
+
+      // Sort (stable-ish — reflect DOM order using a sort key)
+      if (sort === 'priceAsc' || sort === 'priceDesc') {
+        cards.sort((a, b) => {
+          const ap = Number(a.dataset.priceDrops || Infinity);
+          const bp = Number(b.dataset.priceDrops || Infinity);
+          return sort === 'priceAsc' ? ap - bp : bp - ap;
+        });
+      } else if (sort === 'rankAsc') {
+        cards.sort((a, b) => {
+          const ar = Number(a.dataset.rank || Infinity);
+          const br = Number(b.dataset.rank || Infinity);
+          return ar - br;
+        });
+      }
+      // Reorder DOM
+      if (sort !== 'default') {
+        const frag = document.createDocumentFragment();
+        cards.forEach(c => frag.appendChild(c));
+        grid.appendChild(frag);
+      }
+
+      // Filter
+      let shownListed = 0;
+      for (const c of cards) {
+        const listed = c.dataset.listed === '1';
+        if (listedOnly) {
+          // Hide unlisted AND hide still-pending (unhydrated) cards when
+          // filter is on, to avoid flickering. They'll show if they get
+          // flagged listed. If user wants more, they hit "Scan more".
+          if (listed) { c.classList.remove('hidden-by-filter'); shownListed++; }
+          else c.classList.add('hidden-by-filter');
+        } else {
+          c.classList.remove('hidden-by-filter');
+        }
+      }
+
+      const totalInCollection = state.detailNfts.length;
+      const loaded = cards.length;
+      const scanned = listedCount + unlistedCount;
+      const scanning = pendingCount;
+      const msg = listedOnly
+        ? `${shownListed} listed · ${scanning} still scanning · ${scanned}/${loaded} scanned (${totalInCollection} in collection)`
+        : `${listedCount} listed · ${scanned}/${loaded} scanned (${totalInCollection} in collection)`;
+      $('nftMetaCount').textContent = msg;
+    }
+
+    // --------------------------------------------------------------
+    // NFT DETAIL MODAL
+    // --------------------------------------------------------------
+    async function openNft(nftId) {
+      // Find the NFT in either detailNfts or myNfts
+      const found =
+        state.detailNfts.find(n => n.NFTokenID === nftId) ||
+        state.myNfts.find(n => n.NFTokenID === nftId);
+
+      $('nftMedia').innerHTML = `<div class="skeleton" style="width: 100%; height: 100%;"></div>`;
+      // Fetch rich metadata from xrp.cafe (CORS-friendly, CDN-backed images)
+      (async () => {
+        const meta = await fetchNftMeta(nftId);
+        if (!$('nftModal').classList.contains('open')) return;
+        const img = meta?.full || meta?.thumb;
+        $('nftMedia').innerHTML = img
+          ? `<img src="${escapeAttr(img)}" alt="" onerror="this.parentElement.innerHTML='<div class=placeholder>No preview available</div>'">`
+          : `<div class="placeholder">No preview available</div>`;
+        // Enrich the side panel with the item name + ranking if we got them
+        if (meta?.name) {
+          const h3 = $('nftSide').querySelector('h3');
+          if (h3) h3.textContent = meta.name + (meta.ranking ? ` · Rank #${meta.ranking}` : '');
+        }
+      })();
+
+      $('nftSide').innerHTML = `
+        <h3>NFT #${nftId.slice(-8)}</h3>
+        <div class="sub">${nftId}</div>
+        <div class="section-title">Sell offers</div>
+        <div id="sellOffersList"><div class="mono" style="color: var(--text-muted); font-size: 12px;">Loading offers…</div></div>
+        ${found && state.connectedAccount && (found.Owner || state.currentDetail?.issuer) ? '' : ''}
+        <div id="ownerActions" style="margin-top: auto; padding-top: 16px;"></div>
+      `;
+
+      $('nftModal').classList.add('open');
+
+      try {
+        const offers = await fetchSellOffers(nftId);
+        renderSellOffers(nftId, offers, found);
+      } catch (e) {
+        $('sellOffersList').innerHTML = `<div class="mono" style="color: var(--brand-amber); font-size: 12px;">Failed to load offers: ${escapeHtml(e.message || String(e))}</div>`;
+      }
+
+      // Render owner actions (list/cancel) if the connected wallet owns this NFT
+      renderOwnerActions(nftId, found);
+    }
+
+    function renderSellOffers(nftId, offers, nftRow) {
+      const el = $('sellOffersList');
+      if (!offers.length) {
+        el.innerHTML = `<div class="mono" style="color: var(--text-muted); font-size: 12px;">No active sell offers on-chain.</div>`;
+        return;
+      }
+      // Filter to XRP-only offers. IOU offers are rare for NFTs and add complexity.
+      const xrpOffers = offers.filter(o => typeof o.amount === 'string');
+      const iouCount = offers.length - xrpOffers.length;
+
+      el.innerHTML = xrpOffers.map(o => {
+        const mine = state.connectedAccount && o.owner === state.connectedAccount;
+        return `
+          <div class="offer-row ${mine ? 'mine' : ''}">
+            <div>
+              <div class="px">${fmtXrp(drops(o.amount))} XRP</div>
+              <div class="by">by ${short(o.owner)}${mine ? ' (you)' : ''}${o.destination ? ' · to ' + short(o.destination) : ''}</div>
+            </div>
+            <div>
+              ${mine
+                ? `<button class="btn btn-quiet btn-small" data-cancel-offer="${o.nft_offer_index}">Cancel</button>`
+                : `<button class="btn btn-primary btn-small" data-accept-offer="${o.nft_offer_index}">Buy</button>`}
+            </div>
+          </div>
+        `;
+      }).join('') + (iouCount ? `<div class="mono" style="color: var(--text-muted); font-size: 11px; margin-top: 6px;">${iouCount} non-XRP offer(s) hidden.</div>` : '');
+
+      el.querySelectorAll('[data-accept-offer]').forEach(btn => {
+        btn.addEventListener('click', () => acceptSellOffer(btn.getAttribute('data-accept-offer')));
+      });
+      el.querySelectorAll('[data-cancel-offer]').forEach(btn => {
+        btn.addEventListener('click', () => cancelOffer(btn.getAttribute('data-cancel-offer')));
+      });
+    }
+
+    function renderOwnerActions(nftId, nftRow) {
+      const el = $('ownerActions');
+      if (!state.connectedAccount) {
+        el.innerHTML = `<button class="btn btn-primary btn-large" id="btnConnectFromModal">Connect Xaman to buy or list</button>`;
+        $('btnConnectFromModal').addEventListener('click', () => xumm.authorize());
+        return;
+      }
+      // Determine ownership: if NFT came from myNfts it's yours. Otherwise check Issuer === Owner heuristics are unreliable; check explicitly via account_nfts presence.
+      const isMine = state.myNfts.some(n => n.NFTokenID === nftId);
+      if (isMine) {
+        el.innerHTML = `
+          <div class="section-title">Create sell offer</div>
+          <div class="input-row">
+            <div class="input-row-top"><span>Price</span><span>XRP</span></div>
+            <input class="amt-input" id="listPrice" type="number" placeholder="0.00" step="0.000001" min="0">
+          </div>
+          <button class="btn btn-sell btn-large" id="btnCreateOffer">List for sale</button>
+        `;
+        $('btnCreateOffer').addEventListener('click', () => createSellOffer(nftId));
+      } else {
+        el.innerHTML = '';
+      }
+    }
+
+    $('nftModal').addEventListener('click', (e) => {
+      if (e.target === $('nftModal')) $('nftModal').classList.remove('open');
+    });
+
+    // --------------------------------------------------------------
+    // TRANSACTIONS: build + sign via Xaman
+    // --------------------------------------------------------------
+    async function acceptSellOffer(offerIdx) {
+      if (!state.connectedAccount) { toast('Connect Xaman first.', 'warn'); xumm.authorize(); return; }
+      const tx = {
+        TransactionType: 'NFTokenAcceptOffer',
+        Account: state.connectedAccount,
+        NFTokenSellOffer: offerIdx
+      };
+      await signWithXaman(tx, 'Accept sell offer');
+    }
+
+    async function cancelOffer(offerIdx) {
+      if (!state.connectedAccount) { toast('Connect Xaman first.', 'warn'); return; }
+      const tx = {
+        TransactionType: 'NFTokenCancelOffer',
+        Account: state.connectedAccount,
+        NFTokenOffers: [offerIdx]
+      };
+      await signWithXaman(tx, 'Cancel offer');
+    }
+
+    async function createSellOffer(nftId) {
+      if (!state.connectedAccount) { toast('Connect Xaman first.', 'warn'); return; }
+      const priceXrp = parseFloat($('listPrice').value);
+      if (!priceXrp || priceXrp <= 0) { toast('Enter a price > 0 XRP.', 'warn'); return; }
+      const tx = {
+        TransactionType: 'NFTokenCreateOffer',
+        Account: state.connectedAccount,
+        NFTokenID: nftId,
+        Amount: toDrops(priceXrp.toFixed(6)),
+        Flags: 1  // tfSellNFToken
+      };
+      await signWithXaman(tx, `List NFT for ${priceXrp} XRP`);
+    }
+
+    // --------------------------------------------------------------
+    // XAMAN PKCE + SIGN MODAL
+    // --------------------------------------------------------------
+    const xumm = new XummPkce(XAMAN_API_KEY, { implicit: true });
+    let activeWs = null;
+
+    async function signWithXaman(txjson, label) {
+      if (!state.xummSdk) { toast('Not connected to Xaman.', 'warn'); return; }
+      $('signTitle').textContent = label || 'Sign in Xaman';
+      $('signSub').textContent = 'Scan the QR with the Xaman app, or open the deeplink on your phone.';
+      $('signQR').src = '';
+      $('signStatus').textContent = 'Creating payload…';
+      $('signModal').classList.add('open');
+
+      try {
+        const payload = await state.xummSdk.payload.create(txjson);
+        $('signQR').src = payload.refs.qr_png;
+        $('signDeeplink').href = payload.next.always;
+        $('signStatus').textContent = 'Waiting for scan…';
+
+        if (activeWs) try { activeWs.close(); } catch (_) {}
+        activeWs = new WebSocket(payload.refs.websocket_status);
+        activeWs.onmessage = async (m) => {
+          try {
+            const data = JSON.parse(m.data);
+            if (data.opened) $('signStatus').textContent = 'Opened in Xaman — confirm on your device…';
+            if (data.signed === true) {
+              $('signStatus').textContent = 'Signed — submitting to ledger…';
+              const final = await state.xummSdk.payload.get(payload.uuid);
+              const hash = final?.response?.txid;
+              closeSignModal();
+              toast(hash ? `Tx signed: ${hash.slice(0,10)}…` : 'Transaction signed.', 'ok');
+              // Refresh relevant data
+              setTimeout(async () => {
+                try {
+                  if (state.connectedAccount) {
+                    state.myNfts = await fetchMyNfts(state.connectedAccount);
+                  }
+                  // If NFT modal still open, refresh the offers panel
+                  if ($('nftModal').classList.contains('open')) {
+                    const lastId = $('nftSide').querySelector('.sub')?.textContent?.trim();
+                    if (lastId) {
+                      const offers = await fetchSellOffers(lastId);
+                      renderSellOffers(lastId, offers, null);
+                      renderOwnerActions(lastId, null);
+                    }
+                  }
+                  if (state.tab === 'mine') renderMine();
+                  if (state.tab === 'offers') await loadMyOffers();
+                } catch (err) { console.warn(err); }
+              }, 2000);
+            }
+            if (data.signed === false) {
+              $('signStatus').textContent = 'Rejected in Xaman.';
+              setTimeout(closeSignModal, 900);
+              toast('Signing rejected.', 'warn');
+            }
+            if (data.expired) {
+              $('signStatus').textContent = 'Payload expired.';
+              setTimeout(closeSignModal, 900);
+            }
+          } catch (err) { console.error('[ws msg]', err); }
+        };
+      } catch (e) {
+        console.error(e);
+        $('signStatus').textContent = 'Failed to create payload.';
+        toast('Xaman error: ' + (e.message || e), 'warn');
+        setTimeout(closeSignModal, 1200);
+      }
+    }
+
+    function closeSignModal() {
+      $('signModal').classList.remove('open');
+      if (activeWs) try { activeWs.close(); } catch (_) {}
+      activeWs = null;
+    }
+    $('signCancel').addEventListener('click', closeSignModal);
+    $('signModal').addEventListener('click', (e) => {
+      if (e.target === $('signModal')) closeSignModal();
+    });
+
+    // --------------------------------------------------------------
+    // XAMAN CONNECT / DISCONNECT
+    // --------------------------------------------------------------
+    $('btnConnect').addEventListener('click', () => xumm.authorize());
+
+    xumm.on('success', async () => {
+      try {
+        const s = await xumm.state();
+        state.connectedAccount = s.me.account;
+        state.xummSdk = s.sdk;
+        renderConnected();
+        if (state.tab === 'mine') await loadMine();
+        if (state.tab === 'offers') await loadMyOffers();
+        toast(`Connected ${short(state.connectedAccount)}`, 'ok');
+      } catch (e) {
+        console.error(e); toast('Connection error: ' + e.message, 'warn');
+      }
+    });
+    xumm.on('error', (e) => { console.error('[xumm]', e); toast('Xaman error — try again.', 'warn'); });
+    xumm.on('retrieved', async () => {
+      const s = await xumm.state();
+      if (s?.me) {
+        state.connectedAccount = s.me.account;
+        state.xummSdk = s.sdk;
+        renderConnected();
+        if (state.tab === 'mine') await loadMine();
+        if (state.tab === 'offers') await loadMyOffers();
+      }
+    });
+
+    function renderConnected() {
+      $('walletArea').innerHTML = `
+        <div class="wallet-chip" id="walletChip" title="Click to disconnect">
+          <span class="dot"></span>
+          <span>${short(state.connectedAccount)}</span>
+        </div>
+      `;
+      $('walletChip').addEventListener('click', async () => {
+        if (!confirm('Disconnect Xaman?')) return;
+        await xumm.logout();
+        state.connectedAccount = null;
+        state.xummSdk = null;
+        state.myNfts = [];
+        state.myOffers = [];
+        $('walletArea').innerHTML = `<button class="btn btn-primary" id="btnConnect">Connect Xaman</button>`;
+        $('btnConnect').addEventListener('click', () => xumm.authorize());
+        if (state.tab === 'mine') renderMine();
+        if (state.tab === 'offers') renderMyOffers();
+        toast('Disconnected.');
+      });
+    }
+
+    // --------------------------------------------------------------
+    // TAB SWITCHING
+    // --------------------------------------------------------------
+    document.querySelectorAll('.tabs button').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+    function switchTab(tab) {
+      state.tab = tab;
+      document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+      $('view-collections').style.display = tab === 'collections' ? 'block' : 'none';
+      $('view-detail').style.display = 'none';
+      $('view-mine').style.display = tab === 'mine' ? 'block' : 'none';
+      $('view-offers').style.display = tab === 'offers' ? 'block' : 'none';
+
+      if (tab === 'mine') loadMine();
+      if (tab === 'offers') loadMyOffers();
+    }
+
+    $('btnBack').addEventListener('click', () => {
+      $('view-detail').style.display = 'none';
+      switchTab(state.tab);  // restore whichever tab was active
+      if (state.tab !== 'collections') switchTab('collections');
+      else $('view-collections').style.display = 'block';
+    });
+
+    // Listed-only filter + sort
+    $('listedOnly').addEventListener('change', (e) => {
+      $('listedPill').classList.toggle('active', e.target.checked);
+      applyNftFilterSort();
+    });
+    $('nftSort').addEventListener('change', applyNftFilterSort);
+
+    // Append the next 300 NFTs as skeleton cards and let hydration fill them
+    // in. Returns false if we've already rendered the full collection.
+    function expandRenderCap() {
+      const prev = currentNftRenderCap;
+      currentNftRenderCap = Math.min(prev + NFT_RENDER_CAP_STEP, state.detailNfts.length);
+      if (currentNftRenderCap <= prev) return false;
+      const newNfts = state.detailNfts.slice(prev, currentNftRenderCap);
+      const html = newNfts.map(n => {
+        const id = n.NFTokenID;
+        return `
+          <div class="nft-card" data-nftid="${id}">
+            <div class="cover"><div class="skeleton" style="width: 100%; height: 100%;"></div></div>
+            <div class="body">
+              <div class="name">#${id.slice(-6)}</div>
+              <div class="sub">${short(n.Issuer || state.currentDetail.issuer)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      $('nftsGrid').insertAdjacentHTML('beforeend', html);
+      $('nftsGrid').querySelectorAll('.nft-card:not([data-hydrated])').forEach(el => {
+        if (!el.__wired) { el.addEventListener('click', () => openNft(el.dataset.nftid)); el.__wired = true; }
+      });
+      hydrateNftImages($('nftsGrid'));
+      applyNftFilterSort();
+      // If the viewport is still near the bottom after expansion, keep loading
+      // (happens on very tall viewports where one batch doesn't fill below).
+      maybeLoadMoreOnScroll();
+      return true;
+    }
+
+    // Infinite scroll — when the user nears the bottom of the NFT grid,
+    // grow the render cap. We use a throttled scroll listener (more reliable
+    // than IntersectionObserver in some preview / headless environments).
+    let _scrollCheckPending = false;
+    function maybeLoadMoreOnScroll() {
+      if (_scrollCheckPending) return;
+      _scrollCheckPending = true;
+      setTimeout(() => {
+        _scrollCheckPending = false;
+        // Only act while the detail view is actually visible
+        if ($('view-detail')?.style.display === 'none') return;
+        const sentinel = $('gridSentinel');
+        if (!sentinel) return;
+        const rect = sentinel.getBoundingClientRect();
+        // Sentinel within 800px of the bottom of the viewport → load next batch
+        if (rect.top < window.innerHeight + 800) {
+          expandRenderCap();
+        }
+      }, 120);
+    }
+    window.addEventListener('scroll', maybeLoadMoreOnScroll, { passive: true });
+    window.addEventListener('resize', maybeLoadMoreOnScroll, { passive: true });
+
+    // Auto-scan: when the user ticks "Auto-scan all", keep expanding the
+    // cap (and forcing hydration on every rendered card) until the whole
+    // collection is loaded. A single global flag so we can cancel on
+    // collection switch.
+    let autoScanAbort = 0;  // incremented to cancel any in-flight scan
+    async function startAutoScan() {
+      const myToken = ++autoScanAbort;
+      while (myToken === autoScanAbort) {
+        // Expand render cap to the full collection in 300-card chunks
+        if (currentNftRenderCap < state.detailNfts.length) {
+          expandRenderCap();
+        }
+        // Force-hydrate every un-hydrated card so the filter sees them all.
+        // hydrateCard is a no-op on already-hydrated cards.
+        const grid = $('nftsGrid');
+        if (grid) {
+          for (const card of grid.querySelectorAll('.nft-card[data-nftid]:not([data-hydrated])')) {
+            hydrateCard(card);
+          }
+        }
+        // Stop when everything's in the DOM AND the queue is drained
+        const remaining = grid?.querySelectorAll('.nft-card:not([data-hydrated])').length || 0;
+        if (currentNftRenderCap >= state.detailNfts.length && remaining === 0 && hydrateQueue.length === 0 && hydrateInflight === 0) {
+          break;
+        }
+        // Back off a bit — the hydration queue does its own throttling
+        await new Promise(r => setTimeout(r, 600));
+      }
+    }
+    $('autoScan').addEventListener('change', (e) => {
+      $('autoScanPill').classList.toggle('active', e.target.checked);
+      if (e.target.checked) {
+        startAutoScan();
+      } else {
+        autoScanAbort++;  // cancel any in-flight scan
+      }
+    });
+
+    // --------------------------------------------------------------
+    // MY NFTS TAB
+    // --------------------------------------------------------------
+    async function loadMine() {
+      if (!state.connectedAccount) {
+        $('mineCount').textContent = 'Connect Xaman to see your NFTs.';
+        $('mineGrid').innerHTML = '';
+        return;
+      }
+      $('mineCount').textContent = 'Loading your NFTs…';
+      $('mineGrid').innerHTML = '';
+      try {
+        state.myNfts = await fetchMyNfts(state.connectedAccount);
+        renderMine();
+      } catch (e) {
+        $('mineCount').textContent = 'Failed: ' + (e.message || String(e));
+      }
+    }
+    function renderMine() {
+      const n = state.myNfts.length;
+      $('mineCount').textContent = n ? `${n} NFT${n === 1 ? '' : 's'} in ${short(state.connectedAccount)}` : 'No NFTs found in this wallet.';
+      if (!n) { $('mineGrid').innerHTML = `<div class="empty" style="grid-column: 1/-1;">This wallet owns no XLS-20 NFTs.</div>`; return; }
+      $('mineGrid').innerHTML = state.myNfts.map(nf => `
+          <div class="nft-card" data-nftid="${nf.NFTokenID}">
+            <div class="cover"><div class="skeleton" style="width: 100%; height: 100%;"></div></div>
+            <div class="body">
+              <div class="name">#${nf.NFTokenID.slice(-6)}</div>
+              <div class="sub">${short(nf.Issuer)}</div>
+            </div>
+          </div>
+        `).join('');
+      $('mineGrid').querySelectorAll('.nft-card').forEach(el => {
+        el.addEventListener('click', () => openNft(el.dataset.nftid));
+      });
+      hydrateNftImages($('mineGrid'), state.myNfts);
+    }
+    $('btnMineRefresh').addEventListener('click', loadMine);
+
+    // --------------------------------------------------------------
+    // MY OFFERS TAB
+    // --------------------------------------------------------------
+    async function loadMyOffers() {
+      if (!state.connectedAccount) {
+        $('offersCount').textContent = 'Connect Xaman to see your open offers.';
+        $('offersList').innerHTML = '';
+        return;
+      }
+      $('offersCount').textContent = 'Scanning ledger for your open NFT offers…';
+      $('offersList').innerHTML = '';
+
+      try {
+        if (!state.myNfts.length) {
+          state.myNfts = await fetchMyNfts(state.connectedAccount);
+        }
+        // We scan sell offers across NFTs the user currently owns.
+        // This doesn't catch buy offers or offers on NFTs the user sold — those
+        // would require account_objects scanning, which we can add later.
+        const results = [];
+        let done = 0;
+        for (const nft of state.myNfts) {
+          $('offersCount').textContent = `Scanning ${++done}/${state.myNfts.length}…`;
+          try {
+            const offers = await fetchSellOffers(nft.NFTokenID);
+            for (const o of offers) {
+              if (o.owner === state.connectedAccount) {
+                results.push({ nft, offer: o });
+              }
+            }
+          } catch (_) {}
+        }
+        state.myOffers = results;
+        renderMyOffers();
+      } catch (e) {
+        $('offersCount').textContent = 'Failed: ' + (e.message || String(e));
+      }
+    }
+    function renderMyOffers() {
+      const list = $('offersList');
+      if (!state.myOffers.length) {
+        $('offersCount').textContent = state.connectedAccount
+          ? 'No open sell offers on NFTs you currently own.'
+          : 'Connect Xaman to see your open offers.';
+        list.innerHTML = `<div class="empty">You haven't listed any NFTs for sale.</div>`;
+        return;
+      }
+      $('offersCount').textContent = `${state.myOffers.length} open sell offer${state.myOffers.length === 1 ? '' : 's'}`;
+      list.innerHTML = state.myOffers.map(({ nft, offer }) => {
+        const cached = nftMetaCache.get(nft.NFTokenID);
+        const cachedImg = cached?.thumb;
+        return `
+          <div class="offer-row mine" style="grid-template-columns: 56px 1fr auto; gap: 14px;">
+            <div class="offer-thumb" data-nftid="${nft.NFTokenID}" style="width: 56px; height: 56px; border-radius: 8px; overflow: hidden; background: var(--bg-surface);">
+              ${cachedImg ? `<img src="${escapeAttr(cachedImg)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">` : '<div class="skeleton" style="width:100%;height:100%;"></div>'}
+            </div>
+            <div>
+              <div style="font-weight: 600; font-size: 14px;">NFT #${nft.NFTokenID.slice(-8)}</div>
+              <div class="px">${fmtXrp(drops(offer.amount))} XRP</div>
+              <div class="by">offer ${short(offer.nft_offer_index)}</div>
+            </div>
+            <div>
+              <button class="btn btn-quiet btn-small" data-cancel="${offer.nft_offer_index}">Cancel</button>
+              <button class="btn btn-ghost btn-small" data-view="${nft.NFTokenID}">View</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      list.querySelectorAll('[data-cancel]').forEach(btn => {
+        btn.addEventListener('click', () => cancelOffer(btn.getAttribute('data-cancel')));
+      });
+      list.querySelectorAll('[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => openNft(btn.getAttribute('data-view')));
+      });
+
+      // Hydrate thumbnails that weren't cached yet
+      (async () => {
+        for (const { nft } of state.myOffers) {
+          const thumb = list.querySelector(`.offer-thumb[data-nftid="${nft.NFTokenID}"]`);
+          if (!thumb || thumb.querySelector('img')) continue;
+          const meta = await fetchNftMeta(nft.NFTokenID);
+          if (thumb.isConnected && meta?.thumb) {
+            thumb.innerHTML = `<img src="${escapeAttr(meta.thumb)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`;
+          }
+        }
+      })();
+    }
+
+    // --------------------------------------------------------------
+    // TOOLBAR
+    // --------------------------------------------------------------
+    $('searchInput').addEventListener('input', renderCollections);
+    $('sortSelect').addEventListener('change', renderCollections);
+    $('btnRefresh').addEventListener('click', fetchAllCollections);
+    $('btnAddSlug').addEventListener('click', async () => {
+      const slug = prompt('Add an xrp.cafe collection slug\n(e.g. "xspectar" — find it in the URL at xrp.cafe/collection/...)');
+      if (!slug) return;
+      const clean = slug.trim().toLowerCase().replace(/^https?:\/\/[^/]*\/collection\//, '').replace(/\/$/, '');
+      if (!clean) return;
+      addExtraSlug(clean);
+      state.collections.push({ slug: clean, data: null, err: null, loading: true });
+      renderCollections();
+      try {
+        const data = await fetchCollection(clean);
+        const idx = state.collections.findIndex(r => r.slug === clean);
+        state.collections[idx] = { slug: clean, data, err: null, loading: false };
+        toast(`Added ${data.name}`, 'ok');
+      } catch (e) {
+        const idx = state.collections.findIndex(r => r.slug === clean);
+        state.collections[idx] = { slug: clean, data: null, err: e.message, loading: false };
+        toast(`Slug "${clean}" not found on xrp.cafe`, 'warn');
+      }
+      renderCollections();
+    });
+
+    // --------------------------------------------------------------
+    // BOOT
+    // --------------------------------------------------------------
+    fetchAllCollections();
+
+  </script>
+</body>
+</html>
