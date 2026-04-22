@@ -829,7 +829,7 @@
       <a href="https://x.com/Arcvex_io" target="_blank" rel="noopener">X</a>
     </div>
     <div class="disclaimer" style="margin-top: 8px; max-width: 680px; margin-left: auto; margin-right: auto;">
-      Not financial advice. Collection metadata via <a href="https://xrp.cafe" target="_blank" rel="noopener">xrp.cafe</a>; sell offers are read live from the XRPL. We only surface offers any account can accept (no destination lock) — offers locked to marketplace brokers like xrp.cafe are shown but marked "Broker-only" since a direct accept would fail. NFT markets are illiquid and volatile.
+      Not financial advice. Collection metadata via <a href="https://xrp.cafe" target="_blank" rel="noopener">xrp.cafe</a> (cached through api.arcvex.io); sell offers are read live from the XRPL. We only surface offers any account can accept — offers locked to marketplace brokers are shown but marked "Broker-only". NFT markets are illiquid and volatile.
     </div>
   </footer>
 
@@ -1028,7 +1028,19 @@
       if (!_bannerInterval) _bannerInterval = setInterval(tick, 1000);
     }
 
+    // We talk to xrp.cafe via our own caching proxy at
+    // api.arcvex.io/nft-cache/*. That way 10,000 concurrent users all hit
+    // ONE server (ours), which hits xrp.cafe at most once per cache TTL.
+    // The proxy also serves stale cache on xrp.cafe 429s, so a rate-limit
+    // upstream never reaches the browser as a failure. The path segment
+    // after /nft-cache/ matches xrp.cafe's /api/ layout — nginx strips
+    // and forwards.
+    const NFT_CACHE_BASE = 'https://api.arcvex.io/nft-cache';
+
     async function fetchXrpCafe(path, { retries = 3 } = {}) {
+      // path is e.g. "/api/collection/xspectar" or "/api/nft/<id>".
+      // Rewrite "/api/" to our proxy's layout (same suffix after).
+      const proxiedPath = path.replace(/^\/api\//, '/');
       let attempt = 0;
       while (true) {
         // Wait out any active cool-down before attempting
@@ -1036,7 +1048,7 @@
           await new Promise(r => setTimeout(r, 500));
         }
         try {
-          const res = await fetch(`https://api.xrp.cafe${path}`);
+          const res = await fetch(`${NFT_CACHE_BASE}${proxiedPath}`);
           if (res.status === 429) {
             xrpCafeCoolDown(20_000);
             if (attempt++ >= retries) throw new Error('HTTP 429');
@@ -1045,8 +1057,6 @@
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         } catch (e) {
-          // "Failed to fetch" from the browser covers CORS-wrapped 429s,
-          // network hiccups, and DNS issues. Treat as transient.
           if (String(e.message).includes('Failed to fetch')) {
             xrpCafeCoolDown(15_000);
           }
