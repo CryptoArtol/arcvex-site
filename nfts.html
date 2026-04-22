@@ -638,7 +638,10 @@
       if (error) { console.error('loadListings:', error); toast('Failed to load listings: ' + error.message, 'warn'); state.listings = []; return; }
 
       // Verify each against the ledger. Do this in parallel with a bounded
-      // fan-out so we don't hammer xrplcluster on a large set.
+      // fan-out so we don't hammer xrplcluster on a large set. Rows where
+      // the on-chain offer has vanished are filtered out client-side — DB
+      // stays 'active' for those, and a server-side job (follow-up) will
+      // mark them stale in a background pass.
       const CONC = 6;
       const rows = data || [];
       const keep = [];
@@ -646,9 +649,7 @@
       async function worker() {
         while (i < rows.length) {
           const r = rows[i++];
-          const live = await verifyListingStillActive(r);
-          if (live) keep.push(r);
-          else markListingStale(r.id);  // async, fire-and-forget
+          if (await verifyListingStillActive(r)) keep.push(r);
         }
       }
       await Promise.all(Array.from({ length: CONC }, () => worker()));
@@ -657,12 +658,6 @@
       // order is non-deterministic).
       const keepIds = new Set(keep.map(r => r.id));
       state.listings = rows.filter(r => keepIds.has(r.id));
-    }
-
-    async function markListingStale(id) {
-      await sb.from('arcvex_listings').update({
-        status: 'stale', closed_at: new Date().toISOString()
-      }).eq('id', id);
     }
 
     async function insertListing(row) {
