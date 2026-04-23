@@ -2090,36 +2090,39 @@
     // --------------------------------------------------------------
     function buildSwapTx() {
       // Swap = OfferCreate with tfImmediateOrCancel (market-ish).
-      // XRP → IOU: TakerGets = IOU (we receive at least min), TakerPays = XRP (we give).
+      // XRPL semantics: TakerGets = what the offer creator GIVES (sells).
+      //                  TakerPays = what the offer creator RECEIVES (buys).
       const amt = parseFloat(inpFrom.value);
       const slip = parseFloat(slipSel.value);
       if (state.swapDir === 'xrpToIou') {
+        // We give XRP, receive IOU
         const expected = parseFloat(inpTo.value);
         const minOut = (expected * (1 - slip)).toFixed(8);
         return {
           TransactionType: 'OfferCreate',
           Account: state.connectedAccount,
           Flags: TF_IOC,
-          TakerGets: { currency: state.pair.currency, issuer: state.pair.issuer, value: minOut },
-          TakerPays: toDrops(amt),
+          TakerGets: toDrops(amt),                                                             // we SELL XRP
+          TakerPays: { currency: state.pair.currency, issuer: state.pair.issuer, value: minOut }, // we BUY IOU (at least minOut)
         };
       } else {
+        // We give IOU, receive XRP
         const expectedXrp = parseFloat(inpTo.value);
         const minXrp = (expectedXrp * (1 - slip));
         return {
           TransactionType: 'OfferCreate',
           Account: state.connectedAccount,
           Flags: TF_IOC,
-          TakerGets: toDrops(minXrp.toFixed(6)),
-          TakerPays: { currency: state.pair.currency, issuer: state.pair.issuer, value: String(amt) },
+          TakerGets: { currency: state.pair.currency, issuer: state.pair.issuer, value: String(amt) }, // we SELL IOU
+          TakerPays: toDrops(minXrp.toFixed(6)),                                                      // we BUY XRP (at least minXrp)
         };
       }
     }
 
     function buildLimitTx() {
-      // Limit order:
-      //   side=buy (buy IOU with XRP): TakerGets = IOU (amount = size * price), TakerPays = XRP (amount = size)
-      //   side=sell (sell IOU for XRP): TakerGets = XRP (amount = size), TakerPays = IOU (amount = size * price), with tfSell
+      // Limit order. XRPL semantics: TakerGets = what we sell, TakerPays = what we buy.
+      //   side=buy  (user wants IOU, pays XRP): TakerGets = XRP (size), TakerPays = IOU (size*price)
+      //   side=sell (user has IOU, wants XRP): TakerGets = IOU (size*price), TakerPays = XRP (size), with tfSell
       const size = parseFloat(inpFrom.value);  // XRP size
       const price = parseFloat(inpTo.value);   // IOU per XRP
       const iouAmt = (size * price).toFixed(8);
@@ -2131,12 +2134,12 @@
       };
 
       if (state.side === 'buy') {
-        tx.TakerGets = { currency: state.pair.currency, issuer: state.pair.issuer, value: iouAmt };
-        tx.TakerPays = toDrops(size.toFixed(6));
+        tx.TakerGets = toDrops(size.toFixed(6));                                                   // we sell XRP
+        tx.TakerPays = { currency: state.pair.currency, issuer: state.pair.issuer, value: iouAmt }; // we buy IOU
       } else {
         tx.Flags = TF_SELL;
-        tx.TakerGets = toDrops(size.toFixed(6));
-        tx.TakerPays = { currency: state.pair.currency, issuer: state.pair.issuer, value: iouAmt };
+        tx.TakerGets = { currency: state.pair.currency, issuer: state.pair.issuer, value: iouAmt }; // we sell IOU
+        tx.TakerPays = toDrops(size.toFixed(6));                                                   // we want XRP
       }
       if (expSec > 0) {
         // XRPL epoch: seconds since 2000-01-01
