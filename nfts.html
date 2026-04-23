@@ -603,6 +603,48 @@
       return out;
     }
 
+    // Resolve a thumbnail URL for an XLS-20 NFT via the api.arcvex.io
+    // cache proxy (which fronts api.xrp.cafe with shared disk cache +
+    // 6r/s upstream cap). Only called for the connected user's own NFTs
+    // — never for arbitrary on-chain data — so the fan-out stays bounded.
+    // Returns null on miss; never throws.
+    const NFT_CACHE_BASE = 'https://api.arcvex.io/nft-cache/nft/';
+    const _nftThumbCache = new Map();   // nft_id → url|null (in-memory, page lifetime)
+    async function fetchNftThumbnail(nftId) {
+      if (_nftThumbCache.has(nftId)) return _nftThumbCache.get(nftId);
+      try {
+        const r = await fetch(NFT_CACHE_BASE + nftId, { headers: { accept: 'application/json' } });
+        if (!r.ok) { _nftThumbCache.set(nftId, null); return null; }
+        const j = await r.json();
+        const n = j?.nft || {};
+        const url = n.media_url_sm || n.media_url || null;
+        const ok = url && /^https:\/\//i.test(url) ? url : null;
+        _nftThumbCache.set(nftId, ok);
+        return ok;
+      } catch (_) {
+        _nftThumbCache.set(nftId, null);
+        return null;
+      }
+    }
+
+    // Fan-out thumbnail resolution across a list of NFTs with bounded
+    // concurrency (matches the listings verifier — proxy upstream is
+    // capped at 6r/s, queue-mode burst 300, so 6 workers is the right
+    // ceiling). Mutates each nft entry in place: sets `_thumb` to a
+    // URL string or null. Returns when all are resolved.
+    async function resolveMyNftThumbnails(nfts) {
+      const CONC = 6;
+      let i = 0;
+      async function worker() {
+        while (i < nfts.length) {
+          const nf = nfts[i++];
+          if (nf._thumb !== undefined) continue;
+          nf._thumb = await fetchNftThumbnail(nf.NFTokenID);
+        }
+      }
+      await Promise.all(Array.from({ length: CONC }, () => worker()));
+    }
+
     // Given a just-signed NFTokenCreateOffer tx hash, resolve the
     // on-chain nft_offer_index of the offer it created.
     async function txCreatedOfferIndex(txHash) {
@@ -761,7 +803,14 @@
       $('mineGrid').innerHTML = '';
       try {
         state.myNfts = await fetchMyNfts(state.connectedAccount);
+        // Paint immediately with placeholders / on-chain http URIs so the
+        // grid feels responsive, then resolve thumbnails via the proxy
+        // and re-render once they're in.
         renderMine();
+        if (state.myNfts.length) {
+          await resolveMyNftThumbnails(state.myNfts);
+          renderMine();
+        }
       } catch (e) {
         $('mineCount').textContent = 'Failed: ' + (e.message || String(e));
       }
@@ -784,7 +833,8 @@
 
       $('mineGrid').innerHTML = state.myNfts.map(nf => {
         const uri = nf.URI ? hexToAscii(nf.URI) : '';
-        const imgSrc = uri && /^https?:\/\//i.test(uri) ? uri : '';
+        const onchainHttp = uri && /^https?:\/\//i.test(uri) ? uri : '';
+        const imgSrc = nf._thumb || onchainHttp || '';
         const isListed = listedByNftId.has(nf.NFTokenID);
         return `
           <div class="card-nft" data-nftid="${escapeAttr(nf.NFTokenID)}">
@@ -903,14 +953,19 @@
     // --------------------------------------------------------------
     // MODAL: list your own NFT
     // --------------------------------------------------------------
-    function openMyNftModal(nftId) {
+    async function openMyNftModal(nftId) {
       const nft = state.myNfts.find(n => n.NFTokenID === nftId);
       if (!nft) return;
 
       // Already listed via Arcvex?
       const existingListing = state.myListings.find(r => r.nft_id === nftId);
       const uri = nft.URI ? hexToAscii(nft.URI) : '';
-      const imgSrc = uri && /^https?:\/\//i.test(uri) ? uri : '';
+      const onchainHttp = uri && /^https?:\/\//i.test(uri) ? uri : '';
+      // Prefer the proxy-resolved thumbnail (already cached in-memory if
+      // the grid render finished). If the user clicked through before
+      // resolution completed, fetch on demand.
+      if (nft._thumb === undefined) nft._thumb = await fetchNftThumbnail(nft.NFTokenID);
+      const imgSrc = nft._thumb || onchainHttp || '';
 
       $('nftMedia').innerHTML = imgSrc
         ? `<img src="${escapeAttr(imgSrc)}" alt="" onerror="this.parentElement.innerHTML='<div class=placeholder>No preview available</div>'">`
@@ -955,7 +1010,12 @@
     function openListForm(nft) {
       state.pendingList = nft;
       const uri = nft.URI ? hexToAscii(nft.URI) : '';
-      const imgSrc = uri && /^https?:\/\//i.test(uri) ? uri : '';
+      const onchainHttp = uri && /^https?:\/\//i.test(uri) ? uri : '';
+      // Pre-fill from the proxy thumbnail when available (resolved by
+      // openMyNftModal before this runs) — falling back to the on-chain
+      // URI if it happened to be a direct https image. The user can
+      // still edit before confirming.
+      const imgSrc = nft._thumb || onchainHttp || '';
       $('listTitle').textContent = `List NFT #${nft.NFTokenID.slice(-8)} for sale`;
       $('listNftId').textContent = nft.NFTokenID;
       $('listPrice').value = '';
