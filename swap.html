@@ -1206,6 +1206,13 @@
       'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B|USD':  'GateHub USD',
       'rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz|534F4C4F00000000000000000000000000000000': 'Sologenic',
       'rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr|CSC': 'CasinoCoin',
+      'rchGBxcD1A1C2tdxF6papQYZ8kjRKMYcL|BTC': 'BTC',
+      'rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h|ETH': 'ETH',
+      'rcxJwVnftZzXqyH9YheB8TgeiZUhNo1Eu|FLR': 'Flare',
+      'rDFXbW2ZZCG5WgPtqwNiA2xZokLMm9ivmN|50484E4958000000000000000000000000000000': 'PHNIX',
+      'raDZ4t8WPXkmDfJWMLBcNZmmSHmBC523NZ|ATM': 'ATM',
+      'rszenFJoDdiGjyezQc8pME9KWDQH43Tswh|44524F5000000000000000000000000000000000': 'Drop',
+      'rGG3wQ4kUzd7Jnmk1n5NWPZjjut62kCBfC|41524D5900000000000000000000000000000000': 'Army',
     };
     const isVerified = (issuer, currency) =>
       !!VERIFIED_ISSUERS[`${issuer}|${currency}`];
@@ -1218,6 +1225,13 @@
       { code: 'USD',   issuer: 'rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq', currency: 'USD', name: 'Bitstamp USD' },
       { code: 'SOLO',  issuer: 'rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz', currency: '534F4C4F00000000000000000000000000000000', name: 'Sologenic' },
       { code: 'CSC',   issuer: 'rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr', currency: 'CSC', name: 'CasinoCoin' },
+      { code: 'BTC',   issuer: 'rchGBxcD1A1C2tdxF6papQYZ8kjRKMYcL', currency: 'BTC', name: 'BTC' },
+      { code: 'ETH',   issuer: 'rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h', currency: 'ETH', name: 'ETH' },
+      { code: 'FLR',   issuer: 'rcxJwVnftZzXqyH9YheB8TgeiZUhNo1Eu', currency: 'FLR', name: 'Flare' },
+      { code: 'PHNIX', issuer: 'rDFXbW2ZZCG5WgPtqwNiA2xZokLMm9ivmN', currency: '50484E4958000000000000000000000000000000', name: 'PHNIX' },
+      { code: 'ATM',   issuer: 'raDZ4t8WPXkmDfJWMLBcNZmmSHmBC523NZ', currency: 'ATM', name: 'ATM' },
+      { code: 'DROP',  issuer: 'rszenFJoDdiGjyezQc8pME9KWDQH43Tswh', currency: '44524F5000000000000000000000000000000000', name: 'Drop' },
+      { code: 'ARMY',  issuer: 'rGG3wQ4kUzd7Jnmk1n5NWPZjjut62kCBfC', currency: '41524D5900000000000000000000000000000000', name: 'Army' },
     ];
 
     // ── Tier + reserve constants ─────────────────────────────────
