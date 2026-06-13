@@ -4,500 +4,154 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arcvex Lions — Mutable NFTs on the XRP Ledger</title>
-<meta name="description" content="Arcvex Lions — a 3,210-piece collection of mutable, living NFTs on the XRP Ledger. Minted on our own private launchpad. Art that evolves.">
+<meta name="description" content="Arcvex Lions — 3,210 mutable lions on the XRP Ledger. Mint one on our own launchpad.">
 <meta property="og:title" content="Arcvex Lions">
-<meta property="og:description" content="3,210 mutable lions on the XRP Ledger. Living art that evolves — minted on our own launchpad.">
-<meta property="og:type" content="website">
+<meta property="og:description" content="3,210 mutable lions on the XRP Ledger. Mint one.">
+<meta property="og:image" content="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1757.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://xayoujiqufvlyiakyqaw.supabase.co" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#06080F; --navy-2:#0A0E1A; --card:#0E1322; --card-2:#11172A;
-    --line:#1C2440; --line-2:#28315A;
-    --teal:#00F5D4; --teal-dim:#00C4A8;
-    --gold:#E8B341; --gold-2:#F5C76A; --amber:#F5A623;
-    --txt:#EAF0FF; --dim:#8A93B8; --dim-2:#5A6388;
-    --good:#00E676; --bad:#FF4D6A;
-    --maxw:1140px;
+    --cream:#FFF1CF; --blue:#2F6BFF; --red:#FF4438; --yellow:#FFC83D;
+    --ink:#141414; --white:#fff;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
+  html,body{height:100%}
   body{
-    background:var(--navy); color:var(--txt);
-    font-family:'Space Grotesk',system-ui,sans-serif;
-    line-height:1.6; overflow-x:hidden;
+    background:var(--cream); color:var(--ink);
+    font-family:'Fredoka',system-ui,sans-serif;
+    min-height:100vh; overflow:hidden; position:relative;
+    display:flex; flex-direction:column;
   }
-  h1,h2,h3,.display{font-family:'Sora',sans-serif;line-height:1.1}
-  a{color:inherit;text-decoration:none}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-  .accent-teal{color:var(--teal)}
-  .accent-gold{color:var(--gold)}
+  /* halftone texture */
+  .dots{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:radial-gradient(var(--ink) 2px,transparent 2px);
+    background-size:24px 24px;opacity:.05}
 
-  /* ---------- background glow ---------- */
-  .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-  .glow{position:absolute;border-radius:50%;filter:blur(120px);opacity:.5}
-  .glow.g1{width:600px;height:600px;background:rgba(0,245,212,.18);top:-200px;left:-150px}
-  .glow.g2{width:520px;height:520px;background:rgba(232,179,65,.16);top:340px;right:-180px}
-  .glow.g3{width:500px;height:500px;background:rgba(0,196,168,.10);bottom:-200px;left:30%}
+  /* ---------- gallery marquee (behind) ---------- */
+  .gallery{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;
+    justify-content:center;gap:clamp(14px,2.5vh,26px);pointer-events:none}
+  .row{display:flex;gap:clamp(14px,2vw,24px);width:max-content;
+    will-change:transform}
+  .row.a{animation:scrollL 60s linear infinite}
+  .row.b{animation:scrollR 70s linear infinite}
+  @keyframes scrollL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes scrollR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+  .lion{flex:0 0 auto;width:clamp(150px,21vh,230px);aspect-ratio:1;
+    border:5px solid var(--ink);border-radius:18px;overflow:hidden;background:#222;
+    box-shadow:7px 7px 0 rgba(20,20,20,.35);transform:rotate(-2deg)}
+  .row.b .lion{transform:rotate(2deg)}
+  .lion img{width:100%;height:100%;object-fit:cover;display:block}
+  /* cream fade at edges so center card reads */
+  .scrim{position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse 60% 75% at 50% 50%,
+      rgba(255,241,207,.92) 0%, rgba(255,241,207,.74) 38%, rgba(255,241,207,.30) 70%, rgba(255,241,207,0) 100%)}
 
-  /* ---------- nav ---------- */
-  header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
-    background:rgba(6,8,15,.72);border-bottom:1px solid var(--line)}
-  nav{display:flex;align-items:center;gap:28px;height:68px}
-  .brand{display:flex;align-items:center;gap:11px;font-family:'Sora';font-weight:800;font-size:1.12rem;letter-spacing:.3px}
-  .brand .mark{width:30px;height:30px}
-  .navlinks{display:flex;gap:26px;margin-left:auto;font-size:.92rem;color:var(--dim)}
-  .navlinks a:hover{color:var(--txt)}
-  .nav-cta{padding:9px 18px;border-radius:10px;font-weight:600;font-size:.9rem;
-    background:linear-gradient(135deg,var(--teal),var(--teal-dim));color:#04211c}
-  .nav-cta:hover{filter:brightness(1.08)}
-  @media(max-width:820px){.navlinks{display:none}.nav-cta{margin-left:auto}}
+  /* ---------- brand bar ---------- */
+  header{position:relative;z-index:4;display:flex;align-items:center;
+    padding:20px clamp(18px,4vw,42px)}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';
+    font-size:1.6rem;letter-spacing:1.5px}
+  .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
+  .brand .badge{width:34px;height:34px;background:var(--yellow);border:3px solid var(--ink);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;
+    box-shadow:3px 3px 0 var(--ink)}
 
-  /* ---------- hero ---------- */
-  section{position:relative;z-index:1}
-  .hero{padding:clamp(56px,9vw,120px) 0 70px}
-  .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
-  @media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:36px}}
-  .pill{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;letter-spacing:.5px;
-    text-transform:uppercase;color:var(--teal);border:1px solid var(--line-2);
-    background:rgba(0,245,212,.05);padding:6px 14px;border-radius:99px;margin-bottom:22px}
-  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal)}
-  h1{font-size:clamp(2.5rem,6vw,4.3rem);font-weight:800;letter-spacing:-1px}
-  h1 .grad{background:linear-gradient(120deg,var(--gold-2),var(--gold) 45%,var(--amber));
-    -webkit-background-clip:text;background-clip:text;color:transparent}
-  .lede{margin:22px 0 30px;font-size:clamp(1.02rem,2vw,1.18rem);color:var(--dim);max-width:30em}
-  .cta-row{display:flex;gap:14px;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;gap:9px;padding:15px 28px;border-radius:12px;
-    font-weight:700;font-size:1rem;font-family:'Sora';cursor:pointer;transition:.18s;border:none}
-  .btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-dim));color:#04211c}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,245,212,.25)}
-  .btn-ghost{background:transparent;color:var(--txt);border:1px solid var(--line-2)}
-  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+  /* ---------- center card ---------- */
+  main{position:relative;z-index:4;flex:1;display:flex;align-items:center;justify-content:center;
+    padding:10px 20px 40px}
+  .card{background:var(--white);border:5px solid var(--ink);border-radius:26px;
+    box-shadow:12px 12px 0 var(--ink);padding:clamp(24px,4vw,42px) clamp(22px,5vw,54px);
+    text-align:center;max-width:540px}
+  .kicker{font-weight:700;font-size:clamp(.72rem,2vw,.9rem);letter-spacing:1px;
+    text-transform:uppercase;color:var(--blue);
+    background:var(--cream);border:3px solid var(--ink);border-radius:99px;
+    padding:6px 16px;box-shadow:3px 3px 0 var(--ink);display:inline-block;transform:rotate(-2deg)}
+  h1{font-family:'Bangers';font-weight:400;line-height:.9;letter-spacing:2px;
+    font-size:clamp(3rem,11vw,6rem);margin:16px 0 4px;color:var(--ink);
+    text-shadow:5px 5px 0 var(--yellow), 8px 8px 0 var(--ink)}
+  h1 .blue{color:var(--blue)}
+  .supply{display:inline-flex;align-items:center;gap:9px;font-family:'Bangers';
+    font-size:clamp(1.05rem,3.4vw,1.5rem);letter-spacing:1.5px;
+    background:var(--yellow);border:4px solid var(--ink);border-radius:13px;
+    padding:5px 16px;box-shadow:4px 4px 0 var(--ink);transform:rotate(-2deg);margin:16px 0 22px}
+  .supply .dot{width:12px;height:12px;border-radius:50%;background:var(--red);border:2px solid var(--ink)}
+  .mint{font-family:'Bangers';font-size:clamp(1.5rem,5vw,2.2rem);letter-spacing:2px;
+    color:var(--white);background:var(--red);border:4px solid var(--ink);border-radius:18px;
+    padding:14px 40px;cursor:pointer;text-decoration:none;display:inline-block;
+    box-shadow:7px 7px 0 var(--ink);transition:.1s}
+  .mint:hover{transform:translate(-2px,-2px);box-shadow:10px 10px 0 var(--ink)}
+  .mint:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
+  .note{margin-top:16px;font-weight:600;font-size:.9rem;opacity:.7}
+  .note b{color:var(--blue)}
 
-  /* hero crest */
-  .crest-wrap{position:relative;display:flex;justify-content:center}
-  .crest{width:min(420px,86vw);height:auto;filter:drop-shadow(0 24px 60px rgba(0,245,212,.18))}
-  .crest-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:-1}
-  .crest-ring .r{width:min(420px,82vw);height:min(420px,82vw);border-radius:50%;
-    border:1px solid var(--line-2);opacity:.6}
+  footer{position:relative;z-index:4;text-align:center;padding:12px;
+    font-weight:600;font-size:.74rem;opacity:.55}
 
-  .statbar{display:flex;gap:14px;margin-top:46px;flex-wrap:wrap}
-  .stat{flex:1;min-width:130px;background:var(--card);border:1px solid var(--line);
-    border-radius:14px;padding:18px 20px}
-  .stat b{display:block;font-family:'Sora';font-size:1.7rem;font-weight:800;color:var(--txt)}
-  .stat b .u{font-size:.9rem;color:var(--gold)}
-  .stat span{font-size:.74rem;text-transform:uppercase;letter-spacing:.6px;color:var(--dim-2)}
-
-  /* ---------- generic section ---------- */
-  .sec{padding:84px 0}
-  .sec-head{max-width:640px;margin-bottom:46px}
-  .kicker{font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--teal);font-weight:600}
-  h2{font-size:clamp(1.8rem,4vw,2.7rem);font-weight:800;margin:12px 0 14px;letter-spacing:-.5px}
-  .sec-head p{color:var(--dim);font-size:1.05rem}
-
-  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  @media(max-width:860px){.cards{grid-template-columns:1fr}}
-  .feat{background:linear-gradient(180deg,var(--card),var(--navy-2));
-    border:1px solid var(--line);border-radius:18px;padding:30px;transition:.2s}
-  .feat:hover{border-color:var(--line-2);transform:translateY(-4px)}
-  .feat .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-    background:rgba(0,245,212,.08);border:1px solid var(--line-2);margin-bottom:18px;font-size:1.4rem}
-  .feat.gold .ic{background:rgba(232,179,65,.09)}
-  .feat h3{font-size:1.22rem;font-weight:700;margin-bottom:9px}
-  .feat p{color:var(--dim);font-size:.96rem}
-
-  /* mutable highlight band */
-  .band{background:linear-gradient(135deg,var(--card-2),var(--navy-2));
-    border:1px solid var(--line-2);border-radius:24px;padding:clamp(30px,5vw,56px);
-    display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
-  @media(max-width:860px){.band{grid-template-columns:1fr;gap:26px}}
-  .band h2{margin-top:6px}
-  .mut-table{width:100%;border-collapse:collapse;font-size:.94rem}
-  .mut-table td{padding:14px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-  .mut-table tr:last-child td{border-bottom:none}
-  .mut-table .lbl{color:var(--gold);font-weight:600;font-family:'Sora';white-space:nowrap}
-  .mut-table .desc{color:var(--dim)}
-  .mut-table .tag{display:inline-block;font-size:.7rem;color:var(--teal);
-    border:1px solid var(--line-2);border-radius:6px;padding:1px 7px;margin-top:6px}
-
-  /* steps */
-  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:s}
-  @media(max-width:860px){.steps{grid-template-columns:1fr 1fr}}
-  @media(max-width:520px){.steps{grid-template-columns:1fr}}
-  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 22px;position:relative}
-  .step::before{counter-increment:s;content:"0" counter(s);font-family:'Sora';font-weight:800;
-    font-size:1.5rem;color:var(--teal);opacity:.55}
-  .step h3{font-size:1.06rem;margin:12px 0 7px}
-  .step p{color:var(--dim);font-size:.9rem}
-
-  /* roadmap */
-  .road{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-  @media(max-width:860px){.road{grid-template-columns:1fr 1fr}}
-  @media(max-width:520px){.road{grid-template-columns:1fr}}
-  .phase{border:1px solid var(--line);border-radius:16px;padding:24px;background:var(--card)}
-  .phase .ph{font-family:'Sora';font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)}
-  .phase h3{font-size:1.1rem;margin:8px 0 10px}
-  .phase ul{list-style:none;color:var(--dim);font-size:.9rem;display:grid;gap:7px}
-  .phase li{padding-left:18px;position:relative}
-  .phase li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;
-    border-radius:50%;background:var(--teal-dim)}
-
-  /* faq */
-  .faq{max-width:780px;margin:0 auto}
-  details{border:1px solid var(--line);border-radius:14px;padding:4px 22px;margin-bottom:12px;background:var(--card)}
-  details[open]{border-color:var(--line-2)}
-  summary{cursor:pointer;padding:18px 0;font-family:'Sora';font-weight:600;font-size:1.04rem;
-    list-style:none;display:flex;justify-content:space-between;align-items:center;gap:14px}
-  summary::-webkit-details-marker{display:none}
-  summary::after{content:"+";color:var(--teal);font-size:1.4rem;transition:.2s}
-  details[open] summary::after{transform:rotate(45deg)}
-  details p{color:var(--dim);padding:0 0 20px;font-size:.96rem}
-
-  /* final cta */
-  .final{text-align:center;padding:96px 0}
-  .final h2{font-size:clamp(2rem,5vw,3.2rem)}
-  .final p{color:var(--dim);max-width:34em;margin:16px auto 30px;font-size:1.08rem}
-
-  /* footer */
-  footer{border-top:1px solid var(--line);padding:46px 0 60px;position:relative;z-index:1}
-  .foot{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;align-items:flex-start}
-  .foot .brand{margin-bottom:12px}
-  .foot p{color:var(--dim-2);font-size:.86rem;max-width:30em}
-  .foot-links{display:flex;gap:30px;flex-wrap:wrap}
-  .foot-col h4{font-family:'Sora';font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
-  .foot-col a{display:block;color:var(--dim-2);font-size:.9rem;margin-bottom:8px}
-  .foot-col a:hover{color:var(--teal)}
-  .disclaimer{margin-top:36px;padding-top:22px;border-top:1px solid var(--line);
-    color:var(--dim-2);font-size:.78rem;line-height:1.7}
-  .ph-note{color:var(--amber);font-size:.92em}
+  @media(prefers-reduced-motion:reduce){.row.a,.row.b{animation:none}}
 </style>
 </head>
 <body>
 
-<div class="bg-fx">
-  <div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+<div class="dots"></div>
+
+<!-- gallery: real Lions from the collection -->
+<div class="gallery" aria-hidden="true">
+  <div class="row a">
+    <div class="lion"><img loading="eager" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1757.png" alt=""></div>
+    <div class="lion"><img loading="eager" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0777.png" alt=""></div>
+    <div class="lion"><img loading="eager" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0420.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0672.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2554.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2486.png" alt=""></div>
+    <!-- duplicate set for seamless loop -->
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1757.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0777.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0420.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0672.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2554.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2486.png" alt=""></div>
+  </div>
+  <div class="row b">
+    <div class="lion"><img loading="eager" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2908.png" alt=""></div>
+    <div class="lion"><img loading="eager" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2534.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0902.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2279.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1073.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1389.png" alt=""></div>
+    <!-- duplicate set for seamless loop -->
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2908.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2534.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0902.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2279.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1073.png" alt=""></div>
+    <div class="lion"><img loading="lazy" src="https://xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1389.png" alt=""></div>
+  </div>
 </div>
 
-<!-- ============ NAV ============ -->
+<div class="scrim"></div>
+
 <header>
-  <div class="wrap">
-    <nav>
-      <a class="brand" href="#top">
-        <svg class="mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#F5C76A"/><stop offset="1" stop-color="#E8B341"/></linearGradient></defs>
-          <path d="M50 8 L72 20 L72 30 Q88 38 84 58 Q80 78 50 92 Q20 78 16 58 Q12 38 28 30 L28 20 Z"
-            stroke="url(#lg)" stroke-width="3" fill="rgba(232,179,65,.06)"/>
-          <path d="M38 40 Q42 34 46 40 M54 40 Q58 34 62 40" stroke="#00F5D4" stroke-width="3" stroke-linecap="round"/>
-          <path d="M50 48 L50 56 M42 60 Q50 68 58 60" stroke="url(#lg)" stroke-width="3" stroke-linecap="round" fill="none"/>
-        </svg>
-        ARCVEX<span class="accent-gold">&nbsp;LIONS</span>
-      </a>
-      <div class="navlinks">
-        <a href="#mutable">Mutable</a>
-        <a href="#collection">Collection</a>
-        <a href="#mint">How to Mint</a>
-        <a href="#roadmap">Roadmap</a>
-        <a href="#faq">FAQ</a>
-      </div>
-      <a class="nav-cta" href="https://mint.arcvex.io">Enter Launchpad →</a>
-    </nav>
-  </div>
+  <span class="brand">
+    <span class="badge">🦁</span>
+    <span><span class="a">ARCVEX</span> <span class="l">LIONS</span></span>
+  </span>
 </header>
 
-<!-- ============ HERO ============ -->
-<section class="hero" id="top">
-  <div class="wrap hero-grid">
-    <div>
-      <span class="pill"><span class="dot"></span> Mutable NFTs · XRP Ledger</span>
-      <h1>The pride is<br><span class="grad">alive.</span></h1>
-      <p class="lede">3,210 hand-crafted lions on the XRP Ledger — minted with the new mutable
-        standard so the art can evolve <em>after</em> it's in your wallet. No middleman,
-        no XRP.cafe tax. Minted on our own private launchpad.</p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://mint.arcvex.io">Enter the Launchpad</a>
-        <a class="btn btn-ghost" href="#mutable">Why mutable?</a>
-      </div>
-      <div class="statbar">
-        <div class="stat"><b>3,210</b><span>Total Lions</span></div>
-        <div class="stat"><b>XLS-20<span class="u"> +46</span></b><span>Mutable Standard</span></div>
-        <div class="stat"><b><span class="u">◈</span> XRPL</b><span>Native Chain</span></div>
-        <div class="stat"><b>[TBA]<span class="u"> XRP</span></b><span>Mint Price</span></div>
-      </div>
-    </div>
-    <div class="crest-wrap">
-      <div class="crest-ring"><div class="r"></div></div>
-      <!-- geometric lion crest -->
-      <svg class="crest" viewBox="0 0 360 380" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Arcvex Lion crest">
-        <defs>
-          <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#F5C76A"/><stop offset=".55" stop-color="#E8B341"/><stop offset="1" stop-color="#C8902B"/>
-          </linearGradient>
-          <linearGradient id="tealg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#00F5D4"/><stop offset="1" stop-color="#00C4A8"/>
-          </linearGradient>
-          <radialGradient id="glow" cx=".5" cy=".4" r=".6">
-            <stop offset="0" stop-color="rgba(0,245,212,.20)"/><stop offset="1" stop-color="rgba(0,0,0,0)"/>
-          </radialGradient>
-        </defs>
-        <circle cx="180" cy="170" r="160" fill="url(#glow)"/>
-        <!-- mane: radial spikes -->
-        <g stroke="url(#gold)" stroke-width="3" fill="none" opacity=".9">
-          <path d="M180 22 L180 56"/><path d="M126 32 L138 64"/><path d="M234 32 L222 64"/>
-          <path d="M80 60 L102 84"/><path d="M280 60 L258 84"/><path d="M48 104 L78 116"/>
-          <path d="M312 104 L282 116"/><path d="M36 160 L70 162"/><path d="M324 160 L290 162"/>
-          <path d="M44 216 L76 206"/><path d="M316 216 L284 206"/>
-        </g>
-        <!-- mane outline -->
-        <path d="M180 50 Q120 54 92 96 Q60 110 64 158 Q40 196 78 226 Q92 286 180 320
-                 Q268 286 282 226 Q320 196 296 158 Q300 110 268 96 Q240 54 180 50 Z"
-              fill="rgba(232,179,65,.05)" stroke="url(#gold)" stroke-width="3.5"/>
-        <!-- face -->
-        <path d="M180 96 Q132 100 124 152 Q120 196 150 232 Q180 256 210 232 Q240 196 236 152 Q228 100 180 96 Z"
-              fill="rgba(10,14,26,.7)" stroke="url(#gold)" stroke-width="2.5"/>
-        <!-- eyes (teal) -->
-        <path d="M150 158 Q160 148 172 158" stroke="url(#tealg)" stroke-width="5" stroke-linecap="round" fill="none"/>
-        <path d="M188 158 Q200 148 210 158" stroke="url(#tealg)" stroke-width="5" stroke-linecap="round" fill="none"/>
-        <circle cx="161" cy="160" r="3.4" fill="#00F5D4"/><circle cx="199" cy="160" r="3.4" fill="#00F5D4"/>
-        <!-- nose + muzzle -->
-        <path d="M180 178 L168 196 Q180 206 192 196 Z" fill="url(#gold)"/>
-        <path d="M180 206 L180 220 M180 220 Q164 230 150 222 M180 220 Q196 230 210 222"
-              stroke="url(#gold)" stroke-width="3" stroke-linecap="round" fill="none"/>
-        <!-- whisker hint -->
-        <path d="M150 200 L116 196 M150 208 L120 214 M210 200 L244 196 M210 208 L240 214"
-              stroke="rgba(232,179,65,.4)" stroke-width="1.6"/>
-      </svg>
-    </div>
+<main>
+  <div class="card">
+    <span class="kicker">Mutable NFTs · XRP Ledger</span>
+    <h1>ARCVEX <span class="blue">LIONS</span></h1>
+    <div class="supply"><span class="dot"></span> 3,210 LIONS</div>
+    <br>
+    <a class="mint" href="https://mint.arcvex.io">MINT A LION →</a>
+    <p class="note">Lions that <b>evolve</b> after you mint them. Built on XRPL.</p>
   </div>
-</section>
+</main>
 
-<!-- ============ MUTABLE ============ -->
-<section class="sec" id="mutable">
-  <div class="wrap">
-    <div class="band">
-      <div>
-        <span class="kicker">The whole point</span>
-        <h2>NFTs that don't sit still.</h2>
-        <p style="color:var(--dim);margin-bottom:6px">Most XRPL NFTs are frozen the second they're minted.
-          Arcvex Lions are minted with the <b style="color:var(--txt)">tfMutable</b> flag set — so the art and
-          traits can change <em>after</em> you own them. Two ways we can evolve a Lion:</p>
-      </div>
-      <table class="mut-table">
-        <tr>
-          <td class="lbl">Off-chain<br>re-skin</td>
-          <td class="desc">We change what the token's URI serves — image and traits update live in every wallet.
-            Free, instant, infinite. This is the reactive / "living art" layer.
-            <span class="tag">No transaction</span></td>
-        </tr>
-        <tr>
-          <td class="lbl">On-chain<br>evolution</td>
-          <td class="desc">A real <b style="color:var(--txt)">NFTokenModify</b> transaction (XLS-46) rewrites the on-chain URI itself —
-            for permanent "evolution" events and milestones.
-            <span class="tag">One ledger tx</span></td>
-        </tr>
-      </table>
-    </div>
-  </div>
-</section>
+<footer>© 2026 Arcvex · NFTs carry risk — only spend what you can afford to lose.</footer>
 
-<!-- ============ FEATURES ============ -->
-<section class="sec" id="collection" style="padding-top:30px">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker">The Collection</span>
-      <h2>3,210 lions. One pride.</h2>
-      <p>Every Lion is generated from a deep trait system — manes, eyes, markings, auras and rarer
-        one-of-one frames. Built XRPL-native, so mint fees are fractions of a cent, not gas-war money.</p>
-    </div>
-    <div class="cards">
-      <div class="feat">
-        <div class="ic">🦁</div>
-        <h3>Trait-driven art</h3>
-        <p>A layered trait system across manes, eyes, markings and auras produces 3,210 distinct Lions,
-          with scarcity tiers and hidden one-of-ones.</p>
-      </div>
-      <div class="feat gold">
-        <div class="ic">◈</div>
-        <h3>XRPL-native</h3>
-        <p>No bridges, no wrapped junk. Minted directly as XLS-20 tokens on the XRP Ledger — settlement in
-          seconds, fees in fractions of a cent.</p>
-      </div>
-      <div class="feat">
-        <div class="ic">⚡</div>
-        <h3>Living &amp; reactive</h3>
-        <p>Because the metadata is mutable, Lions can react to events, seasons, or holder milestones —
-          art that keeps moving long after mint.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ HOW TO MINT ============ -->
-<section class="sec" id="mint">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker">The Launchpad</span>
-      <h2>How the mint works</h2>
-      <p>A private, allowlist-gated launchpad on <b style="color:var(--txt)">mint.arcvex.io</b> — no third-party
-        marketplace required. You sign everything yourself in Xaman. We never touch your keys.</p>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <h3>Connect</h3>
-        <p>Scan a Xaman QR to sign in. We check your wallet against the allowlist — nothing else.</p>
-      </div>
-      <div class="step">
-        <h3>Pay</h3>
-        <p>Approve a single Xaman payment for the mint price. Verified on-ledger before anything mints.</p>
-      </div>
-      <div class="step">
-        <h3>Mint</h3>
-        <p>The backend mints your Lion as a mutable XLS-20 token, pointed at our metadata.</p>
-      </div>
-      <div class="step">
-        <h3>Claim</h3>
-        <p>Sign one accept-offer in Xaman and the Lion lands in your wallet. Done.</p>
-      </div>
-    </div>
-    <div style="text-align:center;margin-top:40px">
-      <a class="btn btn-primary" href="https://mint.arcvex.io">Go to the Launchpad →</a>
-    </div>
-  </div>
-</section>
-
-<!-- ============ ROADMAP ============ -->
-<section class="sec" id="roadmap">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker">Where this goes</span>
-      <h2>Roadmap <span class="ph-note">· draft</span></h2>
-      <p>Directional, not a promise. Sequence and scope can change.</p>
-    </div>
-    <div class="road">
-      <div class="phase">
-        <span class="ph">Phase 01</span>
-        <h3>The Den</h3>
-        <ul><li>Private launchpad live</li><li>Allowlist mint</li><li>Metadata + reveal engine</li></ul>
-      </div>
-      <div class="phase">
-        <span class="ph">Phase 02</span>
-        <h3>First Roar</h3>
-        <ul><li>Public mint window</li><li>Secondary listings on XRPL marketplaces</li><li>Holder verification</li></ul>
-      </div>
-      <div class="phase">
-        <span class="ph">Phase 03</span>
-        <h3>Evolution</h3>
-        <ul><li>First mutation event</li><li>Reactive trait drops</li><li>Holder-only utility</li></ul>
-      </div>
-      <div class="phase">
-        <span class="ph">Phase 04</span>
-        <h3>The Pride</h3>
-        <ul><li>Ecosystem tie-ins</li><li>Long-term holder rewards</li><li>[TBA]</li></ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FAQ ============ -->
-<section class="sec" id="faq">
-  <div class="wrap">
-    <div class="sec-head" style="text-align:center;margin:0 auto 46px">
-      <span class="kicker">Questions</span>
-      <h2>Good to know</h2>
-    </div>
-    <div class="faq">
-      <details open>
-        <summary>What does "mutable" actually mean?</summary>
-        <p>Each Lion is minted with the XRP Ledger's <b>tfMutable</b> flag. That lets the metadata behind the
-          token change after mint — so the same NFT you hold can be re-skinned or evolved later, without us
-          ever moving it out of your wallet.</p>
-      </details>
-      <details>
-        <summary>Why your own launchpad instead of XRP.cafe?</summary>
-        <p>Two reasons. First, control — minting with the mutable flag set, on our terms, with our branding.
-          Second, no per-mint platform fees. You still get full XRPL liquidity because Lions can be listed on
-          any XRPL marketplace for secondary sales.</p>
-      </details>
-      <details>
-        <summary>Which wallet do I need?</summary>
-        <p>Xaman (formerly XUMM). You sign in and approve the mint payment from your phone — we never see or
-          hold your private keys.</p>
-      </details>
-      <details>
-        <summary>How much does it cost to mint?</summary>
-        <p><b class="ph-note">[Mint price TBA]</b> in XRP, plus the negligible XRPL network fee (a fraction of a
-          cent). Final price and launch date will be announced before mint opens.</p>
-      </details>
-      <details>
-        <summary>Is it allowlist only?</summary>
-        <p>The launchpad opens private/allowlist-first. Each allowlisted wallet gets a set number of mints.
-          A public window may follow — see the roadmap.</p>
-      </details>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FINAL CTA ============ -->
-<section class="final">
-  <div class="wrap">
-    <span class="kicker">Mint is by allowlist</span>
-    <h2>Claim your <span class="accent-gold">Lion</span>.</h2>
-    <p>The launchpad is live at mint.arcvex.io. Connect Xaman, check your spot, and mint a Lion that's
-      built to evolve.</p>
-    <a class="btn btn-primary" href="https://mint.arcvex.io">Enter the Launchpad →</a>
-  </div>
-</section>
-
-<!-- ============ FOOTER ============ -->
-<footer>
-  <div class="wrap">
-    <div class="foot">
-      <div style="max-width:340px">
-        <a class="brand" href="#top">
-          <svg class="mark" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-            <path d="M50 8 L72 20 L72 30 Q88 38 84 58 Q80 78 50 92 Q20 78 16 58 Q12 38 28 30 L28 20 Z"
-              stroke="#E8B341" stroke-width="3" fill="rgba(232,179,65,.06)"/>
-            <path d="M38 40 Q42 34 46 40 M54 40 Q58 34 62 40" stroke="#00F5D4" stroke-width="3" stroke-linecap="round"/>
-          </svg>
-          ARCVEX<span class="accent-gold">&nbsp;LIONS</span>
-        </a>
-        <p>Mutable lions on the XRP Ledger. Minted on our own launchpad. Built by Arcvex.</p>
-      </div>
-      <div class="foot-links">
-        <div class="foot-col">
-          <h4>Project</h4>
-          <a href="#mutable">Mutable NFTs</a>
-          <a href="#collection">Collection</a>
-          <a href="#roadmap">Roadmap</a>
-          <a href="#faq">FAQ</a>
-        </div>
-        <div class="foot-col">
-          <h4>Launch</h4>
-          <a href="https://mint.arcvex.io">Launchpad</a>
-          <a href="#mint">How to mint</a>
-        </div>
-        <div class="foot-col">
-          <h4>Community</h4>
-          <a href="#" data-ph>X / Twitter [link]</a>
-          <a href="#" data-ph>Discord [link]</a>
-          <a href="#" data-ph>Telegram [link]</a>
-        </div>
-      </div>
-    </div>
-    <p class="disclaimer">
-      Arcvex Lions are digital collectibles on the XRP Ledger. Nothing on this page is financial advice or
-      an offer of securities. NFTs carry risk and may lose value; only spend what you can afford to lose.
-      Mint price, supply allocation and launch dates marked <span class="ph-note">[TBA]</span> are not final
-      and will be confirmed before mint. © <span id="yr"></span> Arcvex.
-    </p>
-  </div>
-</footer>
-
-<script>
-  document.getElementById('yr').textContent = new Date().getFullYear();
-  // placeholder links shouldn't navigate
-  document.querySelectorAll('[data-ph]').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
-</script>
 </body>
 </html>
