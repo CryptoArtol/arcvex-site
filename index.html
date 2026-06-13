@@ -16,6 +16,7 @@
   :root{
     --cream:#FFF1CF; --blue:#2F6BFF; --red:#FF4438; --yellow:#FFC83D;
     --ink:#141414; --white:#fff;
+    --bg-image:url('https://mint.arcvex.io/static/bg.png');
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -25,32 +26,34 @@
     min-height:100vh; overflow:hidden; position:relative;
     display:flex; flex-direction:column;
   }
+  h1,h2,h3{font-family:'Bangers',sans-serif}
+  a{text-decoration:none;color:inherit}
+  .custom-bg{position:fixed;inset:0;z-index:0;background-image:var(--bg-image);
+    background-size:cover;background-position:center;pointer-events:none}
   .dots{position:fixed;inset:0;z-index:0;pointer-events:none;
     background-image:radial-gradient(var(--ink) 2px,transparent 2px);
     background-size:24px 24px;opacity:.05}
 
-  /* ---------- gallery marquee (behind) ---------- */
+  /* ---------- gallery marquee (3 rows, behind) ---------- */
   .gallery{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;
-    justify-content:center;gap:clamp(14px,2.5vh,26px);pointer-events:none}
-  .row{display:flex;gap:clamp(14px,2vw,24px);width:max-content;will-change:transform}
-  .row.a{animation:scrollL 75s linear infinite}
-  .row.b{animation:scrollR 90s linear infinite}
+    justify-content:center;gap:clamp(10px,1.8vh,18px);pointer-events:none}
+  .row{display:flex;gap:clamp(12px,1.6vw,20px);width:max-content;will-change:transform}
+  .row.a{animation:scrollL 85s linear infinite}
+  .row.b{animation:scrollR 100s linear infinite}
+  .row.c{animation:scrollL 120s linear infinite}
   @keyframes scrollL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   @keyframes scrollR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
-  .lion{flex:0 0 auto;width:clamp(150px,21vh,230px);aspect-ratio:1;
-    border:5px solid var(--ink);border-radius:18px;overflow:hidden;background:#1c1c1c;
-    box-shadow:7px 7px 0 rgba(20,20,20,.35);transform:rotate(-2deg)}
+  .lion{flex:0 0 auto;width:clamp(108px,15vh,168px);aspect-ratio:1;
+    border:4px solid var(--ink);border-radius:16px;overflow:hidden;background:#1c1c1c;
+    box-shadow:6px 6px 0 rgba(20,20,20,.3);transform:rotate(-2deg)}
   .row.b .lion{transform:rotate(2deg)}
   .lion img{width:100%;height:100%;object-fit:cover;display:block}
-  .scrim{position:fixed;inset:0;z-index:2;pointer-events:none;
-    background:radial-gradient(ellipse 60% 75% at 50% 50%,
-      rgba(255,241,207,.92) 0%, rgba(255,241,207,.74) 38%, rgba(255,241,207,.30) 70%, rgba(255,241,207,0) 100%)}
 
   /* ---------- brand bar ---------- */
   header{position:relative;z-index:4;display:flex;align-items:center;
     padding:20px clamp(18px,4vw,42px)}
   .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';
-    font-size:1.6rem;letter-spacing:1.5px}
+    font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
   .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
   .brand .badge{width:34px;height:34px;background:var(--yellow);border:3px solid var(--ink);
     border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;
@@ -81,70 +84,23 @@
     box-shadow:7px 7px 0 var(--ink);transition:.1s}
   .mint:hover{transform:translate(-2px,-2px);box-shadow:10px 10px 0 var(--ink)}
   .mint:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
-  .note{margin-top:16px;font-weight:600;font-size:.9rem;opacity:.7}
+  .note{margin-top:16px;font-weight:600;font-size:.9rem;opacity:.8}
   .note b{color:var(--blue)}
 
   footer{position:relative;z-index:4;text-align:center;padding:12px;
-    font-weight:600;font-size:.74rem;opacity:.55}
+    font-weight:600;font-size:.74rem;color:var(--ink);
+    background:rgba(255,241,207,.7)}
 
-  @media(prefers-reduced-motion:reduce){.row.a,.row.b{animation:none}}
+  @media(prefers-reduced-motion:reduce){.row.a,.row.b,.row.c{animation:none}}
 </style>
 </head>
 <body>
 
+<div class="custom-bg"></div>
 <div class="dots"></div>
 
-<!-- gallery: real Lions, served as ~400px WebP via images.weserv.nl resizer -->
-<div class="gallery" aria-hidden="true">
-  <div class="row a">
-    <div class="lion"><img loading="eager" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1757.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="eager" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0777.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="eager" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0420.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="eager" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0672.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2554.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2486.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2908.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2534.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0902.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2279.png&w=400&q=72&output=webp" alt=""></div>
-    <!-- duplicate for seamless loop -->
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1757.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0777.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0420.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0672.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2554.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2486.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2908.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2534.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0902.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2279.png&w=400&q=72&output=webp" alt=""></div>
-  </div>
-  <div class="row b">
-    <div class="lion"><img loading="eager" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1073.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="eager" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1389.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="eager" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2019.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="eager" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0972.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0589.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2004.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1028.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2759.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1010.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0501.png&w=400&q=72&output=webp" alt=""></div>
-    <!-- duplicate for seamless loop -->
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1073.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1389.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2019.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0972.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0589.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2004.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1028.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2759.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_1010.png&w=400&q=72&output=webp" alt=""></div>
-    <div class="lion"><img loading="lazy" src="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_0501.png&w=400&q=72&output=webp" alt=""></div>
-  </div>
-</div>
-
-<div class="scrim"></div>
+<!-- gallery rows are generated by JS (see bottom) -->
+<div class="gallery" aria-hidden="true"></div>
 
 <header>
   <span class="brand">
@@ -166,5 +122,29 @@
 
 <footer>© 2026 Arcvex · NFTs carry risk — only spend what you can afford to lose.</footer>
 
+<script>
+// gallery builder — real Lions, 3 scrolling rows via images.weserv.nl
+const LIONS = [1757,777,420,672,2554,2486,2908,2534,902,2279,1073,1389,2019,972,589,2004,1028,2759,1010,501];
+const lionUrl = n => `https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_${String(n).padStart(4,'0')}.png&w=340&q=72&output=webp`;
+(function buildGallery(){
+  const g = document.querySelector('.gallery');
+  const rows = 3, cls = ['a','b','c'];
+  const per = Math.ceil(LIONS.length / rows);
+  for(let r=0;r<rows;r++){
+    let set = LIONS.slice(r*per, r*per+per);
+    if(set.length < 4) set = LIONS;
+    const row = document.createElement('div');
+    row.className = 'row ' + cls[r];
+    [...set, ...set].forEach((n,i)=>{
+      const d = document.createElement('div'); d.className = 'lion';
+      const img = document.createElement('img');
+      img.loading = (r===0 && i<5) ? 'eager' : 'lazy';
+      img.src = lionUrl(n); img.alt = '';
+      d.appendChild(img); row.appendChild(d);
+    });
+    g.appendChild(row);
+  }
+})();
+</script>
 </body>
 </html>
