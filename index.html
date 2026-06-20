@@ -84,6 +84,9 @@
     box-shadow:7px 7px 0 var(--ink);transition:.1s}
   .mint:hover{transform:translate(-2px,-2px);box-shadow:10px 10px 0 var(--ink)}
   .mint:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
+  /* frozen "coming soon" state — non-clickable */
+  .mint.soon{background:var(--yellow);color:var(--ink);cursor:not-allowed;pointer-events:none}
+  .mint.soon:hover,.mint.soon:active{transform:none;box-shadow:7px 7px 0 var(--ink)}
   .note{margin-top:16px;font-weight:600;font-size:.9rem;opacity:.8}
   .note b{color:var(--blue)}
 
@@ -115,7 +118,7 @@
     <h1>ARCVEX <span class="blue">LIONS</span></h1>
     <div class="supply"><span class="dot"></span> 3,210 LIONS</div>
     <br>
-    <a class="mint" href="https://mint.arcvex.io">MINT A LION →</a>
+    <span class="mint soon" role="button" aria-disabled="true">COMING SOON!</span>
     <p class="note">Lions that <b>evolve</b> after you mint them. Built on XRPL.</p>
   </div>
 </main>
