@@ -475,17 +475,16 @@ const petUrl = f => `https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase
     const { count } = await sb.from(TABLE).select("*",{count:"exact",head:true});
     $("#supply").textContent = `${fmt(count)} pets revealed · ${fmt(COLLECTION_MAX)} total`;
 
-    const { data } = await sb.from(TABLE)
-      .select("animal,background,skin_fur,hair_mane,glasses_eyes,mouth,hat,clothes");
+    // exact released-only counts from the DB (avoids the 1000-row browser cap)
+    const { data } = await sb.from("arcvex_trait_counts").select("category,value,n");
     const rows = data || [];
 
-    const counts = {};
-    rows.forEach(r => counts[r.animal] = (counts[r.animal]||0)+1);
-    const animals = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+    const animalRows = rows.filter(r => r.category==="animal" && r.value!=null).sort((a,b)=>b.n-a.n);
+    const totalReleased = animalRows.reduce((s,r)=>s+r.n, 0);
     const chips = $("#animalChips");
     chips.innerHTML =
-      `<button class="chip active" data-animal="">All<span class="n">${fmt(rows.length)}</span></button>` +
-      animals.map(a=>`<button class="chip" data-animal="${a}">${a}<span class="n">${fmt(counts[a])}</span></button>`).join("");
+      `<button class="chip active" data-animal="">All<span class="n">${fmt(totalReleased)}</span></button>` +
+      animalRows.map(r=>`<button class="chip" data-animal="${r.value}">${r.value}<span class="n">${fmt(r.n)}</span></button>`).join("");
     chips.addEventListener("click", e=>{
       const b = e.target.closest(".chip"); if(!b) return;
       chips.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
@@ -497,15 +496,15 @@ const petUrl = f => `https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase
 
     const fbar = $("#traitFilters");
     TRAIT_FILTERS.forEach(([label,key])=>{
-      const vals = [...new Set(rows.map(r=>r[key]).filter(v=>v!=null && v!==""))]
-        .sort((a,b)=>String(a).localeCompare(String(b)));
+      const vals = rows.filter(r=>r.category===key && r.value!=null && r.value!=="")
+        .sort((a,b)=>String(a.value).localeCompare(String(b.value)));
       const sel = document.createElement("select");
       sel.className = "trait"; sel.dataset.key = key;
       sel.setAttribute("aria-label", "Filter by " + label);
       const all = document.createElement("option");
       all.value = ""; all.textContent = `${label}: All`;
       sel.appendChild(all);
-      vals.forEach(v=>{ const o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o); });
+      vals.forEach(r=>{ const o=document.createElement("option"); o.value=r.value; o.textContent=`${r.value} (${r.n})`; sel.appendChild(o); });
       sel.addEventListener("change", ()=>{
         state.traits[key] = sel.value || null;
         sel.classList.toggle("set", !!sel.value);
