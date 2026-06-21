@@ -4,29 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arcvex Big Pets — Mutable NFTs on the XRP Ledger</title>
-<meta name="description" content="Arcvex Big Pets — 3,333 mutable pet NFTs on the XRP Ledger. Mint one on our own launchpad.">
+<meta name="description" content="Arcvex Big Pets — 3,333 mutable pet NFTs on the XRP Ledger. Browse the collection, search by trait, and mint one on our own launchpad.">
 <meta property="og:title" content="Arcvex Big Pets">
-<meta property="og:description" content="3,333 mutable pet NFTs on the XRP Ledger. Mint one.">
+<meta property="og:description" content="3,333 mutable pet NFTs on the XRP Ledger. Browse, search by trait, mint.">
 <meta property="og:image" content="https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/Lion_2868.png&w=800&output=jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.weserv.nl" crossorigin>
+<link rel="preconnect" href="https://xayoujiqufvlyiakyqaw.supabase.co" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --cream:#FFF1CF; --blue:#2F6BFF; --red:#FF4438; --yellow:#FFC83D;
-    --ink:#141414; --white:#fff;
+    --ink:#141414; --white:#fff; --good:#1FA85A; --bad:#FF4438;
     --bg-image:url('https://mint.arcvex.io/static/bg.png');
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
+  html{scroll-behavior:smooth}
   body{
     background:var(--cream); color:var(--ink);
-    font-family:'Fredoka',system-ui,sans-serif;
-    min-height:100vh; overflow:hidden; position:relative;
-    display:flex; flex-direction:column;
+    font-family:'Fredoka',system-ui,sans-serif; min-height:100vh; position:relative;
   }
-  h1,h2,h3{font-family:'Bangers',sans-serif}
+  h1,h2,h3{font-family:'Bangers',sans-serif;font-weight:400}
   a{text-decoration:none;color:inherit}
   .custom-bg{position:fixed;inset:0;z-index:0;background-image:var(--bg-image);
     background-size:cover;background-position:center;pointer-events:none}
@@ -34,8 +33,25 @@
     background-image:radial-gradient(var(--ink) 2px,transparent 2px);
     background-size:24px 24px;opacity:.05}
 
-  /* ---------- gallery marquee (3 rows, behind) ---------- */
-  .gallery{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;
+  /* ---------- brand bar ---------- */
+  header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;flex-wrap:wrap;padding:18px clamp(14px,4vw,42px)}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';
+    font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
+  .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
+  .brand .badge{width:34px;height:34px;background:var(--yellow);border:3px solid var(--ink);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;
+    box-shadow:3px 3px 0 var(--ink)}
+  nav{display:flex;gap:8px;flex-wrap:wrap}
+  .navlink{font-weight:700;font-size:.92rem;padding:8px 16px;border:3px solid var(--ink);
+    border-radius:99px;background:var(--white);box-shadow:3px 3px 0 var(--ink);transition:.1s;cursor:pointer}
+  .navlink:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+  .navlink.mint{background:var(--red);color:var(--white)}
+
+  /* ---------- hero (landing) ---------- */
+  .hero{position:relative;min-height:86vh;display:flex;align-items:center;justify-content:center;
+    padding:20px clamp(14px,4vw,42px) 70px;overflow:hidden}
+  .gallery{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
     justify-content:center;gap:clamp(10px,1.8vh,18px);pointer-events:none}
   .row{display:flex;gap:clamp(12px,1.6vw,20px);width:max-content;will-change:transform}
   .row.a{animation:scrollL 85s linear infinite}
@@ -49,30 +65,17 @@
   .row.b .lion{transform:rotate(2deg)}
   .lion img{width:100%;height:100%;object-fit:cover;display:block}
 
-  /* ---------- brand bar ---------- */
-  header{position:relative;z-index:4;display:flex;align-items:center;
-    padding:20px clamp(18px,4vw,42px)}
-  .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';
-    font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
-  .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
-  .brand .badge{width:34px;height:34px;background:var(--yellow);border:3px solid var(--ink);
-    border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;
-    box-shadow:3px 3px 0 var(--ink)}
-
-  /* ---------- center card ---------- */
-  main{position:relative;z-index:4;flex:1;display:flex;align-items:center;justify-content:center;
-    padding:10px 20px 40px}
-  .card{background:var(--white);border:5px solid var(--ink);border-radius:26px;
+  .card{position:relative;z-index:4;background:var(--white);border:5px solid var(--ink);border-radius:26px;
     box-shadow:12px 12px 0 var(--ink);padding:clamp(24px,4vw,42px) clamp(22px,5vw,54px);
     text-align:center;max-width:540px}
   .kicker{font-weight:700;font-size:clamp(.72rem,2vw,.9rem);letter-spacing:1px;
     text-transform:uppercase;color:var(--blue);
     background:var(--cream);border:3px solid var(--ink);border-radius:99px;
     padding:6px 16px;box-shadow:3px 3px 0 var(--ink);display:inline-block;transform:rotate(-2deg)}
-  h1{font-family:'Bangers';font-weight:400;line-height:.9;letter-spacing:2px;
+  .card h1{font-weight:400;line-height:.9;letter-spacing:2px;
     font-size:clamp(3rem,11vw,6rem);margin:16px 0 4px;color:var(--ink);
     text-shadow:5px 5px 0 var(--yellow), 8px 8px 0 var(--ink)}
-  h1 .blue{color:var(--blue)}
+  .blue{color:var(--blue)}
   .supply{display:inline-flex;align-items:center;gap:9px;font-family:'Bangers';
     font-size:clamp(1.05rem,3.4vw,1.5rem);letter-spacing:1.5px;
     background:var(--yellow);border:4px solid var(--ink);border-radius:13px;
@@ -84,17 +87,135 @@
     box-shadow:7px 7px 0 var(--ink);transition:.1s}
   .mint:hover{transform:translate(-2px,-2px);box-shadow:10px 10px 0 var(--ink)}
   .mint:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
-  /* frozen "coming soon" state — non-clickable */
   .mint.soon{background:var(--yellow);color:var(--ink);cursor:not-allowed;pointer-events:none}
   .mint.soon:hover,.mint.soon:active{transform:none;box-shadow:7px 7px 0 var(--ink)}
   .note{margin-top:16px;font-weight:600;font-size:.9rem;opacity:.8}
   .note b{color:var(--blue)}
+  /* scroll cue -> explorer */
+  .scrolldown{display:inline-flex;align-items:center;gap:8px;margin-top:22px;font-weight:700;
+    font-size:.92rem;padding:9px 18px;border:3px solid var(--ink);border-radius:99px;background:var(--blue);
+    color:#fff;box-shadow:4px 4px 0 var(--ink);cursor:pointer;transition:.1s}
+  .scrolldown:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .scrolldown .arr{animation:bob 1.3s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 
-  footer{position:relative;z-index:4;text-align:center;padding:12px;
-    font-weight:600;font-size:.74rem;color:var(--ink);
-    background:rgba(255,241,207,.7)}
+  /* ---------- explorer ---------- */
+  .explore{position:relative;z-index:2;background:var(--cream);border-top:5px solid var(--ink);
+    padding:30px 0 0}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 clamp(14px,3vw,32px)}
+  .xhero{text-align:center;padding:6px 0 4px}
+  .xtitle{font-size:clamp(2rem,7vw,3.4rem);line-height:.9;letter-spacing:2px;margin:12px 0 4px;
+    text-shadow:3px 3px 0 var(--yellow), 5px 5px 0 var(--ink)}
+  .xcount{display:inline-flex;align-items:center;gap:8px;font-family:'Bangers';letter-spacing:1.2px;
+    font-size:clamp(.9rem,3vw,1.15rem);background:var(--white);border:3px solid var(--ink);border-radius:11px;
+    padding:3px 14px;box-shadow:3px 3px 0 var(--ink);margin-top:8px}
+  .xcount .dot{width:11px;height:11px;border-radius:50%;background:var(--red);border:2px solid var(--ink)}
 
-  @media(prefers-reduced-motion:reduce){.row.a,.row.b,.row.c{animation:none}}
+  .lookup{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:22px 0 4px}
+  .lookup-box{display:flex;align-items:stretch;background:var(--white);border:4px solid var(--ink);
+    border-radius:16px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;max-width:100%}
+  .lookup input{border:0;outline:0;font-family:'Fredoka';font-weight:600;font-size:1.05rem;
+    padding:13px 18px;width:min(62vw,340px);background:transparent;color:var(--ink)}
+  .lookup input::placeholder{color:#9a8f72}
+  .lookup button{font-family:'Bangers';letter-spacing:1.5px;font-size:1.25rem;color:var(--white);
+    background:var(--blue);border:0;border-left:4px solid var(--ink);padding:0 26px;cursor:pointer;transition:.1s}
+  .lookup button:hover{background:#1d54e0}
+  .lookup-msg{min-height:22px;text-align:center;font-weight:600;color:var(--red);margin:2px 0 0}
+
+  .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;
+    margin:20px 0 12px;padding-top:16px;border-top:3px dashed rgba(20,20,20,.18)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-weight:700;font-size:.85rem;padding:6px 13px;border:3px solid var(--ink);border-radius:99px;
+    background:var(--white);box-shadow:2px 2px 0 var(--ink);cursor:pointer;transition:.08s;white-space:nowrap}
+  .chip:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+  .chip.active{background:var(--blue);color:var(--white)}
+  .chip .n{opacity:.6;font-weight:600;font-size:.78em;margin-left:4px}
+  .chip.active .n{opacity:.85}
+  .sortwrap{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.88rem}
+  select.sort{font-family:'Fredoka';font-weight:700;font-size:.9rem;padding:9px 14px;border:3px solid var(--ink);
+    border-radius:12px;background:var(--yellow);box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+
+  .filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+  select.trait{font-family:'Fredoka';font-weight:600;font-size:.85rem;padding:8px 12px;border:3px solid var(--ink);
+    border-radius:11px;background:var(--white);box-shadow:2px 2px 0 var(--ink);cursor:pointer;max-width:170px}
+  select.trait.set{background:var(--blue);color:#fff}
+  .clearbtn{font-weight:700;font-size:.84rem;padding:7px 13px;border:3px solid var(--ink);border-radius:99px;
+    background:var(--red);color:#fff;box-shadow:2px 2px 0 var(--ink);cursor:pointer;display:none}
+  .clearbtn.show{display:inline-block}
+  .resultcount{display:none;font-weight:700;font-size:.95rem;margin:2px 0 14px;color:var(--blue)}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(10px,1.6vw,18px);margin-bottom:18px}
+  @media(min-width:520px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:760px){.grid{grid-template-columns:repeat(4,1fr)}}
+  @media(min-width:1000px){.grid{grid-template-columns:repeat(5,1fr)}}
+  @media(min-width:1200px){.grid{grid-template-columns:repeat(6,1fr)}}
+  .pcard{background:var(--white);border:4px solid var(--ink);border-radius:16px;overflow:hidden;
+    box-shadow:5px 5px 0 var(--ink);cursor:pointer;transition:.1s;display:flex;flex-direction:column}
+  .pcard:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--ink)}
+  .pcard .imgbox{position:relative;aspect-ratio:1;background:#1c1c1c;overflow:hidden}
+  .pcard .imgbox img,.pcard .imgbox video{width:100%;height:100%;object-fit:cover;display:block}
+  .pcard .rank{position:absolute;top:8px;left:8px;font-family:'Bangers';letter-spacing:.5px;font-size:.8rem;
+    background:var(--yellow);border:2.5px solid var(--ink);border-radius:8px;padding:1px 8px;box-shadow:2px 2px 0 var(--ink)}
+  .pcard .anim{position:absolute;top:8px;right:8px;font-size:.7rem;background:var(--red);color:#fff;
+    border:2px solid var(--ink);border-radius:6px;padding:1px 6px;font-weight:700}
+  .pcard .meta{padding:9px 11px 11px}
+  .pcard .name{font-weight:700;font-size:.92rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pcard .sub{font-size:.78rem;font-weight:600;opacity:.7;margin-top:2px}
+
+  .loadmore-wrap{text-align:center;margin:8px 0 26px}
+  #loadMore{font-family:'Bangers';letter-spacing:1.5px;font-size:1.3rem;color:var(--ink);background:var(--yellow);
+    border:4px solid var(--ink);border-radius:14px;padding:11px 34px;cursor:pointer;box-shadow:6px 6px 0 var(--ink);transition:.1s}
+  #loadMore:hover{transform:translate(-2px,-2px);box-shadow:9px 9px 0 var(--ink)}
+  #loadMore:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+  .loadmsg{text-align:center;font-weight:700;padding:6px 20px 24px;opacity:.7}
+  .skeleton{background:linear-gradient(100deg,#eadfbf 30%,#f5ecd2 50%,#eadfbf 70%);
+    background-size:200% 100%;animation:sh 1.1s infinite}
+  @keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
+  .pcard.sk{cursor:default}.pcard.sk:hover{transform:none;box-shadow:5px 5px 0 var(--ink)}
+  .pcard.sk .imgbox{background:none}.pcard.sk .meta{height:42px}
+
+  /* detail modal */
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(20,20,20,.62);display:none;
+    align-items:flex-start;justify-content:center;padding:24px 14px;overflow-y:auto}
+  .overlay.open{display:flex}
+  .modal{background:var(--cream);border:5px solid var(--ink);border-radius:24px;box-shadow:12px 12px 0 var(--ink);
+    width:min(880px,100%);margin:auto;position:relative;overflow:hidden}
+  .modal .x{position:absolute;top:12px;right:12px;z-index:3;width:40px;height:40px;border:3px solid var(--ink);
+    border-radius:50%;background:var(--white);font-family:'Bangers';font-size:1.3rem;line-height:1;cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);display:flex;align-items:center;justify-content:center}
+  .modal .x:hover{background:var(--red);color:#fff}
+  .modal-grid{display:grid;grid-template-columns:1fr;gap:0}
+  @media(min-width:660px){.modal-grid{grid-template-columns:1fr 1fr}}
+  .modal-img{background:#1c1c1c;aspect-ratio:1;border-bottom:5px solid var(--ink)}
+  @media(min-width:660px){.modal-img{border-bottom:0;border-right:5px solid var(--ink)}}
+  .modal-img img,.modal-img video{width:100%;height:100%;object-fit:cover;display:block}
+  .modal-body{padding:clamp(16px,3vw,26px)}
+  .modal-body h2{font-size:clamp(1.6rem,5vw,2.3rem);letter-spacing:1px;line-height:.95}
+  .modal-num{font-weight:700;color:var(--blue);font-size:.95rem;margin-top:2px}
+  .rarity{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+  .rpill{font-family:'Bangers';letter-spacing:.5px;font-size:1rem;background:var(--yellow);
+    border:3px solid var(--ink);border-radius:10px;padding:3px 12px;box-shadow:3px 3px 0 var(--ink)}
+  .rpill.top{background:var(--blue);color:#fff}
+  .traits{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .trait{background:var(--white);border:3px solid var(--ink);border-radius:11px;padding:7px 11px;box-shadow:2px 2px 0 var(--ink)}
+  .trait .k{display:flex;justify-content:space-between;align-items:center;gap:6px;
+    font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--blue)}
+  .trait .tp{font-size:.62rem;font-weight:800;letter-spacing:0;color:var(--ink);background:var(--cream);
+    border:2px solid var(--ink);border-radius:6px;padding:0 5px;white-space:nowrap}
+  .trait .tp.rare{background:var(--yellow)}
+  .trait .tp.ultra{background:var(--blue);color:#fff}
+  .trait .v{font-weight:600;font-size:.9rem;line-height:1.15;margin-top:1px;word-break:break-word}
+  .modal-nav{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .mbtn{font-family:'Bangers';letter-spacing:1px;font-size:1.05rem;padding:9px 18px;border:3px solid var(--ink);
+    border-radius:12px;background:var(--white);box-shadow:4px 4px 0 var(--ink);cursor:pointer;transition:.1s}
+  .mbtn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .mbtn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:4px 4px 0 var(--ink)}
+  .mbtn.share{background:var(--blue);color:#fff;margin-left:auto}
+
+  footer{position:relative;z-index:2;text-align:center;padding:26px 14px;margin-top:10px;
+    font-weight:600;font-size:.76rem;background:rgba(255,241,207,.7);border-top:3px solid rgba(20,20,20,.12)}
+
+  @media(prefers-reduced-motion:reduce){.row.a,.row.b,.row.c,.skeleton,.scrolldown .arr{animation:none}}
 </style>
 </head>
 <body>
@@ -102,17 +223,20 @@
 <div class="custom-bg"></div>
 <div class="dots"></div>
 
-<!-- gallery rows are generated by JS (see bottom) -->
-<div class="gallery" aria-hidden="true"></div>
-
 <header>
-  <span class="brand">
+  <a class="brand" href="#top">
     <span class="badge">🐾</span>
     <span><span class="a">ARCVEX</span> <span class="l">BIG PETS</span></span>
-  </span>
+  </a>
+  <nav>
+    <a class="navlink" href="#explore">Explore</a>
+    <a class="navlink mint" href="https://mint.arcvex.io">Mint</a>
+  </nav>
 </header>
 
-<main>
+<!-- ============ HERO (landing) ============ -->
+<section class="hero" id="top">
+  <div class="gallery" aria-hidden="true"></div>
   <div class="card">
     <span class="kicker">Mutable NFTs · XRP Ledger</span>
     <h1>ARCVEX <span class="blue">BIG PETS</span></h1>
@@ -120,14 +244,64 @@
     <br>
     <span class="mint soon" role="button" aria-disabled="true">COMING SOON!</span>
     <p class="note">Pets that <b>evolve</b> after you mint them. Built on XRPL.</p>
+    <br>
+    <a class="scrolldown" href="#explore">Browse &amp; search the collection <span class="arr">↓</span></a>
+  </div>
+</section>
+
+<!-- ============ EXPLORER ============ -->
+<main class="explore" id="explore">
+  <div class="wrap">
+    <div class="xhero">
+      <span class="kicker">Collection Explorer</span>
+      <h2 class="xtitle">FIND YOUR <span class="blue">PET</span></h2>
+      <div class="xcount"><span class="dot"></span> <span id="supply">Loading…</span></div>
+
+      <div class="lookup">
+        <div class="lookup-box">
+          <input id="numInput" type="number" inputmode="numeric" min="1" max="3333"
+                 placeholder="Enter a pet number (1–3333)" aria-label="Pet number">
+          <button id="goBtn">GO</button>
+        </div>
+      </div>
+      <p class="lookup-msg" id="lookupMsg"></p>
+    </div>
+
+    <section class="controls">
+      <div class="chips" id="animalChips"></div>
+      <div class="sortwrap">
+        <label for="sortSel">Sort</label>
+        <select class="sort" id="sortSel">
+          <option value="rarity" selected>Rarest first</option>
+          <option value="number">Number ↑</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="filters" id="traitFilters" aria-label="Search by trait"></section>
+    <div class="resultcount" id="resultCount"></div>
+
+    <div class="grid" id="grid"></div>
+    <div class="loadmore-wrap"><button id="loadMore" type="button">Load More Pets</button></div>
+    <div class="loadmsg" id="loadMsg"></div>
   </div>
 </main>
 
-<footer>© 2026 Arcvex · NFTs carry risk — only spend what you can afford to lose.</footer>
+<!-- detail modal -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Pet detail">
+    <button class="x" id="closeBtn" aria-label="Close">✕</button>
+    <div class="modal-grid">
+      <div class="modal-img" id="mImg"></div>
+      <div class="modal-body" id="mBody"></div>
+    </div>
+  </div>
+</div>
 
+<footer>© 2026 Arcvex · Mutable NFTs on the XRP Ledger · NFTs carry risk — only spend what you can afford to lose.</footer>
+
+<!-- marquee builder (TOP 100 RAREST, hero background) -->
 <script>
-// gallery builder — TOP 100 RAREST Big Pets (live media_url filenames), 3 scrolling rows via images.weserv.nl
-// Filenames vary (Lion_… / pet_…) and do NOT match NFT numbers — always use the stored filename.
 const PETS = ["Lion_2868.png","Lion_3021.png","Lion_1735.png","Lion_1582.png","Lion_0739.png","Lion_1761.png","Lion_2912.png","Lion_1762.png","pet_1083_b1428d3c.png","pet_0768_ae322493.png","pet_1469_2dd718ad.png","Lion_2782.png","pet_0898_92016273.png","pet_1970_45c0b825.png","pet_1776_a0970589.png","Lion_1703.png","pet_2678_eb761992.png","pet_2356_86761566.png","pet_2737_4431196e.png","pet_2367_b3e1094c.png","pet_1591_2d4ea431.png","Lion_2061.png","pet_2652_c9fd964f.png","pet_0952_252d4136.png","Lion_3104.png","pet_3147_4d8e3ebb.png","Lion_2118.png","Lion_0909.png","Lion_1376.png","pet_2564_6a4e7f07.png","Lion_2661.png","pet_2160_58ed53ae.png","Lion_1754.png","pet_0679_1d714a70.png","Lion_3002.png","pet_2050_55b24565.png","pet_0809_6e91b3c5.png","Lion_1411.png","Lion_2354.png","Lion_1369.png","Lion_2914.png","pet_0778_bd71f1e6.png","pet_2419_93511e2c.png","Lion_1311.png","Lion_3110.png","Lion_1851.png","Lion_2019.png","Lion_3192.png","Lion_2173.png","Lion_1629.png","Lion_1300.png","Lion_2375.png","Lion_2888.png","Lion_2481.png","Lion_2864.png","Lion_1015.png","Lion_2939.png","Lion_2171.png","Lion_3134.png","Lion_0976.png","Lion_0649.png","Lion_0587.png","Lion_0132.png","Lion_0787.png","Lion_2372.png","pet_1675_d714591a.png","Lion_1372.png","Lion_2994.png","Lion_0138.png","Lion_2808.png","Lion_1969.png","Lion_2222.png","Lion_1796.png","pet_2848_ff560cb4.png","Lion_1669.png","Lion_2505.png","Lion_2110.png","Lion_2017.png","Lion_0500.png","Lion_2927.png","Lion_1389.png","Lion_3087.png","pet_2869_7d331fd7.png","Lion_2155.png","Lion_2141.png","pet_2803_38800bbd.png","Lion_2610.png","Lion_2983.png","Lion_0277.png","Lion_0582.png","Lion_2907.png","Lion_2373.png","Lion_2273.png","Lion_2186.png","Lion_1131.png","Lion_2947.png","Lion_2627.png","Lion_1111.png","Lion_2030.png","Lion_2244.png"];
 const petUrl = f => `https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase.co/storage/v1/object/public/arcvex-lions/${f}&w=340&q=72&output=webp`;
 (function buildGallery(){
@@ -148,6 +322,322 @@ const petUrl = f => `https://images.weserv.nl/?url=xayoujiqufvlyiakyqaw.supabase
     });
     g.appendChild(row);
   }
+})();
+</script>
+
+<!-- explorer (Supabase-powered: gallery + number lookup + trait search + rarity) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+
+  const SUPABASE_URL = "https://xayoujiqufvlyiakyqaw.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhheW91amlxdWZ2bHlpYWt5cWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMzY3NjAsImV4cCI6MjA3MzcxMjc2MH0.Y7Ywc7L3P8OXpbnv68FM8aIBVn0Ha2mTLWQcwr_O9no";
+  const TABLE = "arcvex_public";
+  const COLLECTION_MAX = 3333;
+  const PAGE = 20;
+  const COLS = "nft_number,token_name,animal,background,skin_fur,hair_mane,glasses_eyes,mouth,hat,clothes,rarity_rank,rarity_score,media_url,media_type,is_animated";
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const TRAITS = [
+    ["Animal","animal"],["Background","background"],["Fur","skin_fur"],["Hair","hair_mane"],
+    ["Eyes","glasses_eyes"],["Mouth","mouth"],["Hat","hat"],["Clothes","clothes"]
+  ];
+  const TRAIT_FILTERS = [
+    ["Background","background"],["Fur","skin_fur"],["Hair","hair_mane"],
+    ["Eyes","glasses_eyes"],["Mouth","mouth"],["Hat","hat"],["Clothes","clothes"]
+  ];
+
+  const $ = s => document.querySelector(s);
+  const fmt = n => (n==null?"–":Number(n).toLocaleString("en-US"));
+  const isVideo = p => p.is_animated === true || /mp4|webm|video|gif/i.test(p.media_type||"");
+  function thumb(url,w){
+    if(!url) return "";
+    const s = url.replace(/^https?:\/\//,"");
+    return `https://images.weserv.nl/?url=${encodeURIComponent(s)}&w=${w}&q=74&output=webp`;
+  }
+  function topPct(rank){
+    if(rank==null) return null;
+    const p = (rank / COLLECTION_MAX) * 100;
+    return p < 1 ? p.toFixed(2) : Math.ceil(p);
+  }
+
+  let state = { animal:null, sort:"rarity", traits:{}, from:0, loading:false, done:false };
+
+  function buildBaseQuery(cols, opts){
+    let q = sb.from(TABLE).select(cols, opts);
+    if(state.animal) q = q.eq("animal", state.animal);
+    for(const k in state.traits){ if(state.traits[k]) q = q.eq(k, state.traits[k]); }
+    return q;
+  }
+  function anyFilter(){ return !!(state.animal || Object.keys(state.traits).some(k=>state.traits[k])); }
+
+  const grid = $("#grid"), loadMsg = $("#loadMsg");
+
+  function skeletons(n){
+    let html = "";
+    for(let i=0;i<n;i++) html += `<div class="pcard sk"><div class="imgbox skeleton"></div><div class="meta skeleton"></div></div>`;
+    return html;
+  }
+  function cardHTML(p){
+    const media = isVideo(p)
+      ? `<video src="${p.media_url}" muted autoplay loop playsinline></video>`
+      : `<img loading="lazy" src="${thumb(p.media_url,400)}" alt="${p.token_name||('Pet #'+p.nft_number)}">`;
+    const animBadge = isVideo(p) ? `<span class="anim">▶ LIVE</span>` : "";
+    return `<div class="pcard" data-n="${p.nft_number}">
+      <div class="imgbox">${media}<span class="rank">#${fmt(p.rarity_rank)}</span>${animBadge}</div>
+      <div class="meta">
+        <div class="name">${p.token_name || ("Pet #"+p.nft_number)}</div>
+        <div class="sub">${p.animal||""} · No. ${fmt(p.nft_number)}</div>
+      </div>
+    </div>`;
+  }
+
+  async function loadPage(){
+    if(state.loading || state.done) return;
+    state.loading = true;
+    loadMsg.textContent = "Loading pets…";
+    const lm = $("#loadMore");
+    if(lm){ lm.disabled = true; lm.textContent = "Loading…"; }
+    if(state.from===0) grid.insertAdjacentHTML("beforeend", skeletons(10));
+
+    let q = buildBaseQuery(COLS);
+    q = state.sort==="rarity"
+      ? q.order("rarity_rank",{ascending:true})
+      : q.order("nft_number",{ascending:true});
+    q = q.range(state.from, state.from + PAGE - 1);
+
+    const { data, error } = await q;
+    grid.querySelectorAll(".pcard.sk").forEach(el=>el.remove());
+
+    if(error){
+      loadMsg.innerHTML = `<span style="color:var(--red)">Couldn't load pets. Please refresh.</span>`;
+      state.loading = false; state.done = true;
+      if(lm) lm.style.display = "none";
+      return;
+    }
+    if(data && data.length){
+      data.forEach(p => rowCache.set(p.nft_number, p));
+      grid.insertAdjacentHTML("beforeend", data.map(cardHTML).join(""));
+    }
+    if(!data || data.length < PAGE) state.done = true;
+    state.from += (data ? data.length : 0);
+    loadMsg.textContent = state.done && !grid.children.length
+      ? "No pets match these filters yet. Try clearing a filter." : "";
+    if(lm){
+      lm.disabled = false; lm.textContent = "Load More Pets";
+      lm.style.display = state.done ? "none" : "inline-block";
+    }
+    state.loading = false;
+  }
+
+  function resetGrid(){
+    grid.innerHTML = ""; state.from = 0; state.done = false; state.loading = false;
+    const lm = $("#loadMore"); if(lm) lm.style.display = "inline-block";
+    loadPage();
+  }
+
+  function onFilterChange(){ updateCount(); resetGrid(); }
+
+  async function updateCount(){
+    const rc = $("#resultCount");
+    if(!anyFilter()){ rc.style.display = "none"; rc.textContent = ""; return; }
+    rc.style.display = "block"; rc.textContent = "Counting…";
+    const { count } = await buildBaseQuery("*", { count:"exact", head:true });
+    rc.textContent = `${fmt(count)} matching pet${count===1?"":"s"}`;
+  }
+
+  const rowCache = new Map();
+
+  const traitPct = {};
+  async function loadTraitRarity(){
+    const { data, error } = await sb.from("arcvex_trait_rarity").select("category,value,pct");
+    if(error || !data) return;
+    data.forEach(r=>{ (traitPct[r.category] || (traitPct[r.category]={}))[r.value] = r.pct; });
+    if(current!=null) openDetail(current);
+  }
+
+  $("#loadMore").addEventListener("click", loadPage);
+
+  grid.addEventListener("click", e=>{
+    const c = e.target.closest(".pcard"); if(!c || c.classList.contains("sk")) return;
+    openDetail(Number(c.dataset.n));
+  });
+
+  async function loadStats(){
+    const { count } = await sb.from(TABLE).select("*",{count:"exact",head:true});
+    $("#supply").textContent = `${fmt(count)} pets revealed · ${fmt(COLLECTION_MAX)} total`;
+
+    const { data } = await sb.from(TABLE)
+      .select("animal,background,skin_fur,hair_mane,glasses_eyes,mouth,hat,clothes");
+    const rows = data || [];
+
+    const counts = {};
+    rows.forEach(r => counts[r.animal] = (counts[r.animal]||0)+1);
+    const animals = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+    const chips = $("#animalChips");
+    chips.innerHTML =
+      `<button class="chip active" data-animal="">All<span class="n">${fmt(rows.length)}</span></button>` +
+      animals.map(a=>`<button class="chip" data-animal="${a}">${a}<span class="n">${fmt(counts[a])}</span></button>`).join("");
+    chips.addEventListener("click", e=>{
+      const b = e.target.closest(".chip"); if(!b) return;
+      chips.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      state.animal = b.dataset.animal || null;
+      toggleClear();
+      onFilterChange();
+    });
+
+    const fbar = $("#traitFilters");
+    TRAIT_FILTERS.forEach(([label,key])=>{
+      const vals = [...new Set(rows.map(r=>r[key]).filter(v=>v!=null && v!==""))]
+        .sort((a,b)=>String(a).localeCompare(String(b)));
+      const sel = document.createElement("select");
+      sel.className = "trait"; sel.dataset.key = key;
+      sel.setAttribute("aria-label", "Filter by " + label);
+      const all = document.createElement("option");
+      all.value = ""; all.textContent = `${label}: All`;
+      sel.appendChild(all);
+      vals.forEach(v=>{ const o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o); });
+      sel.addEventListener("change", ()=>{
+        state.traits[key] = sel.value || null;
+        sel.classList.toggle("set", !!sel.value);
+        toggleClear();
+        onFilterChange();
+      });
+      fbar.appendChild(sel);
+    });
+
+    const clear = document.createElement("button");
+    clear.type = "button"; clear.className = "clearbtn"; clear.id = "clearBtn"; clear.textContent = "Clear ✕";
+    clear.addEventListener("click", ()=>{
+      state.animal = null; state.traits = {};
+      chips.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+      const allChip = chips.querySelector('.chip[data-animal=""]'); if(allChip) allChip.classList.add("active");
+      fbar.querySelectorAll("select.trait").forEach(s=>{ s.value=""; s.classList.remove("set"); });
+      toggleClear();
+      onFilterChange();
+    });
+    fbar.appendChild(clear);
+  }
+
+  function toggleClear(){
+    const c = $("#clearBtn"); if(c) c.classList.toggle("show", anyFilter());
+  }
+
+  $("#sortSel").addEventListener("change", e=>{ state.sort = e.target.value; resetGrid(); });
+
+  const msg = $("#lookupMsg");
+  async function doLookup(){
+    const raw = $("#numInput").value.trim();
+    msg.textContent = "";
+    if(raw===""){ msg.textContent = "Type a pet number first."; return; }
+    const n = Number(raw);
+    if(!Number.isInteger(n) || n < 1 || n > COLLECTION_MAX){
+      msg.style.color = "var(--red)";
+      msg.textContent = `Enter a whole number between 1 and ${fmt(COLLECTION_MAX)}.`; return;
+    }
+    msg.style.color = "var(--ink)"; msg.textContent = "Looking up…";
+    const p = await fetchPet(n);
+    if(p){ msg.textContent=""; openDetail(n, p); }
+    else { msg.style.color="var(--red)"; msg.textContent = `Pet #${fmt(n)} hasn't been revealed yet. 🔒`; }
+  }
+  $("#goBtn").addEventListener("click", doLookup);
+  $("#numInput").addEventListener("keydown", e=>{ if(e.key==="Enter") doLookup(); });
+
+  async function fetchPet(n){
+    if(rowCache.has(n)) return rowCache.get(n);
+    const { data, error } = await sb.from(TABLE).select(COLS).eq("nft_number",n).maybeSingle();
+    if(error || !data) return null;
+    rowCache.set(n, data);
+    return data;
+  }
+
+  const overlay = $("#overlay");
+  let current = null;
+
+  async function neighbours(n){
+    const [{data:nx},{data:pv}] = await Promise.all([
+      sb.from(TABLE).select("nft_number").gt("nft_number",n).order("nft_number",{ascending:true}).limit(1),
+      sb.from(TABLE).select("nft_number").lt("nft_number",n).order("nft_number",{ascending:false}).limit(1)
+    ]);
+    return { next: nx&&nx[0]?nx[0].nft_number:null, prev: pv&&pv[0]?pv[0].nft_number:null };
+  }
+
+  async function openDetail(n, preP){
+    const p = preP || await fetchPet(n);
+    if(!p) return;
+    current = n;
+    if(location.hash !== "#pet/"+n) history.pushState({pet:n}, "", "#pet/"+n);
+
+    $("#mImg").innerHTML = isVideo(p)
+      ? `<video src="${p.media_url}" muted autoplay loop playsinline controls></video>`
+      : `<img src="${thumb(p.media_url,900)}" alt="${p.token_name||('Pet #'+n)}">`;
+
+    const pct = topPct(p.rarity_rank);
+    const traitsHTML = TRAITS.map(([label,key])=>{
+      const v = p[key];
+      const tp = (traitPct[key]||{})[v];
+      let tag = "";
+      if(tp!=null){
+        const cls = tp < 1 ? "tp ultra" : tp < 5 ? "tp rare" : "tp";
+        tag = `<span class="${cls}" title="${tp}% of the collection share this trait">${tp}%</span>`;
+      }
+      return `<div class="trait"><div class="k"><span>${label}</span>${tag}</div><div class="v">${v==null||v===""?"—":v}</div></div>`;
+    }).join("");
+
+    $("#mBody").innerHTML = `
+      <h2>${p.token_name || ("Arcvex Pet #"+n)}</h2>
+      <div class="modal-num">No. ${fmt(n)} · ${p.animal||""}</div>
+      <div class="rarity">
+        <span class="rpill">Rank #${fmt(p.rarity_rank)} / ${fmt(COLLECTION_MAX)}</span>
+        ${pct!=null?`<span class="rpill top">Top ${pct}%</span>`:""}
+        <span class="rpill">Score ${p.rarity_score!=null?Number(p.rarity_score).toFixed(2):"–"}</span>
+      </div>
+      <div class="traits">${traitsHTML}</div>
+      <div class="modal-nav">
+        <button class="mbtn" id="prevBtn">‹ Prev</button>
+        <button class="mbtn" id="nextBtn">Next ›</button>
+        <button class="mbtn share" id="shareBtn">Share</button>
+      </div>`;
+
+    overlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+
+    const nb = await neighbours(n);
+    const prevB = $("#prevBtn"), nextB = $("#nextBtn");
+    prevB.disabled = nb.prev==null; nextB.disabled = nb.next==null;
+    prevB.onclick = ()=> nb.prev!=null && openDetail(nb.prev);
+    nextB.onclick = ()=> nb.next!=null && openDetail(nb.next);
+    $("#shareBtn").onclick = async ()=>{
+      const url = location.origin + location.pathname + "#pet/" + n;
+      try{ await navigator.clipboard.writeText(url); $("#shareBtn").textContent = "Copied!"; setTimeout(()=>$("#shareBtn").textContent="Share",1400); }
+      catch{ prompt("Copy link:", url); }
+    };
+  }
+
+  function closeDetail(push){
+    overlay.classList.remove("open");
+    document.body.style.overflow = "";
+    current = null;
+    if(push!==false && location.hash.startsWith("#pet/")) history.pushState({}, "", location.pathname + location.search);
+  }
+  $("#closeBtn").addEventListener("click", ()=>closeDetail());
+  overlay.addEventListener("click", e=>{ if(e.target===overlay) closeDetail(); });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape" && overlay.classList.contains("open")) closeDetail(); });
+
+  function syncHash(){
+    const m = location.hash.match(/^#pet\/(\d+)$/);
+    if(m){ const n = Number(m[1]); if(n!==current) openDetail(n); }
+    else if(overlay.classList.contains("open")) closeDetail(false);
+  }
+  window.addEventListener("popstate", syncHash);
+
+  loadStats();
+  loadTraitRarity();
+  loadPage();
+  if(location.hash.startsWith("#pet/")) syncHash();
 })();
 </script>
 </body>
