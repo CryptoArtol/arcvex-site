@@ -189,14 +189,14 @@
   .modal-img{background:#1c1c1c;aspect-ratio:1;border-bottom:5px solid var(--ink)}
   @media(min-width:660px){.modal-img{border-bottom:0;border-right:5px solid var(--ink)}}
   .modal-img img,.modal-img video{width:100%;height:100%;object-fit:cover;display:block}
-  .modal-body{padding:clamp(16px,3vw,26px)}
+  .modal-body{padding:clamp(18px,3vw,28px) clamp(18px,3vw,28px) clamp(24px,3.5vw,34px)}
   .modal-body h2{font-size:clamp(1.6rem,5vw,2.3rem);letter-spacing:1px;line-height:.95}
   .modal-num{font-weight:700;color:var(--blue);font-size:.95rem;margin-top:2px}
   .rarity{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
   .rpill{font-family:'Bangers';letter-spacing:.5px;font-size:1rem;background:var(--yellow);
     border:3px solid var(--ink);border-radius:10px;padding:3px 12px;box-shadow:3px 3px 0 var(--ink)}
   .rpill.top{background:var(--blue);color:#fff}
-  .traits{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .traits{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .trait{background:var(--white);border:3px solid var(--ink);border-radius:11px;padding:7px 11px;box-shadow:2px 2px 0 var(--ink)}
   .trait .k{display:flex;justify-content:space-between;align-items:center;gap:6px;
     font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--blue)}
@@ -205,7 +205,7 @@
   .trait .tp.rare{background:var(--yellow)}
   .trait .tp.ultra{background:var(--blue);color:#fff}
   .trait .v{font-weight:600;font-size:.9rem;line-height:1.15;margin-top:1px;word-break:break-word}
-  .modal-nav{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .modal-nav{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
   .mbtn{font-family:'Bangers';letter-spacing:1px;font-size:1.05rem;padding:9px 18px;border:3px solid var(--ink);
     border-radius:12px;background:var(--white);box-shadow:4px 4px 0 var(--ink);cursor:pointer;transition:.1s}
   .mbtn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
@@ -230,7 +230,6 @@
   </a>
   <nav>
     <a class="navlink" href="#explore">Explore</a>
-    <a class="navlink mint" href="https://mint.arcvex.io">Mint</a>
   </nav>
 </header>
 
