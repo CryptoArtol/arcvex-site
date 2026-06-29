@@ -23,19 +23,14 @@
   .dots{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(var(--ink) 2px,transparent 2px);background-size:24px 24px;opacity:.05}
   .wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
 
-  /* diagonal scrolling pets background (live top-100 rarest) */
+  /* diagonal pets field (live top-150 rarest) — whole sheet drifts at a true 45° */
   .bgwrap{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-  .diag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);
-    display:flex;flex-direction:column;gap:clamp(10px,1.6vmin,18px);width:300vmax}
-  .drow{display:flex;gap:clamp(10px,1.6vmin,18px);width:max-content;will-change:transform}
-  .drow.a{animation:dscrollL 80s linear infinite}
-  .drow.b{animation:dscrollR 95s linear infinite}
-  @keyframes dscrollL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  @keyframes dscrollR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
-  .dlion{flex:0 0 auto;width:clamp(92px,13vmin,150px);aspect-ratio:1;border:4px solid var(--ink);
-    border-radius:14px;overflow:hidden;background:#1c1c1c;box-shadow:5px 5px 0 rgba(20,20,20,.25)}
+  .diag{position:absolute;top:0;left:0;width:200%;display:grid;gap:8px;
+    animation:drift 75s linear infinite;will-change:transform}
+  @keyframes drift{from{transform:translate(0,0)}to{transform:translate(-50%,-50%)}}
+  .dlion{aspect-ratio:1;border:3px solid var(--ink);border-radius:13px;overflow:hidden;background:#1c1c1c;box-shadow:4px 4px 0 rgba(20,20,20,.18)}
   .dlion img{width:100%;height:100%;object-fit:cover;display:block}
-  @media(prefers-reduced-motion:reduce){.drow.a,.drow.b{animation:none}}
+  @media(prefers-reduced-motion:reduce){.diag{animation:none}}
 
   header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px clamp(16px,4vw,42px)}
   .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
@@ -209,20 +204,21 @@
     let pool = data.filter(p => !(p.is_animated || /mp4|webm|video/i.test(p.media_type||""))).map(p => p.media_url);
     if(!pool.length) pool = data.map(p => p.media_url);
 
-    const rows = 16, per = Math.max(8, Math.ceil(pool.length / rows) + 4);
-    let idx = 0;
-    for(let r=0;r<rows;r++){
-      const row = document.createElement("div");
-      row.className = "drow " + (r % 2 ? "b" : "a");
-      const set = [];
-      for(let i=0;i<per;i++){ set.push(pool[idx % pool.length]); idx++; }
-      [...set, ...set].forEach(u=>{
+    // Build a square quadrant (Q x Q) and tile it 2x2 with identical content,
+    // so translating the sheet by 50%/50% loops seamlessly at a true 45 degrees.
+    const Q = 13;                 // 13x13 = 169 cells, covers all ~150 distinct pets
+    const full = Q * 2;
+    diag.style.gridTemplateColumns = `repeat(${full}, 1fr)`;
+    const frag = document.createDocumentFragment();
+    for(let R=0; R<full; R++){
+      for(let C=0; C<full; C++){
+        const u = pool[((R % Q) * Q + (C % Q)) % pool.length];
         const d = document.createElement("div"); d.className = "dlion";
         const img = document.createElement("img"); img.loading = "lazy"; img.src = thumb(u); img.alt = "";
-        d.appendChild(img); row.appendChild(d);
-      });
-      diag.appendChild(row);
+        d.appendChild(img); frag.appendChild(d);
+      }
     }
+    diag.appendChild(frag);
   })();
 })();
 </script>
