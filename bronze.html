@@ -25,8 +25,8 @@
 
   /* diagonal scrolling pets background (live top-100 rarest) */
   .bgwrap{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-  .diag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-32deg);
-    display:flex;flex-direction:column;gap:clamp(10px,1.6vmin,18px);width:240vmax}
+  .diag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);
+    display:flex;flex-direction:column;gap:clamp(10px,1.6vmin,18px);width:300vmax}
   .drow{display:flex;gap:clamp(10px,1.6vmin,18px);width:max-content;will-change:transform}
   .drow.a{animation:dscrollL 80s linear infinite}
   .drow.b{animation:dscrollR 95s linear infinite}
@@ -209,7 +209,7 @@
     let pool = data.filter(p => !(p.is_animated || /mp4|webm|video/i.test(p.media_type||""))).map(p => p.media_url);
     if(!pool.length) pool = data.map(p => p.media_url);
 
-    const rows = 12, per = Math.max(8, Math.ceil(pool.length / rows) + 4);
+    const rows = 16, per = Math.max(8, Math.ceil(pool.length / rows) + 4);
     let idx = 0;
     for(let r=0;r<rows;r++){
       const row = document.createElement("div");
