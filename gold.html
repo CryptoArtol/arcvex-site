@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcvex Gold — Real XRP, Paid to Holders</title>
+<meta name="description" content="Arcvex Gold is the ecosystem reward token. Burn Silver into Gold and earn real XRP from platform activity across all four Arcvex collections. Capped at 5,890 forever.">
+<meta property="og:title" content="Arcvex Gold">
+<meta property="og:description" content="The reward token across four Arcvex collections. Earns real XRP. Capped at 5,890.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF1CF; --blue:#2F6BFF; --red:#FF4438; --yellow:#FFC83D;
+    --ink:#141414; --white:#fff; --accent:#FFC83D; --accent-deep:#b07d00;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--cream);color:var(--ink);font-family:'Fredoka',system-ui,sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+  h1,h2,h3{font-family:'Bangers',sans-serif;font-weight:400;letter-spacing:1px}
+  a{text-decoration:none;color:inherit}
+  .dots{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(var(--ink) 2px,transparent 2px);background-size:24px 24px;opacity:.05}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+
+  header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px clamp(16px,4vw,42px)}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
+  .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
+  .brand .badge{width:34px;height:34px;background:var(--yellow);border:3px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:3px 3px 0 var(--ink)}
+  nav{display:flex;gap:8px;flex-wrap:wrap}
+  .navlink{font-weight:700;font-size:.92rem;padding:8px 16px;border:3px solid var(--ink);border-radius:99px;background:var(--white);box-shadow:3px 3px 0 var(--ink);transition:.1s}
+  .navlink:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+
+  section{position:relative;z-index:2;padding:clamp(36px,6vw,64px) 0}
+  .hero{text-align:center;padding-top:clamp(24px,4vw,44px)}
+  .medal{font-size:clamp(3.4rem,10vw,5.4rem);line-height:1}
+  .hero h1{font-size:clamp(2.4rem,8vw,4.4rem);margin:8px 0 6px;color:var(--ink);text-shadow:4px 4px 0 var(--accent),7px 7px 0 var(--ink)}
+  .tagline{font-family:'Bangers';letter-spacing:1px;font-size:clamp(1.1rem,3.2vw,1.5rem);color:var(--accent-deep)}
+  .lead{font-size:clamp(1.02rem,2.4vw,1.2rem);font-weight:500;max-width:720px;margin:18px auto 0;line-height:1.5}
+  .seclabel{font-family:'Fredoka';font-weight:800;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-deep);margin-bottom:8px}
+  h2.big{font-size:clamp(1.7rem,5.4vw,2.7rem);line-height:.98;margin-bottom:12px;text-shadow:3px 3px 0 var(--accent),5px 5px 0 var(--ink)}
+
+  .stats{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:680px){.stats{grid-template-columns:repeat(3,1fr)}}
+  .stat{background:var(--white);border:4px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:20px;text-align:center}
+  .stat .big{font-family:'Bangers';font-size:clamp(1.7rem,5vw,2.4rem);color:var(--accent-deep);line-height:1}
+  .stat .lbl{font-weight:700;font-size:.86rem;margin-top:4px}
+  .stat .sub{font-weight:500;font-size:.78rem;opacity:.75;margin-top:2px}
+
+  .panel{background:var(--white);border:4px solid var(--ink);border-radius:18px;box-shadow:7px 7px 0 var(--ink);padding:clamp(20px,3vw,30px)}
+  .panel p{font-weight:500;line-height:1.55;max-width:760px}.panel p+p{margin-top:12px}.panel b{color:var(--accent-deep)}
+
+  /* burn formula */
+  .burn{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+  .burn .chip{background:var(--white);border:4px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:14px 20px;text-align:center;font-weight:700}
+  .burn .chip .bignum{font-family:'Bangers';font-size:1.6rem;display:block;line-height:1}
+  .burn .eq{font-family:'Bangers';font-size:2rem;color:var(--accent-deep)}
+
+  /* 4 collections */
+  .colls{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  @media(min-width:560px){.colls{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:880px){.colls{grid-template-columns:repeat(4,1fr)}}
+  .coll{background:var(--white);border:4px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:18px;text-align:center;position:relative}
+  .coll .cn{font-family:'Bangers';font-size:1.1rem;color:var(--accent-deep);letter-spacing:.5px}
+  .coll .ct{font-weight:700;font-size:1.05rem;margin-top:4px}
+  .coll .cs{font-weight:600;font-size:.8rem;opacity:.7;margin-top:4px}
+  .coll.live{border-color:var(--accent);box-shadow:6px 6px 0 var(--accent)}
+  .coll .badge2{display:inline-block;font-weight:800;font-size:.66rem;letter-spacing:.6px;text-transform:uppercase;border:2px solid var(--ink);border-radius:7px;padding:2px 8px;margin-bottom:8px}
+  .coll.live .badge2{background:var(--good,#1FA85A);color:#fff;background:#1FA85A}
+  .coll .badge2.soon{background:var(--cream)}
+  .capnote{text-align:center;font-weight:700;margin-top:20px;font-size:1.02rem}
+  .capnote .pill{display:inline-block;background:var(--accent);color:var(--ink);border:3px solid var(--ink);border-radius:99px;padding:6px 16px;box-shadow:3px 3px 0 var(--ink);font-family:'Bangers';letter-spacing:1px}
+
+  .feeds{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px}
+  @media(min-width:640px){.feeds{grid-template-columns:repeat(2,1fr)}}
+  .feed{display:flex;gap:12px;align-items:center;background:var(--white);border:4px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:14px 16px;font-weight:600}
+  .feed .ic{font-size:1.5rem}
+
+  .tokenlinks{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.tokenlinks{grid-template-columns:repeat(3,1fr)}}
+  .tl{display:flex;align-items:center;gap:12px;background:var(--white);border:4px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:14px 16px;transition:.1s;font-weight:700}
+  .tl:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+  .tl .m{font-size:1.6rem}.tl.cur{background:var(--accent);color:var(--ink);border-color:var(--ink)}
+  .tl small{display:block;font-weight:500;opacity:.8;font-size:.76rem}
+
+  footer{position:relative;z-index:2;background:var(--ink);color:var(--cream);text-align:center;padding:26px 16px;font-weight:500;font-size:.8rem;line-height:1.5;border-top:5px solid #000}
+  .disclaimer{max-width:760px;margin:0 auto;opacity:.85}
+</style>
+</head>
+<body>
+<div class="dots"></div>
+
+<header>
+  <a class="brand" href="/"><span class="badge">🐾</span><span><span class="a">ARCVEX</span> <span class="l">BIG PETS</span></span></a>
+  <nav>
+    <a class="navlink" href="/">Home</a>
+    <a class="navlink" href="/#explore">Explore</a>
+    <a class="navlink" href="/how-it-works">How It Works</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="medal">🥇</div>
+    <h1>ARCVEX GOLD</h1>
+    <div class="tagline">Real XRP, paid to holders</div>
+    <p class="lead">Gold is the top of the Arcvex economy. Burn Silver into Gold to tap the ecosystem's reward pool — and Gold earns <b>real XRP</b>, fed by activity across every Arcvex collection. It's capped, it's scarce, and it gets harder to earn over time.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><div class="big">5,890</div><div class="lbl">Hard cap</div><div class="sub">forever — never grows</div></div>
+      <div class="stat"><div class="big">400 : 1</div><div class="lbl">Silver → Gold</div><div class="sub">burn 400 Silver to mint 1 Gold</div></div>
+      <div class="stat"><div class="big">4</div><div class="lbl">Collections</div><div class="sub">Gold fills across all four</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">What Gold is</div>
+    <h2 class="big">Earned from Silver. Paid in XRP.</h2>
+    <div class="panel">
+      <p>You don't buy Gold — you <b>earn</b> it. Burn your Silver and mint Gold at a fixed rate. That's the only way Gold enters circulation, which keeps it scarce.</p>
+      <p>Holding Gold gives you a share of the <b>reward pool</b>: real XRP collected from platform activity, paid out to Gold holders on a regular schedule, pro-rata to how much Gold you hold. The more the ecosystem plays, the bigger the pool.</p>
+    </div>
+    <div class="burn">
+      <div class="chip"><span class="bignum">400</span>Silver</div>
+      <span class="eq">🔥 →</span>
+      <div class="chip"><span class="bignum">1</span>Gold</div>
+      <span class="eq">→ 💧</span>
+      <div class="chip"><span class="bignum">XRP</span>rewards</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">Where the XRP comes from</div>
+    <h2 class="big">Every action feeds the pool.</h2>
+    <div class="feeds">
+      <div class="feed"><span class="ic">🎡</span><div>Every <b>wheel spin</b></div></div>
+      <div class="feed"><span class="ic">🔀</span><div>Every <b>trait swap</b></div></div>
+      <div class="feed"><span class="ic">🎬</span><div>Every <b>animation upgrade</b></div></div>
+      <div class="feed"><span class="ic">💱</span><div>Every <b>secondary sale</b></div></div>
+    </div>
+    <p class="lead" style="margin-top:18px">A slice of all of it flows to Gold holders. So the people who own the most rarity end up paid by everyone chasing it.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">The four collections</div>
+    <h2 class="big">Big Pets is collection #1 of 4.</h2>
+    <p class="lead" style="margin:0 0 22px">Gold isn't just a Big Pets thing. The same 5,890 Gold fills gradually across <b>four</b> Arcvex collections — then stops forever. Big Pets is the very first, which means the earliest stackers claim Gold while the supply is at its smallest and their share of every drop is at its largest.</p>
+    <div class="colls">
+      <div class="coll live"><span class="badge2">● Live now</span><div class="cn">Collection #1</div><div class="ct">Big Pets</div><div class="cs">Minting Gold first</div></div>
+      <div class="coll"><span class="badge2 soon">Coming</span><div class="cn">Collection #2</div><div class="ct">TBA</div><div class="cs">Adds to the same Gold cap</div></div>
+      <div class="coll"><span class="badge2 soon">Coming</span><div class="cn">Collection #3</div><div class="ct">TBA</div><div class="cs">Adds to the same Gold cap</div></div>
+      <div class="coll"><span class="badge2 soon">Coming</span><div class="cn">Collection #4</div><div class="ct">TBA</div><div class="cs">Fills the cap — then done</div></div>
+    </div>
+    <div class="capnote"><span class="pill">5,890 Gold across 4 collections → then never again</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">The other tokens</div>
+    <h2 class="big">One economy, three tokens.</h2>
+    <div class="tokenlinks">
+      <a class="tl" href="/bronze"><span class="m">🥉</span><span>Bronze<small>The key to the mint →</small></span></a>
+      <a class="tl" href="/silver"><span class="m">🥈</span><span>Silver<small>Weekly rarity rewards →</small></span></a>
+      <span class="tl cur"><span class="m">🥇</span><span>Gold<small>You're here</small></span></span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="disclaimer">Arcvex Gold is a utility reward token tied to platform activity — not an investment product, security, or share. XRP rewards depend on real ecosystem usage and are not guaranteed. Do your own research.</p>
+  <p style="margin-top:10px;opacity:.7">© 2026 Arcvex · Mutable NFTs on the XRP Ledger</p>
+</footer>
+
+</body>
+</html>

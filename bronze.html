@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcvex Bronze — The Key to the Mint</title>
+<meta name="description" content="Arcvex Bronze is the currency that mints your Big Pet. Fixed max supply of 589M, 20% off vs XRP, and a standing buyback. Here's how it works.">
+<meta property="og:title" content="Arcvex Bronze">
+<meta property="og:description" content="The mint currency for Arcvex Big Pets. 589M max supply, 20% off, standing buyback.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF1CF; --blue:#2F6BFF; --red:#FF4438; --yellow:#FFC83D;
+    --ink:#141414; --white:#fff; --accent:#CD7F32; --accent-deep:#9c5e1f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--cream);color:var(--ink);font-family:'Fredoka',system-ui,sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+  h1,h2,h3{font-family:'Bangers',sans-serif;font-weight:400;letter-spacing:1px}
+  a{text-decoration:none;color:inherit}
+  .dots{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(var(--ink) 2px,transparent 2px);background-size:24px 24px;opacity:.05}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+
+  header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px clamp(16px,4vw,42px)}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
+  .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
+  .brand .badge{width:34px;height:34px;background:var(--yellow);border:3px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:3px 3px 0 var(--ink)}
+  nav{display:flex;gap:8px;flex-wrap:wrap}
+  .navlink{font-weight:700;font-size:.92rem;padding:8px 16px;border:3px solid var(--ink);border-radius:99px;background:var(--white);box-shadow:3px 3px 0 var(--ink);transition:.1s}
+  .navlink:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+
+  section{position:relative;z-index:2;padding:clamp(36px,6vw,64px) 0}
+  .hero{text-align:center;padding-top:clamp(24px,4vw,44px)}
+  .medal{font-size:clamp(3.4rem,10vw,5.4rem);line-height:1}
+  .hero h1{font-size:clamp(2.4rem,8vw,4.4rem);margin:8px 0 6px;color:var(--ink);text-shadow:4px 4px 0 var(--accent),7px 7px 0 var(--ink)}
+  .tagline{font-family:'Bangers';letter-spacing:1px;font-size:clamp(1.1rem,3.2vw,1.5rem);color:var(--accent-deep)}
+  .lead{font-size:clamp(1.02rem,2.4vw,1.2rem);font-weight:500;max-width:720px;margin:18px auto 0;line-height:1.5}
+  .lead.left{margin-left:0}
+  .seclabel{font-family:'Fredoka';font-weight:800;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-deep);margin-bottom:8px}
+  h2.big{font-size:clamp(1.7rem,5.4vw,2.7rem);line-height:.98;margin-bottom:12px;text-shadow:3px 3px 0 var(--accent),5px 5px 0 var(--ink)}
+
+  .stats{display:grid;grid-template-columns:1fr;gap:16px;margin-top:8px}
+  @media(min-width:680px){.stats{grid-template-columns:repeat(3,1fr)}}
+  .stat{background:var(--white);border:4px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:20px;text-align:center}
+  .stat .big{font-family:'Bangers';font-size:clamp(1.7rem,5vw,2.4rem);color:var(--accent-deep);line-height:1}
+  .stat .lbl{font-weight:700;font-size:.86rem;margin-top:4px}
+  .stat .sub{font-weight:500;font-size:.78rem;opacity:.75;margin-top:2px}
+
+  .panel{background:var(--white);border:4px solid var(--ink);border-radius:18px;box-shadow:7px 7px 0 var(--ink);padding:clamp(20px,3vw,30px);margin-top:8px}
+  .panel p{font-weight:500;line-height:1.55;max-width:760px}
+  .panel p+p{margin-top:12px}
+  .panel b{color:var(--accent-deep)}
+
+  .steps{display:grid;gap:14px;margin-top:18px}
+  .step{display:flex;gap:14px;align-items:flex-start;background:var(--white);border:4px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:16px 18px}
+  .step .n{flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;border:3px solid var(--ink);box-shadow:2px 2px 0 var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Bangers';font-size:1.2rem}
+  .step p{font-weight:500;line-height:1.45}.step b{color:var(--accent-deep)}
+
+  /* trustline box */
+  .trust{background:#1c1408;color:var(--cream);border:5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:clamp(22px,3.5vw,34px);margin-top:8px}
+  .trust h3{font-size:1.5rem;color:var(--yellow);margin-bottom:6px}
+  .trust .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    background:rgba(255,255,255,.06);border:2px dashed rgba(255,255,255,.4);border-radius:12px;padding:12px 16px;margin-top:12px}
+  .trust .row .k{font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.6px;opacity:.8}
+  .trust .row .v{font-family:'Fredoka';font-weight:600;word-break:break-all}
+  .trust .ph{color:var(--yellow);font-weight:700}
+  .trust .tbtn{display:inline-block;margin-top:16px;font-family:'Bangers';letter-spacing:1.5px;font-size:1.3rem;color:var(--ink);
+    background:var(--yellow);border:4px solid var(--ink);border-radius:14px;padding:11px 28px;box-shadow:5px 5px 0 #000;cursor:not-allowed;opacity:.95;position:relative}
+  .trust .tbtn::after{content:"SOON";font-family:'Fredoka';font-weight:800;font-size:.55rem;letter-spacing:1px;background:var(--ink);color:var(--yellow);border-radius:5px;padding:2px 5px;margin-left:8px;vertical-align:middle}
+  .trust .smallnote{font-size:.82rem;opacity:.8;margin-top:12px;font-weight:500}
+
+  /* token cross links */
+  .tokenlinks{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  @media(min-width:640px){.tokenlinks{grid-template-columns:repeat(3,1fr)}}
+  .tl{display:flex;align-items:center;gap:12px;background:var(--white);border:4px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:14px 16px;transition:.1s;font-weight:700}
+  .tl:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+  .tl .m{font-size:1.6rem}.tl.cur{background:var(--accent);color:#fff;border-color:var(--ink)}
+  .tl small{display:block;font-weight:500;opacity:.8;font-size:.76rem}
+
+  footer{position:relative;z-index:2;background:var(--ink);color:var(--cream);text-align:center;padding:26px 16px;font-weight:500;font-size:.8rem;line-height:1.5;border-top:5px solid #000}
+  .disclaimer{max-width:760px;margin:0 auto;opacity:.85}
+</style>
+</head>
+<body>
+<div class="dots"></div>
+
+<header>
+  <a class="brand" href="/"><span class="badge">🐾</span><span><span class="a">ARCVEX</span> <span class="l">BIG PETS</span></span></a>
+  <nav>
+    <a class="navlink" href="/">Home</a>
+    <a class="navlink" href="/#explore">Explore</a>
+    <a class="navlink" href="/how-it-works">How It Works</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="medal">🥉</div>
+    <h1>ARCVEX BRONZE</h1>
+    <div class="tagline">The key to the mint</div>
+    <p class="lead">Bronze is the currency that mints your Big Pet. Buy in early, mint for less than the crowd, and exit any time through a standing buyback. It's the cheapest, most flexible way into the collection.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><div class="big">589M</div><div class="lbl">Max supply</div><div class="sub">589,000,000 · fixed forever</div></div>
+      <div class="stat"><div class="big">20% OFF</div><div class="lbl">Mint discount</div><div class="sub">vs paying in XRP</div></div>
+      <div class="stat"><div class="big">Buyback</div><div class="lbl">Standing exit</div><div class="sub">flat 20% spread</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">What it's for</div>
+    <h2 class="big">A spending token, not a holding token.</h2>
+    <div class="panel">
+      <p>Bronze exists for one job: <b>minting Big Pets</b>. You acquire Bronze, then spend it to mint a pet from the collection — and because you're paying in Bronze, you get <b>20% off</b> versus paying in raw XRP.</p>
+      <p>The supply is capped: there will only ever be <b>589,000,000 Bronze</b> (589M), and that number never grows. Bronze is meant to be <b>spent on NFTs</b> — it flows into mints, not sat on. As the collection mints out, Bronze gets used up against pets.</p>
+      <p>Changed your mind before you mint? Bronze has a <b>standing buyback</b> — sell it back any time and you only ever give up the flat 20% spread. No trapped bags, no waiting for a buyer.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">The tiered launch</div>
+    <h2 class="big">The first Bronze is the cheapest Bronze.</h2>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><p><b>Early tiers are cheapest.</b> Bronze launches in price tiers. The opening tier is the lowest price it will ever be.</p></div>
+      <div class="step"><span class="n">2</span><p><b>Prices step up as it sells.</b> Each tier that fills pushes the next one higher — <b>later mints cost more than the first ones</b>. Simple: the longer you wait, the more you pay.</p></div>
+      <div class="step"><span class="n">3</span><p><b>Mint with Bronze, save 20%.</b> However much you paid for it, minting in Bronze still beats paying in XRP by 20%.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="trust">
+      <h3>🔗 Set the Bronze trustline</h3>
+      <p style="font-weight:500;line-height:1.5;opacity:.9">Before you can hold Bronze, your XRPL wallet needs a trustline to the token. The official details will go live here at launch.</p>
+      <div class="row"><span class="k">Issuer address</span><span class="v ph">[ Issuer address — coming at launch ]</span></div>
+      <div class="row"><span class="k">Currency code</span><span class="v ph">[ BRONZE — coming at launch ]</span></div>
+      <div class="row"><span class="k">Network</span><span class="v">XRPL Mainnet</span></div>
+      <span class="tbtn" role="button" aria-disabled="true">Set Trustline in Xaman</span>
+      <p class="smallnote">⚠️ Only ever trust the official issuer published on this page. Never set a trustline from a link someone DMs you.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">The other tokens</div>
+    <h2 class="big">One economy, three tokens.</h2>
+    <div class="tokenlinks">
+      <span class="tl cur"><span class="m">🥉</span><span>Bronze<small>You're here</small></span></span>
+      <a class="tl" href="/silver"><span class="m">🥈</span><span>Silver<small>Weekly rarity rewards →</small></span></a>
+      <a class="tl" href="/gold"><span class="m">🥇</span><span>Gold<small>Real XRP rewards →</small></span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="disclaimer">Arcvex Bronze is a utility token used to mint NFTs — not an investment product. The buyback and discount are platform mechanics, not a promise of returns. Do your own research.</p>
+  <p style="margin-top:10px;opacity:.7">© 2026 Arcvex · Mutable NFTs on the XRP Ledger</p>
+</footer>
+
+</body>
+</html>

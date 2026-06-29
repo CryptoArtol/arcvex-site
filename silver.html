@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcvex Silver — Your Weekly Rarity Paycheck</title>
+<meta name="description" content="Hold an Arcvex Big Pet and earn Silver every week, weighted by your rarity. The rarer your pet, the fatter the drop. Check any pet's rank below.">
+<meta property="og:title" content="Arcvex Silver">
+<meta property="og:description" content="Weekly rarity-weighted rewards for Big Pet holders. The rarer you are, the more you earn.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.weserv.nl" crossorigin>
+<link rel="preconnect" href="https://xayoujiqufvlyiakyqaw.supabase.co" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF1CF; --blue:#2F6BFF; --red:#FF4438; --yellow:#FFC83D;
+    --ink:#141414; --white:#fff; --accent:#AEB6C0; --accent-deep:#5f6873;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--cream);color:var(--ink);font-family:'Fredoka',system-ui,sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+  h1,h2,h3{font-family:'Bangers',sans-serif;font-weight:400;letter-spacing:1px}
+  a{text-decoration:none;color:inherit}
+  .dots{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(var(--ink) 2px,transparent 2px);background-size:24px 24px;opacity:.05}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+
+  header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px clamp(16px,4vw,42px)}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
+  .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
+  .brand .badge{width:34px;height:34px;background:var(--yellow);border:3px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:3px 3px 0 var(--ink)}
+  nav{display:flex;gap:8px;flex-wrap:wrap}
+  .navlink{font-weight:700;font-size:.92rem;padding:8px 16px;border:3px solid var(--ink);border-radius:99px;background:var(--white);box-shadow:3px 3px 0 var(--ink);transition:.1s}
+  .navlink:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+
+  section{position:relative;z-index:2;padding:clamp(36px,6vw,64px) 0}
+  .hero{text-align:center;padding-top:clamp(24px,4vw,44px)}
+  .medal{font-size:clamp(3.4rem,10vw,5.4rem);line-height:1}
+  .hero h1{font-size:clamp(2.4rem,8vw,4.4rem);margin:8px 0 6px;color:var(--ink);text-shadow:4px 4px 0 var(--accent),7px 7px 0 var(--ink)}
+  .tagline{font-family:'Bangers';letter-spacing:1px;font-size:clamp(1.1rem,3.2vw,1.5rem);color:var(--accent-deep)}
+  .lead{font-size:clamp(1.02rem,2.4vw,1.2rem);font-weight:500;max-width:720px;margin:18px auto 0;line-height:1.5}
+  .seclabel{font-family:'Fredoka';font-weight:800;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-deep);margin-bottom:8px}
+  h2.big{font-size:clamp(1.7rem,5.4vw,2.7rem);line-height:.98;margin-bottom:12px;text-shadow:3px 3px 0 var(--accent),5px 5px 0 var(--ink)}
+
+  .stats{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:680px){.stats{grid-template-columns:repeat(3,1fr)}}
+  .stat{background:var(--white);border:4px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:20px;text-align:center}
+  .stat .big{font-family:'Bangers';font-size:clamp(1.7rem,5vw,2.4rem);color:var(--accent-deep);line-height:1}
+  .stat .lbl{font-weight:700;font-size:.86rem;margin-top:4px}
+  .stat .sub{font-weight:500;font-size:.78rem;opacity:.75;margin-top:2px}
+
+  .panel{background:var(--white);border:4px solid var(--ink);border-radius:18px;box-shadow:7px 7px 0 var(--ink);padding:clamp(20px,3vw,30px)}
+  .panel p{font-weight:500;line-height:1.55;max-width:760px}.panel p+p{margin-top:12px}.panel b{color:var(--accent-deep)}
+
+  /* rank checker */
+  .checker{background:#1a1c20;color:var(--cream);border:5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:clamp(22px,3.5vw,32px);text-align:center}
+  .checker h3{font-size:1.6rem;color:var(--yellow)}
+  .checker p.k{font-weight:500;opacity:.85;margin:4px 0 16px}
+  .lookup-box{display:inline-flex;align-items:stretch;background:var(--white);border:4px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 #000;overflow:hidden;max-width:100%}
+  .lookup-box input{border:0;outline:0;font-family:'Fredoka';font-weight:600;font-size:1.05rem;padding:13px 18px;width:min(60vw,280px);color:var(--ink)}
+  .lookup-box button{font-family:'Bangers';letter-spacing:1.5px;font-size:1.2rem;color:#fff;background:var(--blue);border:0;border-left:4px solid var(--ink);padding:0 24px;cursor:pointer}
+  .lookup-box button:hover{background:#1d54e0}
+  .res{margin-top:18px;display:none}
+  .res.show{display:block}
+  .res .card{display:inline-flex;gap:16px;align-items:center;text-align:left;background:var(--white);color:var(--ink);border:4px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 #000;padding:14px;max-width:100%;flex-wrap:wrap;justify-content:center}
+  .res img{width:104px;height:104px;border-radius:12px;border:3px solid var(--ink);object-fit:cover;background:#1c1c1c}
+  .res .name{font-family:'Bangers';font-size:1.3rem;letter-spacing:.5px}
+  .res .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .res .pill{font-family:'Bangers';letter-spacing:.5px;font-size:.95rem;background:var(--yellow);border:3px solid var(--ink);border-radius:9px;padding:2px 10px;box-shadow:2px 2px 0 var(--ink)}
+  .res .pill.top{background:var(--blue);color:#fff}
+  .res a.view{display:inline-block;margin-top:8px;font-weight:700;color:var(--blue)}
+  .errmsg{color:var(--yellow);font-weight:600;margin-top:14px;min-height:20px}
+
+  /* leaderboard */
+  .lb{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:8px}
+  @media(min-width:620px){.lb{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:900px){.lb{grid-template-columns:repeat(4,1fr)}}
+  .lcard{background:var(--white);border:4px solid var(--ink);border-radius:16px;overflow:hidden;box-shadow:5px 5px 0 var(--ink);transition:.1s;display:block}
+  .lcard:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--ink)}
+  .lcard .ib{position:relative;aspect-ratio:1;background:#1c1c1c}
+  .lcard img{width:100%;height:100%;object-fit:cover;display:block}
+  .lcard .rk{position:absolute;top:8px;left:8px;font-family:'Bangers';font-size:.86rem;background:var(--yellow);border:2.5px solid var(--ink);border-radius:8px;padding:1px 8px;box-shadow:2px 2px 0 var(--ink)}
+  .lcard .crown{position:absolute;top:8px;right:8px;font-size:1.1rem}
+  .lcard .m{padding:9px 11px 11px}
+  .lcard .nm{font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lcard .sc{font-size:.76rem;font-weight:600;opacity:.7;margin-top:2px}
+  .lbmsg{text-align:center;font-weight:700;opacity:.7;padding:14px}
+
+  .tokenlinks{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.tokenlinks{grid-template-columns:repeat(3,1fr)}}
+  .tl{display:flex;align-items:center;gap:12px;background:var(--white);border:4px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:14px 16px;transition:.1s;font-weight:700}
+  .tl:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+  .tl .m{font-size:1.6rem}.tl.cur{background:var(--accent);color:var(--ink);border-color:var(--ink)}
+  .tl small{display:block;font-weight:500;opacity:.8;font-size:.76rem}
+
+  footer{position:relative;z-index:2;background:var(--ink);color:var(--cream);text-align:center;padding:26px 16px;font-weight:500;font-size:.8rem;line-height:1.5;border-top:5px solid #000}
+  .disclaimer{max-width:760px;margin:0 auto;opacity:.85}
+</style>
+</head>
+<body>
+<div class="dots"></div>
+
+<header>
+  <a class="brand" href="/"><span class="badge">🐾</span><span><span class="a">ARCVEX</span> <span class="l">BIG PETS</span></span></a>
+  <nav>
+    <a class="navlink" href="/">Home</a>
+    <a class="navlink" href="/#explore">Explore</a>
+    <a class="navlink" href="/how-it-works">How It Works</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="medal">🥈</div>
+    <h1>ARCVEX SILVER</h1>
+    <div class="tagline">Your weekly rarity paycheck</div>
+    <p class="lead">Hold a Big Pet and earn Silver every week — dropped straight to your wallet, weighted by your rarity. The rarer your pet, the fatter the drop. This is the reason you grind to climb the board.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><div class="big">589K</div><div class="lbl">Minted weekly</div><div class="sub">589,000 Silver every week</div></div>
+      <div class="stat"><div class="big">104 wks</div><div class="lbl">Emission window</div><div class="sub">~2 years of weekly drops</div></div>
+      <div class="stat"><div class="big">45×</div><div class="lbl">Top vs floor</div><div class="sub">rarest pets earn the most</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">Why rarity matters</div>
+    <h2 class="big">Your rank decides your paycheck.</h2>
+    <div class="panel">
+      <p>Every week, all 3,333 pets are ranked by their <b>current</b> traits — not how they minted. Your weekly Silver drop is weighted by that rank: the rarer you sit, the bigger your slice. Top pets pull up to <b>45× what the floor earns</b>.</p>
+      <p>Rarity here is <b>live and relative</b>. Snapshot is taken Monday, Silver pays out Tuesday — then the board resets and the race starts again. Chase a rare trait and the crowd chases it too, until it's common and a different trait becomes the crown. Climb, hold your spot, and keep earning.</p>
+      <p>You don't have to play to earn — just holding pays Silver by rarity. But spinning, swapping and animating your pet to climb the ranks is how you turn a floor paycheck into a top one.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">Rarity viewer</div>
+    <h2 class="big">Check any pet's rank.</h2>
+    <div class="checker">
+      <h3>🔎 Rank checker</h3>
+      <p class="k">Type a pet number (1–3333) to see its rarity rank, score and percentile.</p>
+      <div class="lookup-box">
+        <input id="numInput" type="number" inputmode="numeric" min="1" max="3333" placeholder="Enter a pet number" aria-label="Pet number">
+        <button id="goBtn">CHECK</button>
+      </div>
+      <div class="errmsg" id="errmsg"></div>
+      <div class="res" id="res"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">The current board</div>
+    <h2 class="big">Top 24 rarest right now 👑</h2>
+    <div class="lb" id="leaderboard"></div>
+    <div class="lbmsg" id="lbmsg">Loading the board…</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">The other tokens</div>
+    <h2 class="big">One economy, three tokens.</h2>
+    <div class="tokenlinks">
+      <a class="tl" href="/bronze"><span class="m">🥉</span><span>Bronze<small>The key to the mint →</small></span></a>
+      <span class="tl cur"><span class="m">🥈</span><span>Silver<small>You're here</small></span></span>
+      <a class="tl" href="/gold"><span class="m">🥇</span><span>Gold<small>Real XRP rewards →</small></span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="disclaimer">Arcvex Silver is a utility reward tied to holding and platform activity — not an investment product. Emissions and weightings can change with the ecosystem and are not guaranteed. Do your own research.</p>
+  <p style="margin-top:10px;opacity:.7">© 2026 Arcvex · Mutable NFTs on the XRP Ledger</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+  const SUPABASE_URL = "https://xayoujiqufvlyiakyqaw.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhheW91amlxdWZ2bHlpYWt5cWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMzY3NjAsImV4cCI6MjA3MzcxMjc2MH0.Y7Ywc7L3P8OXpbnv68FM8aIBVn0Ha2mTLWQcwr_O9no";
+  const TABLE = "arcvex_public";
+  const COLLECTION_MAX = 3333;
+  const COLS = "nft_number,token_name,animal,rarity_rank,rarity_score,media_url,media_type,is_animated";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const $ = s => document.querySelector(s);
+  const fmt = n => (n==null?"–":Number(n).toLocaleString("en-US"));
+  const isVideo = p => p.is_animated === true || /mp4|webm|video|gif/i.test(p.media_type||"");
+  function thumb(url,w){ if(!url) return ""; return `https://images.weserv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//,""))}&w=${w}&q=74&output=webp`; }
+  function topPct(rank){ if(rank==null) return null; const p=(rank/COLLECTION_MAX)*100; return p<1?p.toFixed(2):Math.ceil(p); }
+
+  /* leaderboard */
+  (async function loadBoard(){
+    const board = $("#leaderboard"), msg = $("#lbmsg");
+    const { data, error } = await sb.from(TABLE).select(COLS).order("rarity_rank",{ascending:true}).limit(24);
+    if(error || !data || !data.length){ msg.textContent = "Couldn't load the board — please refresh."; return; }
+    board.innerHTML = data.map((p,i)=>{
+      const media = isVideo(p) ? `<video src="${p.media_url}" muted autoplay loop playsinline></video>`
+                               : `<img loading="lazy" src="${thumb(p.media_url,360)}" alt="${p.token_name||('Pet #'+p.nft_number)}">`;
+      const crown = i<3 ? `<span class="crown">${["👑","🥈","🥉"][i]}</span>` : "";
+      return `<a class="lcard" href="/#pet/${p.nft_number}">
+        <div class="ib">${media}<span class="rk">#${fmt(p.rarity_rank)}</span>${crown}</div>
+        <div class="m"><div class="nm">${p.token_name||("Pet #"+p.nft_number)}</div>
+        <div class="sc">Score ${p.rarity_score!=null?Number(p.rarity_score).toFixed(2):"–"}</div></div></a>`;
+    }).join("");
+    msg.textContent = "";
+  })();
+
+  /* rank checker */
+  const err = $("#errmsg"), res = $("#res");
+  async function check(){
+    err.textContent=""; res.classList.remove("show"); res.innerHTML="";
+    const raw = $("#numInput").value.trim();
+    if(raw===""){ err.textContent="Type a pet number first."; return; }
+    const n = Number(raw);
+    if(!Number.isInteger(n)||n<1||n>COLLECTION_MAX){ err.textContent=`Enter a whole number between 1 and ${fmt(COLLECTION_MAX)}.`; return; }
+    err.textContent="Looking up…";
+    const { data, error } = await sb.from(TABLE).select(COLS).eq("nft_number",n).maybeSingle();
+    if(error){ err.textContent="Something went wrong — try again."; return; }
+    if(!data){ err.textContent=`Pet #${fmt(n)} hasn't been revealed yet. 🔒`; return; }
+    err.textContent="";
+    const pct = topPct(data.rarity_rank);
+    const media = isVideo(data) ? `<video src="${data.media_url}" muted autoplay loop playsinline></video>`
+                                : `<img src="${thumb(data.media_url,260)}" alt="">`;
+    res.innerHTML = `<div class="card">${media}
+      <div><div class="name">${data.token_name||("Pet #"+n)}</div>
+      <div class="pills">
+        <span class="pill">Rank #${fmt(data.rarity_rank)} / ${fmt(COLLECTION_MAX)}</span>
+        ${pct!=null?`<span class="pill top">Top ${pct}%</span>`:""}
+        <span class="pill">Score ${data.rarity_score!=null?Number(data.rarity_score).toFixed(2):"–"}</span>
+      </div>
+      <a class="view" href="/#pet/${n}">View full traits on the explorer →</a></div></div>`;
+    res.classList.add("show");
+  }
+  $("#goBtn").addEventListener("click", check);
+  $("#numInput").addEventListener("keydown", e=>{ if(e.key==="Enter") check(); });
+})();
+</script>
+</body>
+</html>
