@@ -25,6 +25,16 @@
   .dots{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(var(--ink) 2px,transparent 2px);background-size:24px 24px;opacity:.05}
   .wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
 
+  /* diagonal pets field (live top-150 rarest) — whole sheet drifts at a true 45° */
+  .bgwrap{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .diag{position:absolute;top:0;left:0;width:200%;display:grid;gap:8px;animation:drift 75s linear infinite;will-change:transform}
+  @keyframes drift{from{transform:translate(0,0)}to{transform:translate(-50%,-50%)}}
+  .dlion{aspect-ratio:1;border:3px solid var(--ink);border-radius:13px;overflow:hidden;background:#1c1c1c;box-shadow:4px 4px 0 rgba(20,20,20,.18)}
+  .dlion img{width:100%;height:100%;object-fit:cover;display:block}
+  @media(prefers-reduced-motion:reduce){.diag{animation:none}}
+  .herocard{background:var(--white);border:5px solid var(--ink);border-radius:24px;box-shadow:10px 10px 0 var(--ink);
+    padding:clamp(22px,3.5vw,36px) clamp(20px,4vw,44px);max-width:680px;margin:0 auto}
+
   header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px clamp(16px,4vw,42px)}
   .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
   .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
@@ -99,6 +109,7 @@
 </head>
 <body>
 <div class="dots"></div>
+<div class="bgwrap"><div class="diag" id="diag"></div></div>
 
 <header>
   <a class="brand" href="/"><span class="badge">🐾</span><span><span class="a">ARCVEX</span> <span class="l">BIG PETS</span></span></a>
@@ -111,10 +122,12 @@
 
 <section class="hero">
   <div class="wrap">
-    <div class="medal">🥈</div>
-    <h1>ARCVEX SILVER</h1>
-    <div class="tagline">Your weekly rarity paycheck</div>
-    <p class="lead">Hold a Big Pet and earn Silver every week — dropped straight to your wallet, weighted by your rarity. The rarer your pet, the fatter the drop. This is the reason you grind to climb the board.</p>
+    <div class="herocard">
+      <div class="medal">🥈</div>
+      <h1>ARCVEX SILVER</h1>
+      <div class="tagline">Your weekly rarity paycheck</div>
+      <p class="lead">Hold a Big Pet and earn Silver every week — dropped straight to your wallet, weighted by your rarity. The rarer your pet, the fatter the drop. This is the reason you grind to climb the board.</p>
+    </div>
   </div>
 </section>
 
@@ -215,6 +228,27 @@
         <div class="sc">Score ${p.rarity_score!=null?Number(p.rarity_score).toFixed(2):"–"}</div></div></a>`;
     }).join("");
     msg.textContent = "";
+  })();
+
+  /* diagonal pets field background (live top-150 rarest, 45° seamless drift) */
+  (async function buildDiagonal(){
+    const diag = document.getElementById("diag"); if(!diag) return;
+    const { data, error } = await sb.from(TABLE).select("media_url,is_animated,media_type").order("rarity_rank",{ascending:true}).limit(150);
+    if(error || !data || !data.length) return;
+    let pool = data.filter(p => !isVideo(p)).map(p => p.media_url);
+    if(!pool.length) pool = data.map(p => p.media_url);
+    const Q = 13, full = Q * 2;
+    diag.style.gridTemplateColumns = `repeat(${full}, 1fr)`;
+    const frag = document.createDocumentFragment();
+    for(let R=0; R<full; R++){
+      for(let C=0; C<full; C++){
+        const u = pool[((R % Q) * Q + (C % Q)) % pool.length];
+        const d = document.createElement("div"); d.className = "dlion";
+        const img = document.createElement("img"); img.loading = "lazy"; img.src = thumb(u,300); img.alt = "";
+        d.appendChild(img); frag.appendChild(d);
+      }
+    }
+    diag.appendChild(frag);
   })();
 
   /* rank checker */
