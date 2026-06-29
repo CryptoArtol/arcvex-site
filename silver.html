@@ -79,6 +79,12 @@
   .res .pill{font-family:'Bangers';letter-spacing:.5px;font-size:.95rem;background:var(--yellow);border:3px solid var(--ink);border-radius:9px;padding:2px 10px;box-shadow:2px 2px 0 var(--ink)}
   .res .pill.top{background:var(--blue);color:#fff}
   .res a.view{display:inline-block;margin-top:8px;font-weight:700;color:var(--blue)}
+  .res .silver-earn{margin-top:10px;background:var(--cream);border:3px solid var(--ink);border-radius:12px;box-shadow:2px 2px 0 var(--ink);padding:8px 12px;font-weight:700;color:var(--ink)}
+  .res .silver-earn .se-big{font-family:'Bangers';font-size:1.35rem;letter-spacing:.5px;color:var(--accent-deep)}
+  .res .silver-earn .se-sub{display:block;font-weight:600;font-size:.74rem;opacity:.78;margin-top:4px}
+  .res .silver-earn .se-floor{display:inline-block;margin-left:8px;font-family:'Bangers';letter-spacing:.5px;
+    background:var(--blue);color:#fff;border:2px solid var(--ink);border-radius:8px;padding:1px 9px;box-shadow:2px 2px 0 var(--ink);vertical-align:middle}
+  .checker .cfoot{font-size:.74rem;opacity:.72;margin:14px auto 0;font-weight:500;max-width:520px}
   .errmsg{color:var(--yellow);font-weight:600;margin-top:14px;min-height:20px}
 
   /* leaderboard */
@@ -157,16 +163,17 @@
 <section>
   <div class="wrap">
     <div class="seclabel">Rarity viewer</div>
-    <h2 class="big">Check any pet's rank.</h2>
+    <h2 class="big">What's your pet worth?</h2>
     <div class="checker">
-      <h3>🔎 Rank checker</h3>
-      <p class="k">Type a pet number (1–3333) to see its rarity rank, score and percentile.</p>
+      <h3>🔎 Rank &amp; Silver lookup</h3>
+      <p class="k">Type any Big Pet number (1–3333) to see its live rank and exactly how much Silver it earns every week. Rarer pet = bigger drop. #1 earns 3,333× the floor.</p>
       <div class="lookup-box">
         <input id="numInput" type="number" inputmode="numeric" min="1" max="3333" placeholder="Enter a pet number" aria-label="Pet number">
         <button id="goBtn">CHECK</button>
       </div>
       <div class="errmsg" id="errmsg"></div>
       <div class="res" id="res"></div>
+      <p class="cfoot">Silver is earned by rank at each weekly snapshot. Ranks update every Monday — evolve your pet to climb. Figures are estimates based on the current rank and assume it's held; not an investment product.</p>
     </div>
   </div>
 </section>
@@ -213,6 +220,14 @@
   const isVideo = p => p.is_animated === true || /mp4|webm|video|gif/i.test(p.media_type||"");
   function thumb(url,w){ if(!url) return ""; return `https://images.weserv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//,""))}&w=${w}&q=74&output=webp`; }
   function topPct(rank){ if(rank==null) return null; const p=(rank/COLLECTION_MAX)*100; return p<1?p.toFixed(2):Math.ceil(p); }
+  // Silver by EXACT rank — harmonic curve (share ∝ 1/rank), computed, never hardcoded.
+  // pool 589,000 · 104 weekly drops · N 3,333 · H₃₃₃₃ = 8.688994
+  function silverByRank(rank){
+    if(rank==null || rank < 1) return null;
+    const weekly = 651.7972 / rank;   // 589000 / 104 / H
+    const total  = 67786.91 / rank;   // 589000 / H
+    return { weekly, total, gold: total/400, floorX: COLLECTION_MAX / rank };
+  }
 
   /* leaderboard */
   (async function loadBoard(){
@@ -268,6 +283,7 @@
     const pct = topPct(data.rarity_rank);
     const media = isVideo(data) ? `<video src="${data.media_url}" muted autoplay loop playsinline></video>`
                                 : `<img src="${thumb(data.media_url,260)}" alt="">`;
+    const sv = silverByRank(data.rarity_rank);
     res.innerHTML = `<div class="card">${media}
       <div><div class="name">${data.token_name||("Pet #"+n)}</div>
       <div class="pills">
@@ -275,6 +291,11 @@
         ${pct!=null?`<span class="pill top">Top ${pct}%</span>`:""}
         <span class="pill">Score ${data.rarity_score!=null?Number(data.rarity_score).toFixed(2):"–"}</span>
       </div>
+      ${sv?`<div class="silver-earn">
+        <span class="se-big">≈ ${sv.weekly.toFixed(2)} 🥈</span> Silver / week
+        <span class="se-floor">${Math.round(sv.floorX)}× the floor</span>
+        <span class="se-sub">≈ ${fmt(Math.round(sv.total))} Silver over 2 years · ≈ ${sv.gold.toFixed(2)} Gold</span>
+      </div>`:""}
       <a class="view" href="/#pet/${n}">View full traits on the explorer →</a></div></div>`;
     res.classList.add("show");
   }
