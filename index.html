@@ -96,6 +96,32 @@
   .scrolldown .arr{animation:bob 1.3s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 
+  /* ---------- how to buy ---------- */
+  .buy{position:relative;z-index:2;background:var(--cream);text-align:center;
+    padding:clamp(42px,7vw,76px) 0 clamp(30px,5vw,52px)}
+  .buy h2{font-size:clamp(1.8rem,6vw,3rem);line-height:.95;margin:12px 0 6px;
+    text-shadow:3px 3px 0 var(--yellow),5px 5px 0 var(--ink)}
+  .buy .sub{font-weight:600;max-width:640px;margin:0 auto 30px;opacity:.85}
+  .buy .sub b{color:var(--blue)}
+  .buycards{display:grid;grid-template-columns:1fr;gap:20px;text-align:left}
+  @media(min-width:800px){.buycards{grid-template-columns:repeat(3,1fr)}}
+  .bcard{position:relative;background:var(--white);border:4px solid var(--ink);border-radius:18px;
+    box-shadow:7px 7px 0 var(--ink);padding:26px 20px 20px}
+  .bcard .num{position:absolute;top:-17px;left:18px;width:38px;height:38px;border-radius:50%;
+    background:var(--blue);color:#fff;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);
+    display:flex;align-items:center;justify-content:center;font-family:'Bangers';font-size:1.3rem}
+  .bcard .ic{font-size:1.8rem;line-height:1}
+  .bcard h3{font-size:1.35rem;margin:8px 0 4px}
+  .bcard .price{display:inline-block;font-family:'Fredoka';font-weight:800;font-size:.8rem;letter-spacing:.4px;
+    background:var(--yellow);border:3px solid var(--ink);border-radius:8px;padding:2px 10px;box-shadow:2px 2px 0 var(--ink);margin-bottom:10px}
+  .bcard p{font-weight:500;font-size:.96rem;line-height:1.45}
+  .bcard.best{border-color:var(--blue);box-shadow:7px 7px 0 var(--blue)}
+  .bcard .besttag{display:inline-block;font-weight:800;font-size:.7rem;text-transform:uppercase;letter-spacing:.6px;
+    color:#fff;background:var(--blue);border:2px solid var(--ink);border-radius:7px;padding:2px 8px;margin-bottom:8px}
+  .buy .learn{display:inline-block;margin-top:26px;font-weight:700;font-size:.95rem;padding:10px 20px;
+    border:3px solid var(--ink);border-radius:99px;background:var(--white);box-shadow:4px 4px 0 var(--ink);transition:.1s}
+  .buy .learn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+
   /* ---------- explorer (custom dark comic background) ---------- */
   .explore{position:relative;z-index:2;
     background-color:#15151f;
@@ -253,6 +279,40 @@
     <p class="note">Pets that <b>evolve</b> after you mint them. Built on XRPL.</p>
     <br>
     <a class="scrolldown" href="#explore">Browse &amp; search the collection <span class="arr">↓</span></a>
+  </div>
+</section>
+
+<!-- ============ HOW TO BUY ============ -->
+<section class="buy" id="buy">
+  <div class="wrap">
+    <span class="kicker">How to get one</span>
+    <h2>Three ways to get your pet</h2>
+    <p class="sub">Pick the path that suits you. <b>Minting opens soon</b> — here's how it'll work.</p>
+    <div class="buycards">
+      <div class="bcard">
+        <span class="num">1</span>
+        <div class="ic">🛒</div>
+        <h3>Pick the exact one</h3>
+        <span class="price">On XRP Cafe · in XRP</span>
+        <p>Browse the secondary market on XRP Cafe and buy the precise pet you want. Priced in XRP — the rare ones list well above the 7.5 XRP random price. You see exactly what you're getting.</p>
+      </div>
+      <div class="bcard">
+        <span class="num">2</span>
+        <div class="ic">🎲</div>
+        <h3>Random mint</h3>
+        <span class="price">7.5 XRP</span>
+        <p>Pay 7.5 XRP and pull a random pet from all 3,333. Pure gacha — you might land a top-tier rare for the flat mint price. The number stays hidden until you pay.</p>
+      </div>
+      <div class="bcard best">
+        <span class="num">3</span>
+        <span class="besttag">Best value · 20% off</span>
+        <div class="ic">🥉</div>
+        <h3>Pay with Arcvex Bronze</h3>
+        <span class="price">−20% vs XRP</span>
+        <p>Swap XRP for Arcvex Bronze, then mint with Bronze and take 20% off the random price. The cheapest way in — and the first Bronze is the cheapest Bronze.</p>
+      </div>
+    </div>
+    <a class="learn" href="/how-it-works">See how the rewards work →</a>
   </div>
 </section>
 
