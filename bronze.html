@@ -23,6 +23,21 @@
   .dots{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(var(--ink) 2px,transparent 2px);background-size:24px 24px;opacity:.05}
   .wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
 
+  /* diagonal scrolling pets background (live top-100 rarest) */
+  .bgwrap{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .diag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-22deg);
+    display:flex;flex-direction:column;gap:clamp(10px,1.6vmin,18px);width:220vmax}
+  .drow{display:flex;gap:clamp(10px,1.6vmin,18px);width:max-content;will-change:transform}
+  .drow.a{animation:dscrollL 80s linear infinite}
+  .drow.b{animation:dscrollR 95s linear infinite}
+  @keyframes dscrollL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes dscrollR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+  .dlion{flex:0 0 auto;width:clamp(92px,13vmin,150px);aspect-ratio:1;border:4px solid var(--ink);
+    border-radius:14px;overflow:hidden;background:#1c1c1c;box-shadow:5px 5px 0 rgba(20,20,20,.25)}
+  .dlion img{width:100%;height:100%;object-fit:cover;display:block}
+  .veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:rgba(255,241,207,.66)}
+  @media(prefers-reduced-motion:reduce){.drow.a,.drow.b{animation:none}}
+
   header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px clamp(16px,4vw,42px)}
   .brand{display:flex;align-items:center;gap:10px;font-family:'Bangers';font-size:1.6rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--white)}
   .brand .a{color:var(--blue)} .brand .l{color:var(--red)}
@@ -85,6 +100,8 @@
 </head>
 <body>
 <div class="dots"></div>
+<div class="bgwrap"><div class="diag" id="diag"></div></div>
+<div class="veil"></div>
 
 <header>
   <a class="brand" href="/"><span class="badge">🐾</span><span><span class="a">ARCVEX</span> <span class="l">BIG PETS</span></span></a>
@@ -168,6 +185,45 @@
   <p class="disclaimer">Arcvex Bronze is a utility token used to mint NFTs — not an investment product. The buyback and discount are platform mechanics, not a promise of returns. Do your own research.</p>
   <p style="margin-top:10px;opacity:.7">© 2026 Arcvex · Mutable NFTs on the XRP Ledger</p>
 </footer>
+
+<!-- diagonal pets background: live top-100 rarest from Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+  const SUPABASE_URL = "https://xayoujiqufvlyiakyqaw.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhheW91amlxdWZ2bHlpYWt5cWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMzY3NjAsImV4cCI6MjA3MzcxMjc2MH0.Y7Ywc7L3P8OXpbnv68FM8aIBVn0Ha2mTLWQcwr_O9no";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const thumb = u => u ? `https://images.weserv.nl/?url=${encodeURIComponent(u.replace(/^https?:\/\//,""))}&w=300&q=70&output=webp` : "";
+
+  (async function buildDiagonal(){
+    const diag = document.getElementById("diag");
+    if(!diag) return;
+    const { data, error } = await sb.from("arcvex_public")
+      .select("media_url,is_animated,media_type")
+      .order("rarity_rank",{ascending:true}).limit(100);
+    if(error || !data || !data.length) return;
+    // prefer still images for a clean marquee
+    let pool = data.filter(p => !(p.is_animated || /mp4|webm|video/i.test(p.media_type||""))).map(p => p.media_url);
+    if(!pool.length) pool = data.map(p => p.media_url);
+
+    const rows = 12, per = Math.max(8, Math.ceil(pool.length / rows) + 4);
+    let idx = 0;
+    for(let r=0;r<rows;r++){
+      const row = document.createElement("div");
+      row.className = "drow " + (r % 2 ? "b" : "a");
+      const set = [];
+      for(let i=0;i<per;i++){ set.push(pool[idx % pool.length]); idx++; }
+      [...set, ...set].forEach(u=>{
+        const d = document.createElement("div"); d.className = "dlion";
+        const img = document.createElement("img"); img.loading = "lazy"; img.src = thumb(u); img.alt = "";
+        d.appendChild(img); row.appendChild(d);
+      });
+      diag.appendChild(row);
+    }
+  })();
+})();
+</script>
 
 </body>
 </html>
