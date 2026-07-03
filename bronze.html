@@ -92,6 +92,26 @@
 
   footer{position:relative;z-index:2;background:var(--ink);color:var(--cream);text-align:center;padding:26px 16px;font-weight:500;font-size:.8rem;line-height:1.5;border-top:5px solid #000}
   .disclaimer{max-width:760px;margin:0 auto;opacity:.85}
+
+  /* trustline panel */
+  .tlsec{position:relative;z-index:2;padding:clamp(36px,6vw,64px) 0}
+  .tl-lead{font-weight:500;line-height:1.5;max-width:720px;margin:0}
+  .tl-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:22px}
+  @media(min-width:680px){.tl-grid{grid-template-columns:repeat(3,1fr)}}
+  .tl-btn{display:flex;flex-direction:column;gap:3px;align-items:flex-start;background:var(--white);color:var(--ink);
+    border:4px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:16px 18px;transition:.1s;
+    font-family:'Bangers';letter-spacing:.5px;font-size:1.2rem}
+  .tl-btn:hover{transform:translate(-2px,-2px);box-shadow:9px 9px 0 var(--ink)}
+  .tl-btn .em{font-size:1.6rem;line-height:1}
+  .tl-btn small{font-family:'Fredoka';font-weight:600;font-size:.72rem;opacity:.72;letter-spacing:0}
+  .tl-btn.b{border-top:9px solid #CD7F32}
+  .tl-btn.s{border-top:9px solid #AEB6C0}
+  .tl-btn.g{border-top:9px solid #FFC83D}
+  .tl-verify{margin-top:20px;background:var(--white);border:3px dashed var(--ink);border-radius:14px;padding:14px 18px;font-weight:600;line-height:1.55;font-size:.9rem}
+  .tl-verify code{display:inline-block;margin-top:6px;font-family:ui-monospace,Menlo,monospace;font-weight:700;word-break:break-all;background:var(--cream);border:2px solid var(--ink);border-radius:7px;padding:3px 8px;font-size:.84rem}
+  .tl-codes{margin-top:12px;display:grid;gap:6px;font-size:.78rem;font-weight:600}
+  .tl-codes code.hex{margin-top:0;font-size:.7rem;padding:1px 6px}
+  .tl-warn{margin-top:10px;font-weight:700;font-size:.82rem;color:var(--red)}
 </style>
 </head>
 <body>
@@ -152,16 +172,25 @@
   </div>
 </section>
 
-<section>
+<section class="tlsec">
   <div class="wrap">
-    <div class="trust">
-      <h3>🔗 Set the Bronze trustline</h3>
-      <p style="font-weight:500;line-height:1.5;opacity:.9">Before you can hold Bronze, your XRPL wallet needs a trustline to the token. The official details will go live here at launch.</p>
-      <div class="row"><span class="k">Issuer address</span><span class="v ph">[ Issuer address — coming at launch ]</span></div>
-      <div class="row"><span class="k">Currency code</span><span class="v ph">[ BRONZE — coming at launch ]</span></div>
-      <div class="row"><span class="k">Network</span><span class="v">XRPL Mainnet</span></div>
-      <span class="tbtn" role="button" aria-disabled="true">Set Trustline in Xaman</span>
-      <p class="smallnote">⚠️ Only ever trust the official issuer published on this page. Never set a trustline from a link someone DMs you.</p>
+    <div class="seclabel">Step 1 — add to your wallet</div>
+    <h2 class="big">Add the Arcvex token trustlines</h2>
+    <p class="tl-lead">Before your XRPL wallet can hold a token, it needs a trustline. Tap a button to set it in <b>Xaman</b> — on mobile it opens the app, on desktop it shows a QR to scan. You sign it yourself; the issuer never touches your wallet. Bronze is the one you need to mint.</p>
+    <div class="tl-grid">
+      <a class="tl-btn b" href="https://mint.arcvex.io/trustline/bronze"><span class="em">🥉</span>Add ARCVEXBRONZE<small>Limit 589,000,000 · the mint currency</small></a>
+      <a class="tl-btn s" href="https://mint.arcvex.io/trustline/silver"><span class="em">🥈</span>Add ARCVEXSILVER<small>Limit 589,000 · rarity rewards</small></a>
+      <a class="tl-btn g" href="https://mint.arcvex.io/trustline/gold"><span class="em">🥇</span>Add ARCVEXGOLD<small>Limit 5,890 · XRP rewards</small></a>
+    </div>
+    <div class="tl-verify">
+      <div><b>Verified issuer</b> (arcvex.io) — confirm this address before you sign:</div>
+      <code>rExb9UjddAXUi8ajqNTmfzhFoHUCoHPzc8</code>
+      <div class="tl-codes">
+        <div>ARCVEXBRONZE · <code class="hex">41524356455842524F4E5A450000000000000000</code></div>
+        <div>ARCVEXSILVER · <code class="hex">41524356455853494C5645520000000000000000</code></div>
+        <div>ARCVEXGOLD · <code class="hex">415243564558474F4C4400000000000000000000</code></div>
+      </div>
+      <div class="tl-warn">⚠️ Only ever trust this issuer. Never set a trustline from a link someone DMs you.</div>
     </div>
   </div>
 </section>

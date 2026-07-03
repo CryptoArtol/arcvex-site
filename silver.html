@@ -111,6 +111,26 @@
 
   footer{position:relative;z-index:2;background:var(--ink);color:var(--cream);text-align:center;padding:26px 16px;font-weight:500;font-size:.8rem;line-height:1.5;border-top:5px solid #000}
   .disclaimer{max-width:760px;margin:0 auto;opacity:.85}
+
+  /* trustline panel */
+  .tlsec{position:relative;z-index:2;padding:clamp(36px,6vw,64px) 0}
+  .tl-lead{font-weight:500;line-height:1.5;max-width:720px;margin:0}
+  .tl-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:22px}
+  @media(min-width:680px){.tl-grid{grid-template-columns:repeat(3,1fr)}}
+  .tl-btn{display:flex;flex-direction:column;gap:3px;align-items:flex-start;background:var(--white);color:var(--ink);
+    border:4px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:16px 18px;transition:.1s;
+    font-family:'Bangers';letter-spacing:.5px;font-size:1.2rem}
+  .tl-btn:hover{transform:translate(-2px,-2px);box-shadow:9px 9px 0 var(--ink)}
+  .tl-btn .em{font-size:1.6rem;line-height:1}
+  .tl-btn small{font-family:'Fredoka';font-weight:600;font-size:.72rem;opacity:.72;letter-spacing:0}
+  .tl-btn.b{border-top:9px solid #CD7F32}
+  .tl-btn.s{border-top:9px solid #AEB6C0}
+  .tl-btn.g{border-top:9px solid #FFC83D}
+  .tl-verify{margin-top:20px;background:var(--white);border:3px dashed var(--ink);border-radius:14px;padding:14px 18px;font-weight:600;line-height:1.55;font-size:.9rem}
+  .tl-verify code{display:inline-block;margin-top:6px;font-family:ui-monospace,Menlo,monospace;font-weight:700;word-break:break-all;background:var(--cream);border:2px solid var(--ink);border-radius:7px;padding:3px 8px;font-size:.84rem}
+  .tl-codes{margin-top:12px;display:grid;gap:6px;font-size:.78rem;font-weight:600}
+  .tl-codes code.hex{margin-top:0;font-size:.7rem;padding:1px 6px}
+  .tl-warn{margin-top:10px;font-weight:700;font-size:.82rem;color:var(--red)}
 </style>
 </head>
 <body>
@@ -142,7 +162,7 @@
     <div class="stats">
       <div class="stat"><div class="big">589K</div><div class="lbl">Max supply</div><div class="sub">hard-capped · minted once</div></div>
       <div class="stat"><div class="big">104 wks</div><div class="lbl">Drip schedule</div><div class="sub">the fixed pool, paid out over ~2 years</div></div>
-      <div class="stat"><div class="big">45×</div><div class="lbl">Top vs floor</div><div class="sub">rarest pets earn the most</div></div>
+      <div class="stat"><div class="big">3,333×</div><div class="lbl">Top vs floor</div><div class="sub">#1 earns 3,333× the floor</div></div>
     </div>
   </div>
 </section>
@@ -153,7 +173,7 @@
     <h2 class="big">Your rank decides your paycheck.</h2>
     <div class="panel">
       <p>First, the supply: Silver is <b>hard-capped at 589,000</b>. It's minted once — never printed weekly. That fixed pool is then dripped to holders across <b>104 weekly drops (~2 years)</b>, weighted by rarity.</p>
-      <p>Every week, all 3,333 pets are ranked by their <b>current</b> traits — not how they minted. Your weekly Silver payout is weighted by that rank: the rarer you sit, the bigger your slice. Top pets pull up to <b>45× what the floor earns</b>.</p>
+      <p>Every week, all 3,333 pets are ranked by their <b>current</b> traits — not how they minted. Your weekly Silver payout is weighted by that rank: the rarer you sit, the bigger your slice. Top pets pull up to <b>3,333× what the floor earns</b>.</p>
       <p>Rarity here is <b>live and relative</b>. Snapshot is taken Monday, Silver pays out Tuesday — then the board resets and the race starts again. Chase a rare trait and the crowd chases it too, until it's common and a different trait becomes the crown. Climb, hold your spot, and keep earning.</p>
       <p>You don't have to play to earn — just holding pays Silver by rarity. But spinning, swapping and animating your pet to climb the ranks is how you turn a floor paycheck into a top one.</p>
     </div>
@@ -184,6 +204,29 @@
     <h2 class="big">Top 24 rarest right now 👑</h2>
     <div class="lb" id="leaderboard"></div>
     <div class="lbmsg" id="lbmsg">Loading the board…</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="seclabel">Add to your wallet</div>
+    <h2 class="big">Add the Arcvex token trustlines</h2>
+    <p class="tl-lead">Hold Silver in your XRPL wallet by setting its trustline. Tap a button to set it in <b>Xaman</b> — mobile opens the app, desktop shows a QR. You sign it yourself; the issuer never touches your wallet.</p>
+    <div class="tl-grid">
+      <a class="tl-btn b" href="https://mint.arcvex.io/trustline/bronze"><span class="em">🥉</span>Add ARCVEXBRONZE<small>Limit 589,000,000 · the mint currency</small></a>
+      <a class="tl-btn s" href="https://mint.arcvex.io/trustline/silver"><span class="em">🥈</span>Add ARCVEXSILVER<small>Limit 589,000 · rarity rewards</small></a>
+      <a class="tl-btn g" href="https://mint.arcvex.io/trustline/gold"><span class="em">🥇</span>Add ARCVEXGOLD<small>Limit 5,890 · XRP rewards</small></a>
+    </div>
+    <div class="tl-verify">
+      <div><b>Verified issuer</b> (arcvex.io) — confirm this address before you sign:</div>
+      <code>rExb9UjddAXUi8ajqNTmfzhFoHUCoHPzc8</code>
+      <div class="tl-codes">
+        <div>ARCVEXBRONZE · <code class="hex">41524356455842524F4E5A450000000000000000</code></div>
+        <div>ARCVEXSILVER · <code class="hex">41524356455853494C5645520000000000000000</code></div>
+        <div>ARCVEXGOLD · <code class="hex">415243564558474F4C4400000000000000000000</code></div>
+      </div>
+      <div class="tl-warn">⚠️ Only ever trust this issuer. Never set a trustline from a link someone DMs you.</div>
+    </div>
   </div>
 </section>
 
@@ -220,13 +263,13 @@
   const isVideo = p => p.is_animated === true || /mp4|webm|video|gif/i.test(p.media_type||"");
   function thumb(url,w){ if(!url) return ""; return `https://images.weserv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//,""))}&w=${w}&q=74&output=webp`; }
   function topPct(rank){ if(rank==null) return null; const p=(rank/COLLECTION_MAX)*100; return p<1?p.toFixed(2):Math.ceil(p); }
-  // Silver by EXACT rank — harmonic curve (share ∝ 1/rank), computed, never hardcoded.
-  // pool 589,000 · 104 weekly drops · N 3,333 · H₃₃₃₃ = 8.688994
+  // Silver by EXACT rank — steep harmonic curve (share ∝ 1/rank). Rarest earns far more.
+  // pool 589,000 · 104 weekly drops · N 3,333 · H₃₃₃₃ = 8.688994. Computed, never hardcoded.
   function silverByRank(rank){
     if(rank==null || rank < 1) return null;
-    const weekly = 651.7972 / rank;   // 589000 / 104 / H
+    const weekly = 651.7972 / rank;   // 589000 / 104 / H  -> #1 ≈ 651.80/wk
     const total  = 67786.91 / rank;   // 589000 / H
-    return { weekly, total, gold: total/400, floorX: COLLECTION_MAX / rank };
+    return { weekly, total, gold: total / 400, floorX: COLLECTION_MAX / rank };  // #1 -> 3,333x the floor
   }
 
   /* leaderboard */
