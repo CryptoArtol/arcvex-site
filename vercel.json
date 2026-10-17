@@ -1,3 +1,7 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/how-it-works", "destination": "/", "permanent": true },
+    { "source": "/how-it-works.html", "destination": "/", "permanent": true }
+  ]
 }
